@@ -20,10 +20,12 @@ public class CommandReader {
         try (Scanner s = new Scanner(System.in)) {
             String line = s.nextLine();
             while(!line.equalsIgnoreCase("exit")) {
-                try {
-                    commandAnalyzer.analyzeAndCalc(line);
-                } catch (Exception e) {
-                    System.out.printf(e.getMessage());
+                if (!line.isEmpty()) {
+                    try {
+                        commandAnalyzer.analyze(line);
+                    } catch (Exception e) {
+                        System.out.printf(e.getMessage());
+                    }
                 }
                 line = s.nextLine();
             }
@@ -33,13 +35,18 @@ public class CommandReader {
     private void readFromFile(String fileName) {
         try (Scanner s = new Scanner(new BufferedInputStream(new FileInputStream(fileName)))) {
             int lineCount = 0;
+            String line;
+
             while(s.hasNext()) {
+                line = s.nextLine();
                 lineCount++;
-                try {
-                    commandAnalyzer.analyzeAndCalc(s.nextLine());
-                } catch (Exception e) {
-                    System.out.printf(e.getMessage() + "\nline: " + lineCount);
-                    System.exit(1);
+                if (!line.isEmpty()) {
+                    try {
+                        commandAnalyzer.analyze(line);
+                    } catch (Exception e) {
+                        System.out.printf(e.getMessage() + "\nline: " + lineCount);
+                        System.exit(1);
+                    }
                 }
             }
         } catch (IOException e) {
