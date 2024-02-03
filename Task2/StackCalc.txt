@@ -1,0 +1,10 @@
+DEFINE a 4
+DEFINE b 5
+PUSH a
+PUSH b
++
+#Сложили a и b
+PUSH 19.02
+-
+# Вычли из a+b 19.02
+PRINT
