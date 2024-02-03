@@ -13,10 +13,11 @@ public class InputParser {
         input_file_name = file_name;
     }
 
+    // Считывает строку из входного файла и разбивая по словам, добавляет в Map
     public Map<String, Integer> readString() throws FileNotFoundException {
         // Считываем байты из файла
         FileInputStream fin = new FileInputStream(input_file_name);
-        // Накладываем буфферизацию
+        // Накладываем буферизацию
         BufferedInputStream bin = new BufferedInputStream(fin);
         // И наконец-то читаем из файла
         Scanner ifs = new Scanner(bin);
@@ -35,6 +36,7 @@ public class InputParser {
         return table_size;
     }
 
+    // Распределяет массив слов в Map, параллельно ведя подсчет
     public void addToTable(String[] words) {
         for (String word : words) {
             word = word.toLowerCase();
