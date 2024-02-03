@@ -14,21 +14,23 @@ public class InputParser {
     }
 
     // Считывает строку из входного файла и разбивая по словам, добавляет в Map
-    public Map<String, Integer> readString() throws FileNotFoundException {
-        // Считываем байты из файла
-        FileInputStream fin = new FileInputStream(input_file_name);
-        // Накладываем буферизацию
-        BufferedInputStream bin = new BufferedInputStream(fin);
-        // И наконец-то читаем из файла
-        Scanner ifs = new Scanner(bin);
-
-        while (ifs.hasNext()) {
-            String y = ifs.nextLine();
-            String[] words = y.split(" ");
-            addToTable(words);
+    public Map<String, Integer> readString() {
+        try (FileInputStream fin = new FileInputStream(input_file_name)) {
+            BufferedInputStream bin = new BufferedInputStream(fin);
+            try (Scanner ifs = new Scanner(bin)){
+                while (ifs.hasNext()) {
+                    String y = ifs.nextLine();
+                    String[] words = y.split(" ");
+                    addToTable(words);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Error! File " + input_file_name + " not found!");
+            System.exit(1);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
-        ifs.close();
         return freq_table;
     }
 

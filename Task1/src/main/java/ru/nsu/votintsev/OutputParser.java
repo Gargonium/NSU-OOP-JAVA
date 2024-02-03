@@ -19,9 +19,7 @@ public class OutputParser {
     private void sortMap(Map<String, Integer> freqTable) {
         freq_table = freqTable.entrySet().stream()
                 .sorted(Comparator.comparingInt(e -> -e.getValue()))
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                         (a, b) -> { throw new AssertionError(); },
                         LinkedHashMap::new
                 ));
@@ -33,18 +31,20 @@ public class OutputParser {
     }
 
     // Создает строку и выводит ее в файл
-    public void writeLine() throws IOException {
-        FileWriter fout = new FileWriter(output_file_name);
-        fout.write("Слово, Частота, Частота(в %)\n");
-        for (String key : freq_table.keySet()) {
-            int freq = freq_table.get(key);
+    public void writeLine() {
+        try (FileWriter fout = new FileWriter(output_file_name)) {
+            fout.write("Слово, Частота, Частота(в %)\n");
+            for (String key : freq_table.keySet()) {
+                int freq = freq_table.get(key);
 
-            double procent_freq = ((double) freq /table_size) * 100;
-            String formatted_double = new DecimalFormat("#0.000").format(procent_freq);
-            formatted_double = "\"" + formatted_double + "%\"";
+                double procent_freq = ((double) freq / table_size) * 100;
+                String formatted_double = new DecimalFormat("#0.000").format(procent_freq);
+                formatted_double = "\"" + formatted_double + "%\"";
 
-            fout.append(key).append(", ").append(String.valueOf(freq)).append(", ").append(formatted_double).append("\n");
+                fout.append(key).append(", ").append(String.valueOf(freq)).append(", ").append(formatted_double).append("\n");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        fout.close();
     }
 }
