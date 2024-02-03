@@ -8,7 +8,7 @@ import static java.lang.Math.sqrt;
 
 public class Calculator {
     private final Stack<Double> stack = new Stack<>();
-    private final Map<String, Double> defs = new HashMap<>();
+    private final Map<String, Double> vars = new HashMap<>();
 
     public void pop() {
         stack.pop();
@@ -18,11 +18,12 @@ public class Calculator {
         stack.push(item);
     }
 
-    public void push(String item) {
-        if (defs.containsKey(item)) {
-            stack.push(defs.get(item));
+    public void push(String item) throws Exception {
+        if (vars.containsKey(item)) {
+            stack.push(vars.get(item));
+        } else {
+            throw new Exception("Unknown variable");
         }
-        // Need to add throw UnknownVarException
     }
 
     public void print() {
@@ -30,7 +31,7 @@ public class Calculator {
     }
 
     public void define(String variable, double value) {
-        defs.put(variable, value);
+        vars.put(variable, value);
     }
 
     public void operation(char op) {
