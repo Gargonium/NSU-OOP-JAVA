@@ -1,4 +1,39 @@
-DEFINE a 4
-PUSH a
-SQRT
+DEFINE d 4
+DEFINE r1 2
+DEFINE r2 2
+PUSH d
+# 4
+PUSH d
+# 4 4
+*
+# 16
+PUSH r1
+# 16 2
+PUSH r1
+# 16 2 2
+*
+# 16 4
+-
+# 12
+PUSH r2
+# 12 2
+PUSH r2
+# 12 2 2
+*
+# 12 4
+-
+# 8
+PUSH 2
+# 8 2
+PUSH r1
+# 8 2 2
+*
+# 8 4
+PUSH r2
+# 8 4 2
+*
+# 8 8
+/
+# 1
 PRINT
+# cosa = (d^2-r1^2-r2^2)/(2*r1*r2)
