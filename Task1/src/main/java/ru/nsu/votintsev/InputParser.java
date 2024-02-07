@@ -14,7 +14,7 @@ public class InputParser {
     }
 
     // Считывает строку из входного файла и разбивая по словам, добавляет в Map
-    public Map<String, Integer> readString() {
+    public Map<String, Integer> readString() throws Exception {
         try (FileInputStream fin = new FileInputStream(input_file_name)) {
             BufferedInputStream bin = new BufferedInputStream(fin);
             try (Scanner ifs = new Scanner(bin)){
@@ -25,8 +25,7 @@ public class InputParser {
                 }
             }
         } catch (FileNotFoundException e) {
-            System.out.println("Error! File " + input_file_name + " not found!");
-            System.exit(1);
+            throw new Exception("Error! File " + input_file_name + " not found!");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

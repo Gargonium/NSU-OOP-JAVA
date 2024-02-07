@@ -12,11 +12,15 @@ public class ParsersLinker {
     }
 
     public void txtToCsv() {
-        InputParser inp = new InputParser(inFile);
-        Map<String, Integer> freq_table = inp.readString();
-        OutputParser oup = new OutputParser(outFile, freq_table);
-        oup.setTable_size(inp.getTable_size());
-        oup.writeLine();
+        try {
+            InputParser inp = new InputParser(inFile);
+            Map<String, Integer> freq_table = inp.readString();
+            OutputParser oup = new OutputParser(outFile, freq_table);
+            oup.setTable_size(inp.getTable_size());
+            oup.writeLine();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
 }
