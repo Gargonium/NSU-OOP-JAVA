@@ -20,7 +20,7 @@ public class InputParser {
             try (Scanner ifs = new Scanner(bin)){
                 while (ifs.hasNext()) {
                     String y = ifs.nextLine();
-                    String[] words = y.split(" ");
+                    String[] words = y.split("(?U)\\W+");
                     addToTable(words);
                 }
             }
