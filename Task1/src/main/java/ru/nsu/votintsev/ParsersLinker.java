@@ -1,5 +1,6 @@
 package ru.nsu.votintsev;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class ParsersLinker {
@@ -11,16 +12,12 @@ public class ParsersLinker {
         outFile = outputFileName;
     }
 
-    public void txtToCsv() {
-        try {
-            InputParser inp = new InputParser(inFile);
-            Map<String, Integer> freq_table = inp.readString();
-            OutputParser oup = new OutputParser(outFile, freq_table);
-            oup.setTable_size(inp.getTable_size());
-            oup.writeLine();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+    public void txtToCsv() throws IOException {
+        InputParser inp = new InputParser(inFile);
+        Map<String, Integer> freqTable = inp.readString();
+        OutputParser oup = new OutputParser(outFile, freqTable);
+        oup.setTableSize(inp.getTableSize());
+        oup.writeLine();
     }
 
 }

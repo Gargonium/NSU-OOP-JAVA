@@ -7,17 +7,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class OutputParser {
-    private final String output_file_name;
-    private Map<String, Integer> freq_table;
-    private int table_size;
+    private final String outputFileName;
+    private Map<String, Integer> freqTable;
+    private int tableSize;
 
     public OutputParser(String outputFileName, Map<String, Integer> freqTable) {
-        output_file_name = outputFileName;
+        this.outputFileName = outputFileName;
         sortMap(freqTable);
     }
     // Сортирует Map по значению по убыванию
     private void sortMap(Map<String, Integer> freqTable) {
-        freq_table = freqTable.entrySet().stream()
+        this.freqTable = freqTable.entrySet().stream()
                 .sorted(Comparator.comparingInt(e -> -e.getValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                         (a, b) -> { throw new AssertionError(); },
@@ -26,25 +26,23 @@ public class OutputParser {
     }
 
 
-    public void setTable_size(int tableSize) {
-        table_size = tableSize;
+    public void setTableSize(int tableSize) {
+        this.tableSize = tableSize;
     }
 
     // Создает строку и выводит ее в файл
-    public void writeLine() {
-        try (FileWriter fout = new FileWriter(output_file_name)) {
+    public void writeLine() throws IOException {
+        try (FileWriter fout = new FileWriter(outputFileName)) {
             fout.write("Слово, Частота, Частота(в %)\n");
-            for (String key : freq_table.keySet()) {
-                int freq = freq_table.get(key);
+            for (String key : freqTable.keySet()) {
+                int freq = freqTable.get(key);
 
-                double procent_freq = ((double) freq / table_size) * 100;
-                String formatted_double = new DecimalFormat("#0.000").format(procent_freq);
-                formatted_double = "\"" + formatted_double + "%\"";
+                double procentFreq = ((double) freq / tableSize) * 100;
+                String formattedDouble = new DecimalFormat("#0.000").format(procentFreq);
+                formattedDouble = "\"" + formattedDouble + "%\"";
 
-                fout.append(key).append(", ").append(String.valueOf(freq)).append(", ").append(formatted_double).append("\n");
+                fout.append(key).append(", ").append(String.valueOf(freq)).append(", ").append(formattedDouble).append("\n");
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }
