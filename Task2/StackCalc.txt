@@ -3,5 +3,4 @@ DEFINE p23 34
 PUSH p23
 PUSH ar
 +
-PUSH er
 PRINT

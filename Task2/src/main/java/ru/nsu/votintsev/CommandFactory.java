@@ -15,6 +15,10 @@ public class CommandFactory {
         }
         Properties prop = new Properties();
         prop.load(new FileInputStream("config.ini"));
-        return (Command) Class.forName(prop.getProperty(tokens[0])).newInstance();
+        String commandName = prop.getProperty(tokens[0]);
+        if (commandName == null) {
+            throw new Exception("Unknown Command");
+        }
+        return (Command) Class.forName(commandName).newInstance();
     }
 }
