@@ -1,17 +1,21 @@
 package ru.nsu.votintsev;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 public class Context {
     private final Stack<Double> stack = new Stack<>();
-    private final HashMap<String, Double> map = new HashMap<>();
+    private final Map<String, Double> map = new HashMap<>();
 
     private String firstArg;
     private String secondArg;
 
     // Getters
-    public Double getVarFromMap(String key) {
+    public Double getVarFromMap(String key) throws Exception {
+        if (!this.isContains(key)) {
+            throw new Exception("Unknown variable");
+        }
         return map.get(key);
     }
 

@@ -7,7 +7,7 @@ public class StackCalculator {
     Context ctx = new Context();
 
     public void calculate(String input) throws Exception {
-        Command command = (Command) commandFactory.createCommand(input, ctx);
+        Command command = commandFactory.createCommand(input, ctx);
         command.execute(ctx);
     }
 }

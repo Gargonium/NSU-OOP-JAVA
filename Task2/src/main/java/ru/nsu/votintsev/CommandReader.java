@@ -39,7 +39,7 @@ public class CommandReader {
                 try {
                     stackCalculator.calculate(line);
                 } catch (Exception e) {
-                    System.out.println("line" + lineCount + ": " + e.getMessage());
+                    System.out.println("line " + lineCount + ": " + e.getMessage());
                 }
             }
         }
