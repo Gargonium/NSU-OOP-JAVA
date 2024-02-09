@@ -19,5 +19,4 @@ public class ParsersLinker {
         oup.setTableSize(inp.getTableSize());
         oup.writeLine();
     }
-
 }
