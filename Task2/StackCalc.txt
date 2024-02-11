@@ -1,8 +1,4 @@
-DEFINE ar 12
-DEFINE p23
-# 23 45 56
-+ 12 34
-PUSH p23
-PUSH ar
-+
+PUSH 4
+PUSH 4
+PUSH ret
 PRINT

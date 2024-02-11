@@ -1,5 +1,8 @@
 package ru.nsu.votintsev;
 
+import ru.nsu.votintsev.exceptions.NotEnoughValuesException;
+import ru.nsu.votintsev.exceptions.UnknownVariableException;
+
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,9 +15,9 @@ public class Context {
     private String[] arguments;
 
     // Getters
-    public Double getVarFromMap(String key) throws Exception {
+    public Double getVarFromMap(String key) throws UnknownVariableException {
         if (!this.isContains(key)) {
-            throw new Exception("Unknown variable");
+            throw new UnknownVariableException();
         }
         return map.get(key);
     }
@@ -23,14 +26,14 @@ public class Context {
         try {
             return stack.peek();
         } catch (EmptyStackException e) {
-            throw new Exception("There are not enough values on the stack to perform this operation");
+            throw new NotEnoughValuesException();
         }
     }
     public Double getItem() throws Exception{
         try {
             return stack.pop();
         } catch (EmptyStackException e) {
-            throw new Exception("There are not enough values on the stack to perform this operation");
+            throw new NotEnoughValuesException();
         }
     }
 

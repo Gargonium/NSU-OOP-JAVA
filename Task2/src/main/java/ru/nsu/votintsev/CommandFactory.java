@@ -1,6 +1,7 @@
 package ru.nsu.votintsev;
 
 import ru.nsu.votintsev.commands.Command;
+import ru.nsu.votintsev.exceptions.UnknownCommandException;
 
 import java.io.FileInputStream;
 import java.util.Properties;
@@ -11,7 +12,7 @@ public class CommandFactory {
         prop.load(new FileInputStream("config.ini"));
         String commandName = prop.getProperty(input);
         if (commandName == null) {
-            throw new Exception("Unknown Command");
+            throw new UnknownCommandException();
         }
         return (Command) Class.forName(commandName).newInstance();
     }

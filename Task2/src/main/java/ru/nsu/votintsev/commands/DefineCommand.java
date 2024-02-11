@@ -1,13 +1,16 @@
 package ru.nsu.votintsev.commands;
 
 import ru.nsu.votintsev.Context;
+import ru.nsu.votintsev.exceptions.ValueOfVariableMustBeNumericException;
+import ru.nsu.votintsev.exceptions.VariableNameMustStartWithLetterException;
+import ru.nsu.votintsev.exceptions.WrongNumberOfArgumentsException;
 
 public class DefineCommand implements Command {
 
     @Override
     public void execute(Context ctx) throws Exception {
         if (ctx.getNumberOfArgs() != 2) {
-            throw new Exception("Wrong Number of Arguments");
+            throw new WrongNumberOfArgumentsException();
         }
         String name = ctx.getFirstArg();
         double value;
@@ -15,10 +18,10 @@ public class DefineCommand implements Command {
             try {
                 value = Double.parseDouble(ctx.getSecondArg());
             } catch (NumberFormatException e) {
-                throw new Exception("Value of variable must be numeric");
+                throw new ValueOfVariableMustBeNumericException();
             }
         } else {
-            throw new Exception("Variable name must start with letter");
+            throw new VariableNameMustStartWithLetterException();
         }
 
         ctx.setVarToMap(name, value);

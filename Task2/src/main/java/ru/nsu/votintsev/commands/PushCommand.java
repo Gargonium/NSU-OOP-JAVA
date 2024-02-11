@@ -1,6 +1,7 @@
 package ru.nsu.votintsev.commands;
 
 import ru.nsu.votintsev.Context;
+import ru.nsu.votintsev.exceptions.WrongNumberOfArgumentsException;
 
 public class PushCommand implements Command{
     private Double value = null;
@@ -9,7 +10,7 @@ public class PushCommand implements Command{
     @Override
     public void execute(Context ctx) throws Exception {
         if (ctx.getNumberOfArgs() != 1) {
-            throw new Exception("Wrong Number of Arguments");
+            throw new WrongNumberOfArgumentsException();
         }
         try {
             value = Double.parseDouble(ctx.getFirstArg());
