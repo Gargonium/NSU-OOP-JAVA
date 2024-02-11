@@ -20,7 +20,6 @@ class DefineCommandTest {
     @BeforeEach
     public void setUp() {
         ctx = new Context();
-
         defineCommand = new DefineCommand();
     }
 
