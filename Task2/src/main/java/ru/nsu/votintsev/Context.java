@@ -1,6 +1,6 @@
 package ru.nsu.votintsev;
 
-import ru.nsu.votintsev.exceptions.NotEnoughValuesException;
+import ru.nsu.votintsev.exceptions.NotEnoughValuesOnStackException;
 import ru.nsu.votintsev.exceptions.UnknownVariableException;
 
 import java.util.EmptyStackException;
@@ -26,14 +26,14 @@ public class Context {
         try {
             return stack.peek();
         } catch (EmptyStackException e) {
-            throw new NotEnoughValuesException();
+            throw new NotEnoughValuesOnStackException();
         }
     }
     public Double getItem() throws Exception{
         try {
             return stack.pop();
         } catch (EmptyStackException e) {
-            throw new NotEnoughValuesException();
+            throw new NotEnoughValuesOnStackException();
         }
     }
 
