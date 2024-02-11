@@ -19,7 +19,7 @@ class PopCommandTest {
     }
 
     @Test
-    @Name("Wrong Number of Arguments")
+    @Name("Wrong Number of Arguments Test")
     public void shouldThrowWrongNumberOfArguments() {
         ctx.setArgs("POP 23 45".split(" "));
         assertThrows(WrongNumberOfArgumentsException.class, () -> popCommand.execute(ctx));

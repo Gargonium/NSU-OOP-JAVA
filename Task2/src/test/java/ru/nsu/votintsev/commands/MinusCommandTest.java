@@ -21,7 +21,7 @@ class MinusCommandTest {
     }
 
     @Test
-    @Name("Wrong Number of Arguments")
+    @Name("Wrong Number of Arguments Test")
     public void shouldThrowWrongNumberOfArguments() {
         ctx.setArgs("- 23 45".split(" "));
         assertThrows(WrongNumberOfArgumentsException.class, () -> minusCommand.execute(ctx));

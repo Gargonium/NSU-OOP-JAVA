@@ -21,7 +21,7 @@ class SqrtCommandTest {
     }
 
     @Test
-    @Name("Wrong Number of Arguments")
+    @Name("Wrong Number of Arguments Test")
     public void shouldThrowWrongNumberOfArguments() {
         ctx.setArgs("SQRT 23 45".split(" "));
         assertThrows(WrongNumberOfArgumentsException.class, () -> sqrtCommand.execute(ctx));

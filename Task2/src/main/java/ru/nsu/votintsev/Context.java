@@ -22,14 +22,14 @@ public class Context {
         return map.get(key);
     }
 
-    public Double getItemSafe() throws Exception{
+    public Double getItemSafe() throws NotEnoughValuesOnStackException{
         try {
             return stack.peek();
         } catch (EmptyStackException e) {
             throw new NotEnoughValuesOnStackException();
         }
     }
-    public Double getItem() throws Exception{
+    public Double getItem() throws NotEnoughValuesOnStackException{
         try {
             return stack.pop();
         } catch (EmptyStackException e) {

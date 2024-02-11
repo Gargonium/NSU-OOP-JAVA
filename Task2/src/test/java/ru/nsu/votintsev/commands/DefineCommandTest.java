@@ -36,21 +36,21 @@ class DefineCommandTest {
     class ThrowExceptionsTests {
 
         @Test
-        @Name("Wrong Number of Arguments")
+        @Name("Wrong Number of Arguments Test")
         public void shouldThrowWrongNumberOfArgumentsException() {
             ctx.setArgs("DEFINE name anotherName 123".split(" "));
             assertThrows(WrongNumberOfArgumentsException.class, () -> defineCommand.execute(ctx));
         }
 
         @Test
-        @Name("Not Numeric Value")
+        @Name("Not Numeric Value Test")
         public void shouldThrowValueMustBeNumericException() {
             ctx.setArgs("DEFINE name value".split(" "));
             assertThrows(ValueOfVariableMustBeNumericException.class, () -> defineCommand.execute(ctx));
         }
 
         @Test
-        @Name("Name Must Start With Letter")
+        @Name("Name Must Start With Letter Test")
         public void shouldThrowVarNameMustStartWithLetter() {
             ctx.setArgs("DEFINE 1name 123".split(" "));
             assertThrows(VariableNameMustStartWithLetterException.class, () -> defineCommand.execute(ctx));

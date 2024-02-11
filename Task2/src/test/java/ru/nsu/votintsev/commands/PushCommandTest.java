@@ -21,7 +21,7 @@ class PushCommandTest {
     }
 
     @Test
-    @Name("Wrong Number of Arguments")
+    @Name("Wrong Number of Arguments Test")
     public void shouldThrowWrongNumberOfArguments() {
         ctx.setArgs("PUSH 23 45".split(" "));
         assertThrows(WrongNumberOfArgumentsException.class, () -> pushCommand.execute(ctx));
