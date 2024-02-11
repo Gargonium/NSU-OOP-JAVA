@@ -6,16 +6,10 @@ import java.io.FileInputStream;
 import java.util.Properties;
 
 public class CommandFactory {
-    public Command createCommand(String input, Context ctx) throws Exception {
-        String[] tokens = input.split(" ");
-        switch (tokens.length) {
-            case 2: ctx.setArgs(tokens[1]); break;
-            case 3: ctx.setArgs(tokens[1], tokens[2]); break;
-            default: break;
-        }
+    public Command createCommand(String input) throws Exception {
         Properties prop = new Properties();
         prop.load(new FileInputStream("config.ini"));
-        String commandName = prop.getProperty(tokens[0]);
+        String commandName = prop.getProperty(input);
         if (commandName == null) {
             throw new Exception("Unknown Command");
         }

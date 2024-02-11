@@ -4,10 +4,12 @@ import ru.nsu.votintsev.commands.Command;
 
 public class StackCalculator {
     private final CommandFactory commandFactory = new CommandFactory();
-    Context ctx = new Context();
+    private final Context ctx = new Context();
 
     public void calculate(String input) throws Exception {
-        Command command = commandFactory.createCommand(input, ctx);
+        String[] tokens = input.split(" ");
+        Command command = commandFactory.createCommand(tokens[0]);
+        ctx.setArgs(tokens);
         command.execute(ctx);
     }
 }

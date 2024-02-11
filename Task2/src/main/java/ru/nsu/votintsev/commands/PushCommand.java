@@ -8,6 +8,9 @@ public class PushCommand implements Command{
 
     @Override
     public void execute(Context ctx) throws Exception {
+        if (ctx.getNumberOfArgs() != 1) {
+            throw new Exception("Wrong Number of Arguments");
+        }
         try {
             value = Double.parseDouble(ctx.getFirstArg());
         } catch (NumberFormatException e) {

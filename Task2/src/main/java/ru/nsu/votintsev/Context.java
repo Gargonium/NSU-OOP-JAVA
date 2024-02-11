@@ -1,5 +1,6 @@
 package ru.nsu.votintsev;
 
+import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -8,8 +9,7 @@ public class Context {
     private final Stack<Double> stack = new Stack<>();
     private final Map<String, Double> map = new HashMap<>();
 
-    private String firstArg;
-    private String secondArg;
+    private String[] arguments;
 
     // Getters
     public Double getVarFromMap(String key) throws Exception {
@@ -19,18 +19,29 @@ public class Context {
         return map.get(key);
     }
 
-    public Double getItemSafe() {
-        return stack.peek();
+    public Double getItemSafe() throws Exception{
+        try {
+            return stack.peek();
+        } catch (EmptyStackException e) {
+            throw new Exception("There are not enough values on the stack to perform this operation");
+        }
     }
-    public Double getItem() {
-        return stack.pop();
+    public Double getItem() throws Exception{
+        try {
+            return stack.pop();
+        } catch (EmptyStackException e) {
+            throw new Exception("There are not enough values on the stack to perform this operation");
+        }
     }
 
     public String getFirstArg() {
-        return firstArg;
+        return arguments[1];
     }
     public String getSecondArg() {
-        return secondArg;
+        return arguments[2];
+    }
+    public int getNumberOfArgs() {
+        return arguments.length - 1;
     }
 
     // Setters
@@ -42,12 +53,8 @@ public class Context {
         stack.push(item);
     }
 
-    public void setArgs(String firstArg) {
-        this.firstArg = firstArg;
-    }
-    public void setArgs(String firstArg, String secondArg) {
-        this.firstArg = firstArg;
-        this.secondArg = secondArg;
+    public void setArgs(String[] args) {
+        arguments = args;
     }
 
     // Checkers

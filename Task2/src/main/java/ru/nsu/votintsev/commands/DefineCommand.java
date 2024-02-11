@@ -6,6 +6,9 @@ public class DefineCommand implements Command {
 
     @Override
     public void execute(Context ctx) throws Exception {
+        if (ctx.getNumberOfArgs() != 2) {
+            throw new Exception("Wrong Number of Arguments");
+        }
         String name = ctx.getFirstArg();
         double value;
         if (Character.isLetter(name.charAt(0))) {
