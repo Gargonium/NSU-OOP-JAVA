@@ -1,8 +1,8 @@
 package ru.nsu.votintsev.Model;
 
 public abstract class GameObject {
-    private int X = 0;
-    private int Y = 0;
+    protected int X = 0;
+    protected int Y = 0;
 
     public void action() {}
 

@@ -5,5 +5,5 @@ import ru.nsu.votintsev.Observer;
 public interface Observable {
     void addObserver(Observer observer);
     void removeObserver(Observer observer);
-    void notifyObservers();
+    void notifyObservers(String change);
 }
