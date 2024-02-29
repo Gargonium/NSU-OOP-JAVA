@@ -40,5 +40,4 @@ class MultiplyCommandTest {
         assertDoesNotThrow(() -> multiplyCommand.execute(ctx));
         assertDoesNotThrow(() -> assertEquals(result, ctx.getItemSafe()));
     }
-
 }

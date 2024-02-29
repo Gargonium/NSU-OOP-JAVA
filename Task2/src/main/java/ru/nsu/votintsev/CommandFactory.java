@@ -10,11 +10,11 @@ import java.util.Properties;
 public class CommandFactory {
     Properties prop = new Properties();
 
-    public CommandFactory() throws IOException {
-        prop.load(new FileInputStream("config.ini"));
+    public CommandFactory() {
     }
 
-    public Command createCommand(String input) throws Exception {
+    public Command createCommand(String input) throws UnknownCommandException, ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
+        prop.load(new FileInputStream("config.ini"));
         String commandName = prop.getProperty(input);
         if (commandName == null) {
             throw new UnknownCommandException();
