@@ -8,7 +8,11 @@ import ru.nsu.votintsev.exceptions.WrongNumberOfArgumentsException;
 public class DefineCommand implements Command {
 
     @Override
-    public void execute(Context ctx) throws Exception {
+    public void execute(Context ctx) throws
+            WrongNumberOfArgumentsException,
+            ValueOfVariableMustBeNumericException,
+            VariableNameMustStartWithLetterException
+    {
         if (ctx.getNumberOfArgs() != 2) {
             throw new WrongNumberOfArgumentsException();
         }
@@ -18,7 +22,7 @@ public class DefineCommand implements Command {
             try {
                 value = Double.parseDouble(ctx.getSecondArg());
             } catch (NumberFormatException e) {
-                throw new ValueOfVariableMustBeNumericException();
+                throw new ValueOfVariableMustBeNumericException(e);
             }
         } else {
             throw new VariableNameMustStartWithLetterException();

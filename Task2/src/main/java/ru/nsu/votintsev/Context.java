@@ -23,14 +23,14 @@ public class Context {
         try {
             return stack.peek();
         } catch (EmptyStackException e) {
-            throw new NotEnoughValuesOnStackException();
+            throw new NotEnoughValuesOnStackException(e);
         }
     }
     public Double getItem() throws NotEnoughValuesOnStackException{
         try {
             return stack.pop();
         } catch (EmptyStackException e) {
-            throw new NotEnoughValuesOnStackException();
+            throw new NotEnoughValuesOnStackException(e);
         }
     }
 

@@ -8,7 +8,7 @@ public class PushCommand implements Command{
     private String key = null;
 
     @Override
-    public void execute(Context ctx) throws Exception {
+    public void execute(Context ctx) throws WrongNumberOfArgumentsException {
         if (ctx.getNumberOfArgs() != 1) {
             throw new WrongNumberOfArgumentsException();
         }

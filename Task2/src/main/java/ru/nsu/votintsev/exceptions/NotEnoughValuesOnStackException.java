@@ -5,4 +5,8 @@ public class NotEnoughValuesOnStackException extends CalculatorException {
     public String getMessage() {
         return "There are not enough values on the stack to perform this operation";
     }
+
+    public NotEnoughValuesOnStackException(Throwable cause) {
+        super(cause);
+    }
 }

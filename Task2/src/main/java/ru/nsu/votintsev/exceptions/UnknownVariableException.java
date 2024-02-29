@@ -5,4 +5,7 @@ public class UnknownVariableException extends CalculatorException {
     public String getMessage() {
         return "Unknown Variable";
     }
+
+    public UnknownVariableException() {
+    }
 }

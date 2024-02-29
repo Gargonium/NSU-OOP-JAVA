@@ -5,7 +5,7 @@ import ru.nsu.votintsev.exceptions.WrongNumberOfArgumentsException;
 
 public class PrintCommand implements Command {
     @Override
-    public void execute(Context ctx) throws Exception {
+    public void execute(Context ctx) throws WrongNumberOfArgumentsException {
         if (ctx.getNumberOfArgs() != 0) {
             throw new WrongNumberOfArgumentsException();
         }

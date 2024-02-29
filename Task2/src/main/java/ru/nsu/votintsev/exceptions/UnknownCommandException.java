@@ -5,4 +5,8 @@ public class UnknownCommandException extends CalculatorException {
     public String getMessage() {
         return "Unknown Command";
     }
+
+    public UnknownCommandException(Throwable cause) {
+        super(cause);
+    }
 }

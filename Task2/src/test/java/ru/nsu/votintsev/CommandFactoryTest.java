@@ -4,17 +4,18 @@ import jdk.jfr.Name;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.nsu.votintsev.exceptions.UnknownCommandException;
+import ru.nsu.votintsev.factories.ClassLoadingCommandFactory;
 
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class CommandFactoryTest {
-    CommandFactory commandFactory;
+    ClassLoadingCommandFactory commandFactory;
 
     @BeforeEach
     public void setUp() throws IOException {
-       commandFactory = new CommandFactory();
+       commandFactory = new ClassLoadingCommandFactory();
     }
 
     @Test

@@ -1,7 +1,7 @@
-package ru.nsu.votintsev;
+package ru.nsu.votintsev.factories;
 
 import ru.nsu.votintsev.commands.Command;
 
-public interface CommandFactoryInterface {
+public interface CommandFactory {
     Command createCommand(String input);
 }
