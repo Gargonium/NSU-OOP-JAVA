@@ -9,20 +9,18 @@ import java.util.Properties;
 
 public class ClassLoadingCommandFactory implements CommandFactory {
     private final Properties prop = new Properties();
-    FileInputStream config;
 
-    public ClassLoadingCommandFactory() throws UnknownCommandException {
-        try (FileInputStream file = new FileInputStream("config.ini")) {
-            config = file;
+    public ClassLoadingCommandFactory() {
+        try (FileInputStream file = new FileInputStream("src/main/resources/config.ini")) {
+            prop.load(file);
         } catch (IOException e) {
-            throw new UnknownCommandException(e);
+            System.out.println("File config not found");
         }
     }
 
     @Override
     public Command createCommand(String input) throws UnknownCommandException {
         try {
-            prop.load(config);
             String commandName = prop.getProperty(input);
             return (Command) Class.forName(commandName).newInstance();
         } catch (Exception e) {
