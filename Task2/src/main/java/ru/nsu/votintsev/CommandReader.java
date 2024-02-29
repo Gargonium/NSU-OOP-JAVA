@@ -6,12 +6,9 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class CommandReader {
-    StackCalculator stackCalculator = new StackCalculator();
+    private final StackCalculator stackCalculator = new StackCalculator();
 
-    public CommandReader() throws IOException {
-    }
-
-    public void readCommands(String[] args) throws IOException {
+    public void readCommands(String[] args) {
         if (args.length == 0) {
             readFromConsole();
         } else {
@@ -25,9 +22,11 @@ public class CommandReader {
         }
     }
 
-    private void readFromFile(String fileName) throws IOException {
+    private void readFromFile(String fileName) {
         try (Scanner s = new Scanner(new BufferedInputStream(new FileInputStream(fileName)))) {
             read(s);
+        } catch (IOException e) {
+            System.out.println("Can`t open file " + fileName);
         }
     }
 

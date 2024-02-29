@@ -3,16 +3,13 @@ package ru.nsu.votintsev;
 import ru.nsu.votintsev.exceptions.NotEnoughValuesOnStackException;
 import ru.nsu.votintsev.exceptions.UnknownVariableException;
 
-import java.util.EmptyStackException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 public class Context {
     private final Stack<Double> stack = new Stack<>();
     private final Map<String, Double> map = new HashMap<>();
 
-    private String[] arguments;
+    private List<String> arguments = new ArrayList<>();
 
     // Getters
     public Double getVarFromMap(String key) throws UnknownVariableException {
@@ -38,13 +35,13 @@ public class Context {
     }
 
     public String getFirstArg() {
-        return arguments[1];
+        return arguments.get(1);
     }
     public String getSecondArg() {
-        return arguments[2];
+        return arguments.get(2);
     }
     public int getNumberOfArgs() {
-        return arguments.length - 1;
+        return arguments.size() - 1;
     }
 
     // Setters
@@ -56,7 +53,7 @@ public class Context {
         stack.push(item);
     }
 
-    public void setArgs(String[] args) {
+    public void setArgs(List<String> args) {
         arguments = args;
     }
 

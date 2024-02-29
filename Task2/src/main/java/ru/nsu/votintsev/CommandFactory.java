@@ -4,21 +4,22 @@ import ru.nsu.votintsev.commands.Command;
 import ru.nsu.votintsev.exceptions.UnknownCommandException;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Properties;
 
-public class CommandFactory {
-    Properties prop = new Properties();
+public class CommandFactory implements CommandFactoryInterface {
+    private final Properties prop = new Properties();
 
     public CommandFactory() {
     }
 
-    public Command createCommand(String input) throws UnknownCommandException, ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
-        prop.load(new FileInputStream("config.ini"));
-        String commandName = prop.getProperty(input);
-        if (commandName == null) {
+    @Override
+    public Command createCommand(String input) throws UnknownCommandException {
+        try {
+            prop.load(new FileInputStream("config.ini"));
+            String commandName = prop.getProperty(input);
+            return (Command) Class.forName(commandName).newInstance();
+        } catch (Exception e) {
             throw new UnknownCommandException();
         }
-        return (Command) Class.forName(commandName).newInstance();
     }
 }
