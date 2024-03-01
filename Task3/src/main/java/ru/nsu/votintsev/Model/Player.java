@@ -70,7 +70,7 @@ public class Player extends GameObject implements ActionListener {
 
     public void interact() {
         Door door = ctx.getDoor();
-        if (((X + width>= door.getX()) && (X <= door.getX() + door.getWidth())) ||
+        if (((X + width >= door.getX()) && (X <= door.getX() + door.getWidth())) &&
                 ((Y <= door.getY() + door.getHeight()) && (Y + height >= door.getY()))) {
            reachDoor();
         }
