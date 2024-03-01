@@ -58,6 +58,14 @@ public class ModelFacade implements Observable {
         notifyObservers("Change Cords");
     }
 
+    public void setGameFieldDimensions(int gameFieldHeight, int gameFieldWidth) {
+        player.setGameFieldDimensions(gameFieldWidth, gameFieldHeight);
+    }
+
+    public void setPlayerStartCords(int x, int y) {
+        player.setStartCords(x, y);
+    }
+
     public int[] getWall(int index) {
         Wall wall = walls.get(index);
         return new int[]{wall.getX(), wall.getY(), wall.getWidth(), wall.getHeight()};

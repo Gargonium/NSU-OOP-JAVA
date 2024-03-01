@@ -9,7 +9,6 @@ public class GameContext {
     public GameContext() {
 
     }
-
     public void setWalls(AbstractList<Wall> walls) {
         this.walls = walls;
     }
@@ -17,5 +16,7 @@ public class GameContext {
     public AbstractList<Wall> getWalls() {
         return walls;
     }
+
+
 
 }

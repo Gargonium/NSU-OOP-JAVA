@@ -30,12 +30,28 @@ public class Player extends GameObject implements ActionListener {
 
     private PlayerDirection playerDirection = PlayerDirection.STAND;
 
+    private int GAME_FIELD_WIDTH;
+    private int GAME_FIELD_HEIGHT;
+
+    private int startX = 0;
+    private int startY = 0;
+
     public Player(GameContext context) {
-        X = 0;
-        Y = 0;
+        X = startX;
+        Y = startY;
         timer.start();
 
         walls = context.getWalls();
+    }
+
+    public void setStartCords(int x, int y) {
+        startX = x;
+        startY = y;
+    }
+
+    public void setGameFieldDimensions(int gameFieldWidth, int gameFieldHeight) {
+        GAME_FIELD_WIDTH = gameFieldWidth;
+        GAME_FIELD_HEIGHT = gameFieldHeight;
     }
 
     public void setMovements(boolean isUp, boolean isDown, boolean isRight, boolean isLeft) {
@@ -89,17 +105,27 @@ public class Player extends GameObject implements ActionListener {
 
         if (moveDown) {
             Y += yVelocity;
+            if (Y >= GAME_FIELD_HEIGHT) {
+                death();
+            }
         }
 
         if (moveLeft) {
-            X -= xVelocity;
+            if (X > 0)
+                X -= xVelocity;
             playerDirection = PlayerDirection.LEFT;
         } else if (moveRight) {
-            X += xVelocity;
+            if (X < GAME_FIELD_WIDTH + width)
+                X += xVelocity;
             playerDirection = PlayerDirection.RIGHT;
         } else {
             playerDirection = PlayerDirection.STAND;
         }
+    }
+
+    private void death() {
+        X = startX;
+        Y = startY;
     }
 
     @Override

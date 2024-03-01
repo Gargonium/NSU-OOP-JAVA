@@ -5,8 +5,10 @@ import ru.nsu.votintsev.Model.ModelFacade;
 import ru.nsu.votintsev.Model.PlayerDirection;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
 
 public class GameFrame extends JFrame implements Observer, ActionListener {
 
@@ -15,7 +17,6 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
     Timer timer = new Timer(1, this);
     Timer playerAnimation = new Timer(100, this);
 
-    private int timerAnimationCount = 0;
     private int runAnimationCount = 0;
     private int standAnimationCount = 0;
 
@@ -25,15 +26,22 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
 
     public GameFrame(ModelFacade modelFacade, Controller controller) {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(500,500);
         this.setLayout(null);
-        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        this.setResizable(false);
+
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        gd.setFullScreenWindow(this);
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        this.setSize(screenSize.getSize());
 
         gameMenu = new GameMenu();
 
         this.addKeyListener(controller);
 
         this.modelFacade = modelFacade;
+        modelFacade.setPlayerStartCords(0,400);
         this.modelFacade.addObserver(this);
         playerPanel = new PlayerPanel();
 
@@ -46,11 +54,13 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         playerAnimation.start();
 
         modelFacade.setPlayerSize(playerPanel.getPlayerWidth(), playerPanel.getPlayerHeight());
+        modelFacade.setGameFieldDimensions(this.getWidth(), this.getHeight());
 
         playerPanel.setBounds(modelFacade.getPlayerX(), modelFacade.getPlayerY(),
                 playerPanel.getPlayerWidth(), playerPanel.getPlayerHeight());
 
         setPlayerLocation();
+
 
         this.setJMenuBar(gameMenu);
         this.add(playerPanel);
@@ -60,6 +70,7 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
     private void setPlayerLocation() {
         playerPanel.setLocation(modelFacade.getPlayerX(), modelFacade.getPlayerY());
     }
+
 
     @Override
     public void update(String changes) {
@@ -90,7 +101,6 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
                     lastPlayerDirection = PlayerDirection.RIGHT;
                 }
             }
-            timerAnimationCount = 0;
         }
     }
 
