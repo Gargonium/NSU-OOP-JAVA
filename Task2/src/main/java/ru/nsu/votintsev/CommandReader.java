@@ -8,6 +8,9 @@ import java.util.Scanner;
 public class CommandReader {
     private final StackCalculator stackCalculator = new StackCalculator();
 
+    public CommandReader() throws IOException {
+    }
+
     public void readCommands(String[] args) {
         if (args.length == 0) {
             readFromConsole();
