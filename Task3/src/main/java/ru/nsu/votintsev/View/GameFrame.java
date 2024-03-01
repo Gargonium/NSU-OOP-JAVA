@@ -8,11 +8,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
 
 public class GameFrame extends JFrame implements Observer, ActionListener {
 
     PlayerPanel playerPanel;
+    DoorPanel doorPanel;
     ModelFacade modelFacade;
     Timer timer = new Timer(1, this);
     Timer playerAnimation = new Timer(100, this);
@@ -44,6 +44,7 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         modelFacade.setPlayerStartCords(0,400);
         this.modelFacade.addObserver(this);
         playerPanel = new PlayerPanel();
+        doorPanel = new DoorPanel();
 
         for (int i = 0; i < modelFacade.getWallsCount(); ++i) {
             WallsPanel wallPanel = new WallsPanel(modelFacade.getWall(i));
@@ -54,16 +55,20 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         playerAnimation.start();
 
         modelFacade.setPlayerSize(playerPanel.getPlayerWidth(), playerPanel.getPlayerHeight());
+        modelFacade.setDoorSize(doorPanel.getWidth(), doorPanel.getHeight());
         modelFacade.setGameFieldDimensions(this.getWidth(), this.getHeight());
+
 
         playerPanel.setBounds(modelFacade.getPlayerX(), modelFacade.getPlayerY(),
                 playerPanel.getPlayerWidth(), playerPanel.getPlayerHeight());
 
         setPlayerLocation();
 
+        doorPanel.setLocation(modelFacade.getDoorX(), modelFacade.getDoorY());
 
         this.setJMenuBar(gameMenu);
         this.add(playerPanel);
+        this.add(doorPanel);
         this.setVisible(true);
     }
 

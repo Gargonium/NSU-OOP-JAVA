@@ -1,10 +1,9 @@
 package ru.nsu.votintsev.View; 
 
-import javax.swing.*; 
-import java.awt.*; 
+import javax.swing.*;
 import java.util.Objects; 
 
-public class PlayerPanel extends JPanel {
+public class PlayerPanel extends JLabel {
 
     private final Icon playerStandLeft0 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/playerSprites/playerLeft/playerStand0.png")));
     private final Icon playerStandLeft1 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/playerSprites/playerLeft/playerStand1.png")));
@@ -24,21 +23,16 @@ public class PlayerPanel extends JPanel {
     private final int PLAYER_HEIGHT; 
 
     private PlayerSpriteState playerSpriteState = PlayerSpriteState.STAND_RIGHT_0;
-    private final JLabel playerLabel = new JLabel();
 
     public PlayerPanel() {
-
 
         setPlayerSprite();
 
         PLAYER_WIDTH = playerSprite.getIconWidth();
         PLAYER_HEIGHT = playerSprite.getIconHeight();
 
-        playerLabel.setSize(PLAYER_WIDTH,PLAYER_HEIGHT); 
-        playerLabel.setIcon(playerSprite);
-
-        this.setSize(new Dimension(PLAYER_WIDTH,PLAYER_HEIGHT)); 
-        this.add(playerLabel); 
+        this.setSize(PLAYER_WIDTH,PLAYER_HEIGHT);
+        this.setIcon(playerSprite);
     }
 
     public int getPlayerWidth() {
@@ -63,7 +57,7 @@ public class PlayerPanel extends JPanel {
             case RUN_RIGHT_1 -> playerSprite = playerRunRight1;
             case RUN_RIGHT_2 -> playerSprite = playerRunRight2;
         }
-        playerLabel.setIcon(playerSprite);
+        this.setIcon(playerSprite);
     }
 
     public void updatePlayerSprite(PlayerSpriteState playerSpriteState) {

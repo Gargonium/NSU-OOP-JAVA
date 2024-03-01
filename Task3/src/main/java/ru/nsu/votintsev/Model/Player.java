@@ -3,8 +3,6 @@ package ru.nsu.votintsev.Model;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.AbstractList;
-import java.util.ArrayList;
 
 public class Player extends GameObject implements ActionListener {
 
@@ -22,8 +20,6 @@ public class Player extends GameObject implements ActionListener {
     private int height;
     private int width;
 
-    private final AbstractList<Wall> walls;
-
     private boolean gravity = false;
 
     private final Timer timer = new Timer(1, this);
@@ -36,12 +32,14 @@ public class Player extends GameObject implements ActionListener {
     private int startX = 0;
     private int startY = 0;
 
+    private final GameContext ctx;
+
     public Player(GameContext context) {
         X = startX;
         Y = startY;
         timer.start();
 
-        walls = context.getWalls();
+        ctx = context;
     }
 
     public void setStartCords(int x, int y) {
@@ -70,8 +68,16 @@ public class Player extends GameObject implements ActionListener {
         return playerDirection;
     }
 
+    public void interact() {
+        Door door = ctx.getDoor();
+        if (((X + width>= door.getX()) && (X <= door.getX() + door.getWidth())) ||
+                ((Y <= door.getY() + door.getHeight()) && (Y + height >= door.getY()))) {
+           reachDoor();
+        }
+    }
+
     private void checkForWalls() {
-        for (Wall wall : walls) {
+        for (Wall wall : ctx.getWalls()) {
             if ((X + width > wall.getX()) && (X <= wall.getWidth() + wall.getX())){
                 if ((Y + height <= wall.getY()) || (Y >= wall.getY() + wall.getHeight())){
                     gravity = true;
@@ -124,6 +130,11 @@ public class Player extends GameObject implements ActionListener {
     }
 
     private void death() {
+        X = startX;
+        Y = startY;
+    }
+
+    private void reachDoor() {
         X = startX;
         Y = startY;
     }

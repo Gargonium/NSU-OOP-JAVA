@@ -5,6 +5,7 @@ import java.util.AbstractList;
 public class GameContext {
 
     AbstractList<Wall> walls;
+    Door door;
 
     public GameContext() {
 
@@ -17,6 +18,12 @@ public class GameContext {
         return walls;
     }
 
+    public void setDoor(Door door) {
+        this.door = door;
+    }
 
+    public Door getDoor() {
+        return door;
+    }
 
 }

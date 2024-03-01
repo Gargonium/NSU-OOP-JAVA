@@ -26,6 +26,7 @@ public class ModelFacade implements Observable {
 
         player = new Player(ctx);
         door = new Door();
+        ctx.setDoor(door);
 
         objects.addAll(enemies);
         objects.add(player);
@@ -51,6 +52,11 @@ public class ModelFacade implements Observable {
 
     public void setPlayerSize(int width, int height) {
         player.setSize(width, height);
+    }
+
+    public void setDoorSize(int width, int height) {
+        door.setWidth(width);
+        door.setHeight(height);
     }
 
     public void movePlayer(boolean isUp, boolean isDown, boolean isRight, boolean isLeft) {
@@ -81,6 +87,18 @@ public class ModelFacade implements Observable {
 
     public PlayerDirection getPlayerDirection() {
         return player.getPlayerDirection();
+    }
+
+    public int getDoorX() {
+        return door.getX();
+    }
+
+    public int getDoorY() {
+        return door.getY();
+    }
+
+    public void playerInteract() {
+        player.interact();
     }
 
     @Override

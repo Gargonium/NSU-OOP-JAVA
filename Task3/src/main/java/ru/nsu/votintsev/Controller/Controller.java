@@ -20,14 +20,19 @@ public class Controller implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
+//        switch (e.getKeyCode()) {
+//            case KeyEvent.VK_E: modelFacade.playerInteract(); break;
+//            default: break;
+//        }
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
+            case KeyEvent.VK_E: modelFacade.playerInteract(); break;
             case KeyEvent.VK_UP:
-            case KeyEvent.VK_SPACE:
-            case KeyEvent.VK_W: moveUp = true; break;
+            case KeyEvent.VK_W:
+            case KeyEvent.VK_SPACE: moveUp = true; break;
             case KeyEvent.VK_LEFT:
             case KeyEvent.VK_A: moveLeft = true; break;
 //            case KeyEvent.VK_DOWN:
@@ -43,8 +48,8 @@ public class Controller implements KeyListener {
     public void keyReleased(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_UP:
-            case KeyEvent.VK_SPACE:
-            case KeyEvent.VK_W: moveUp = false; break;
+            case KeyEvent.VK_W:
+            case KeyEvent.VK_SPACE:moveUp = false; break;
             case KeyEvent.VK_LEFT:
             case KeyEvent.VK_A: moveLeft = false; break;
 //            case KeyEvent.VK_DOWN:

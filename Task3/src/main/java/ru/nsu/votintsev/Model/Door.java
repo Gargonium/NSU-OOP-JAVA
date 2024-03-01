@@ -2,12 +2,28 @@ package ru.nsu.votintsev.Model;
 
 public class Door extends GameObject{
 
+    private int width;
+    private int height;
+
     public Door() {
-
+        X = 1000;
+        Y = 386;
     }
 
-    @Override
-    public void action() {
-
+    public int getWidth() {
+        return width;
     }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
 }
