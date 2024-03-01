@@ -1,19 +1,18 @@
 package ru.nsu.votintsev.Model;
 
-import ru.nsu.votintsev.Observer;
+import ru.nsu.votintsev.View.Observer;
 
-import java.awt.*;
 import java.util.AbstractList;
 import java.util.ArrayList;
 
 public class ModelFacade implements Observable {
-    AbstractList<Observer> observers;
-    AbstractList<GameObject> objects;
-    AbstractList<Enemy> enemies;
-    AbstractList<Wall> walls;
-    Player player;
-    Door door;
-    GameContext ctx;
+    private final AbstractList<Observer> observers;
+    private final AbstractList<GameObject> objects;
+    private final AbstractList<Enemy> enemies;
+    private final AbstractList<Wall> walls;
+    private final Player player;
+    private final Door door;
+    private final GameContext ctx;
 
     public ModelFacade() {
         ctx = new GameContext();
@@ -69,7 +68,11 @@ public class ModelFacade implements Observable {
     }
 
     private void readWalls() {
-        walls.add(new Wall(0, 450, 500, 50));
+        walls.add(new Wall(0, 450, 2000, 50));
+    }
+
+    public PlayerDirection getPlayerDirection() {
+        return player.getPlayerDirection();
     }
 
     @Override

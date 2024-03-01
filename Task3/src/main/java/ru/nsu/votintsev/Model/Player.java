@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class Player extends GameObject implements ActionListener {
 
-    private final int xVelocity = 10;
+    private final int xVelocity = 7;
     private final int yVelocity = 5;
     private boolean moveUp;
     private boolean moveDown;
@@ -28,11 +28,11 @@ public class Player extends GameObject implements ActionListener {
 
     private final Timer timer = new Timer(1, this);
 
+    private PlayerDirection playerDirection = PlayerDirection.STAND;
+
     public Player(GameContext context) {
         X = 0;
         Y = 0;
-        width = 64;
-        height = 64;
         timer.start();
 
         walls = context.getWalls();
@@ -48,6 +48,10 @@ public class Player extends GameObject implements ActionListener {
     public void setSize(int width, int height) {
         this.width = width;
         this.height = height;
+    }
+
+    public PlayerDirection getPlayerDirection() {
+        return playerDirection;
     }
 
     private void checkForWalls() {
@@ -89,8 +93,12 @@ public class Player extends GameObject implements ActionListener {
 
         if (moveLeft) {
             X -= xVelocity;
+            playerDirection = PlayerDirection.LEFT;
         } else if (moveRight) {
             X += xVelocity;
+            playerDirection = PlayerDirection.RIGHT;
+        } else {
+            playerDirection = PlayerDirection.STAND;
         }
     }
 

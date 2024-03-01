@@ -1,5 +1,6 @@
 package ru.nsu.votintsev;
 
+import ru.nsu.votintsev.Controller.Controller;
 import ru.nsu.votintsev.Model.ModelFacade;
 import ru.nsu.votintsev.View.GameFrame;
 

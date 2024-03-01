@@ -1,4 +1,4 @@
-package ru.nsu.votintsev;
+package ru.nsu.votintsev.Controller;
 
 import ru.nsu.votintsev.Model.ModelFacade;
 
