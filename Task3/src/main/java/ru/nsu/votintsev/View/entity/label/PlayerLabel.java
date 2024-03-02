@@ -1,9 +1,11 @@
-package ru.nsu.votintsev.View; 
+package ru.nsu.votintsev.View.entity.label;
+
+import ru.nsu.votintsev.View.sprite.state.PlayerSpriteState;
 
 import javax.swing.*;
 import java.util.Objects; 
 
-public class PlayerPanel extends JLabel {
+public class PlayerLabel extends JLabel {
 
     private final Icon playerStandLeft0 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/playerSprites/playerLeft/playerStand0.png")));
     private final Icon playerStandLeft1 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/playerSprites/playerLeft/playerStand1.png")));
@@ -19,28 +21,14 @@ public class PlayerPanel extends JLabel {
 
     private Icon playerSprite;
 
-    private final int PLAYER_WIDTH; 
-    private final int PLAYER_HEIGHT; 
-
     private PlayerSpriteState playerSpriteState = PlayerSpriteState.STAND_RIGHT_0;
 
-    public PlayerPanel() {
+    public PlayerLabel() {
 
         setPlayerSprite();
 
-        PLAYER_WIDTH = playerSprite.getIconWidth();
-        PLAYER_HEIGHT = playerSprite.getIconHeight();
-
-        this.setSize(PLAYER_WIDTH,PLAYER_HEIGHT);
+        this.setSize(playerSprite.getIconWidth(), playerSprite.getIconHeight());
         this.setIcon(playerSprite);
-    }
-
-    public int getPlayerWidth() {
-        return PLAYER_WIDTH; 
-    }
-
-    public int getPlayerHeight() {
-        return PLAYER_HEIGHT; 
     }
 
     private void setPlayerSprite() {

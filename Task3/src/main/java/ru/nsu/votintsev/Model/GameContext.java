@@ -7,6 +7,9 @@ public class GameContext {
     AbstractList<Wall> walls;
     Door door;
 
+    private int GAME_FIELD_WIDTH;
+    private int GAME_FIELD_HEIGHT;
+
     public GameContext() {
 
     }
@@ -26,4 +29,16 @@ public class GameContext {
         return door;
     }
 
+    public void setGameFieldDimensions(int gameFieldWidth, int gameFieldHeight) {
+        GAME_FIELD_WIDTH = gameFieldWidth;
+        GAME_FIELD_HEIGHT = gameFieldHeight;
+    }
+
+    public int getGameFieldWidth() {
+        return GAME_FIELD_WIDTH;
+    }
+
+    public int getGameFieldHeight() {
+        return GAME_FIELD_HEIGHT;
+    }
 }

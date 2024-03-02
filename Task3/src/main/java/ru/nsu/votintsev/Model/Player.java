@@ -26,9 +26,6 @@ public class Player extends GameObject implements ActionListener {
 
     private PlayerDirection playerDirection = PlayerDirection.STAND;
 
-    private int GAME_FIELD_WIDTH;
-    private int GAME_FIELD_HEIGHT;
-
     private int startX = 0;
     private int startY = 0;
 
@@ -45,11 +42,6 @@ public class Player extends GameObject implements ActionListener {
     public void setStartCords(int x, int y) {
         startX = x;
         startY = y;
-    }
-
-    public void setGameFieldDimensions(int gameFieldWidth, int gameFieldHeight) {
-        GAME_FIELD_WIDTH = gameFieldWidth;
-        GAME_FIELD_HEIGHT = gameFieldHeight;
     }
 
     public void setMovements(boolean isUp, boolean isDown, boolean isRight, boolean isLeft) {
@@ -73,6 +65,34 @@ public class Player extends GameObject implements ActionListener {
         if (((X + width >= door.getX()) && (X <= door.getX() + door.getWidth())) &&
                 ((Y <= door.getY() + door.getHeight()) && (Y + height >= door.getY()))) {
            reachDoor();
+        }
+    }
+
+    private void death() {
+        X = startX;
+        Y = startY;
+    }
+
+    private void reachDoor() {
+        X = startX;
+        Y = startY;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == timer) {
+
+            if (moveUp && !isInAir) {
+                isJump = true;
+            }
+
+            if (isJump) {
+                jump();
+            } else {
+                moveMe();
+            }
+
+            checkForWalls();
         }
     }
 
@@ -108,10 +128,9 @@ public class Player extends GameObject implements ActionListener {
     }
 
     private void moveMe() {
-
         if (moveDown) {
             Y += yVelocity;
-            if (Y >= GAME_FIELD_HEIGHT) {
+            if (Y >= ctx.getGameFieldHeight()) {
                 death();
             }
         }
@@ -121,39 +140,11 @@ public class Player extends GameObject implements ActionListener {
                 X -= xVelocity;
             playerDirection = PlayerDirection.LEFT;
         } else if (moveRight) {
-            if (X < GAME_FIELD_WIDTH + width)
+            if (X + width < ctx.getGameFieldWidth())
                 X += xVelocity;
             playerDirection = PlayerDirection.RIGHT;
         } else {
             playerDirection = PlayerDirection.STAND;
-        }
-    }
-
-    private void death() {
-        X = startX;
-        Y = startY;
-    }
-
-    private void reachDoor() {
-        X = startX;
-        Y = startY;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == timer) {
-
-            if (moveUp && !isInAir) {
-                isJump = true;
-            }
-
-            if (isJump) {
-                jump();
-            } else {
-                moveMe();
-            }
-
-            checkForWalls();
         }
     }
 }

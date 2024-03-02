@@ -2,45 +2,28 @@ package ru.nsu.votintsev.Model;
 
 import ru.nsu.votintsev.View.Observer;
 
-import java.util.AbstractList;
-import java.util.ArrayList;
+import java.awt.*;
+import java.util.Vector;
 
 public class ModelFacade implements Observable {
-    private final AbstractList<Observer> observers;
-    private final AbstractList<GameObject> objects;
-    private final AbstractList<Enemy> enemies;
-    private final AbstractList<Wall> walls;
+    private final Vector<Enemy> enemies = new Vector<>();
+    private final Vector<Wall> walls = new Vector<>();
+    private final Vector<Observer> observers = new Vector<>();
     private final Player player;
     private final Door door;
     private final GameContext ctx;
 
     public ModelFacade() {
         ctx = new GameContext();
-        walls = new ArrayList<>();
 
         ctx.setWalls(walls);
-
-        observers = new ArrayList<>();
-        objects = new ArrayList<>();
-        enemies = new ArrayList<>();
 
         player = new Player(ctx);
         door = new Door();
         ctx.setDoor(door);
 
-        objects.addAll(enemies);
-        objects.add(player);
-        objects.add(door);
         readWalls();
-        objects.addAll(walls);
-
-        start();
-    }
-
-    public void start() {
-        for (GameObject object : objects) {
-            object.action();
-        }
+        readEnemies();
     }
 
     public int getPlayerX() {
@@ -50,13 +33,30 @@ public class ModelFacade implements Observable {
         return player.getY();
     }
 
+    public int getDoorX() {
+        return door.getX();
+    }
+    public int getDoorY() {
+        return door.getY();
+    }
+
+    public int getEnemyX(int id) {
+        return enemies.get(id).getX();
+    }
+    public int getEnemyY(int id) {
+        return enemies.get(id).getY();
+    }
+
     public void setPlayerSize(int width, int height) {
         player.setSize(width, height);
     }
-
     public void setDoorSize(int width, int height) {
         door.setWidth(width);
         door.setHeight(height);
+    }
+    public void setEnemySize(int id, int width, int height) {
+        enemies.get(id).setWidth(width);
+        enemies.get(id).setHeight(height);
     }
 
     public void movePlayer(boolean isUp, boolean isDown, boolean isRight, boolean isLeft) {
@@ -65,36 +65,41 @@ public class ModelFacade implements Observable {
     }
 
     public void setGameFieldDimensions(int gameFieldHeight, int gameFieldWidth) {
-        player.setGameFieldDimensions(gameFieldWidth, gameFieldHeight);
+        ctx.setGameFieldDimensions(gameFieldWidth, gameFieldHeight);
     }
 
     public void setPlayerStartCords(int x, int y) {
         player.setStartCords(x, y);
     }
 
-    public int[] getWall(int index) {
+    public Rectangle getWallRect(int index) {
         Wall wall = walls.get(index);
-        return new int[]{wall.getX(), wall.getY(), wall.getWidth(), wall.getHeight()};
+        return new Rectangle(wall.getX(), wall.getY(), wall.getWidth(), wall.getHeight());
     }
 
     public int getWallsCount() {
         return walls.size();
     }
 
+    public int getEnemiesCount() {
+        return enemies.size();
+    }
+
     private void readWalls() {
-        walls.add(new Wall(0, 450, 2000, 50));
+        walls.add(new Wall(100, 450, 2000, 50));
+    }
+
+    private void readEnemies() {
+        enemies.add(new Enemy(ctx, 0,900, 386));
+        enemies.add(new Enemy(ctx, 1,400, 386));
     }
 
     public PlayerDirection getPlayerDirection() {
         return player.getPlayerDirection();
     }
 
-    public int getDoorX() {
-        return door.getX();
-    }
-
-    public int getDoorY() {
-        return door.getY();
+    public EnemyDirection getEnemyDirection(int id) {
+        return enemies.get(id).getEnemyDirection();
     }
 
     public void playerInteract() {
@@ -103,7 +108,7 @@ public class ModelFacade implements Observable {
 
     @Override
     public void addObserver(Observer observer) {
-    observers.add(observer);
+        observers.add(observer);
     }
 
     @Override
