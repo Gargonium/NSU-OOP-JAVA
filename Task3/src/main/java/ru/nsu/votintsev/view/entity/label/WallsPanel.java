@@ -1,4 +1,4 @@
-package ru.nsu.votintsev.View.entity.label;
+package ru.nsu.votintsev.view.entity.label;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,4 +1,4 @@
-package ru.nsu.votintsev.Model;
+package ru.nsu.votintsev.model.directions;
 
 public enum EnemyDirection {
     LEFT,

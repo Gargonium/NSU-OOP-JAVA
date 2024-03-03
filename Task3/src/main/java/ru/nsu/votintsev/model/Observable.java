@@ -1,6 +1,6 @@
-package ru.nsu.votintsev.Model;
+package ru.nsu.votintsev.model;
 
-import ru.nsu.votintsev.View.Observer;
+import ru.nsu.votintsev.view.Observer;
 
 public interface Observable {
     void addObserver(Observer observer);

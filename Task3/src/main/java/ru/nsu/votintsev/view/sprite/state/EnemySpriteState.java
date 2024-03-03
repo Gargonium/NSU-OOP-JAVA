@@ -1,4 +1,4 @@
-package ru.nsu.votintsev.View.sprite.state;
+package ru.nsu.votintsev.view.sprite.state;
 
 public enum EnemySpriteState {
     RUN_LEFT_0,

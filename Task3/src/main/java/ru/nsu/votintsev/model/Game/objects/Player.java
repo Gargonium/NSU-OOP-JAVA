@@ -1,4 +1,8 @@
-package ru.nsu.votintsev.Model;
+package ru.nsu.votintsev.model.game.objects;
+
+import ru.nsu.votintsev.model.GameContext;
+import ru.nsu.votintsev.model.Wall;
+import ru.nsu.votintsev.model.directions.PlayerDirection;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

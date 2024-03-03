@@ -1,6 +1,6 @@
-package ru.nsu.votintsev.Controller;
+package ru.nsu.votintsev.controller;
 
-import ru.nsu.votintsev.Model.ModelFacade;
+import ru.nsu.votintsev.model.ModelFacade;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;

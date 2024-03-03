@@ -1,4 +1,4 @@
-package ru.nsu.votintsev.Model;
+package ru.nsu.votintsev.model.game.objects;
 
 public abstract class GameObject {
     protected int X = 0;

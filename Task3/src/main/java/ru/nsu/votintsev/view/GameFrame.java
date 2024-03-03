@@ -1,14 +1,10 @@
-package ru.nsu.votintsev.View;
+package ru.nsu.votintsev.view;
 
-import ru.nsu.votintsev.Controller.Controller;
-import ru.nsu.votintsev.Model.ModelFacade;
-import ru.nsu.votintsev.Model.PlayerDirection;
-import ru.nsu.votintsev.View.entity.label.DoorLabel;
-import ru.nsu.votintsev.View.entity.label.EnemyLabel;
-import ru.nsu.votintsev.View.entity.label.PlayerLabel;
-import ru.nsu.votintsev.View.entity.label.WallsPanel;
-import ru.nsu.votintsev.View.sprite.state.EnemySpriteState;
-import ru.nsu.votintsev.View.sprite.state.PlayerSpriteState;
+import ru.nsu.votintsev.controller.Controller;
+import ru.nsu.votintsev.model.ModelFacade;
+import ru.nsu.votintsev.model.directions.PlayerDirection;
+import ru.nsu.votintsev.view.entity.label.*;
+import ru.nsu.votintsev.view.sprite.state.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,7 +17,10 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
     private final PlayerLabel playerLabel = new PlayerLabel();
     private final DoorLabel doorLabel = new DoorLabel();
 
+    private GamePanel gamePanel;
+
     private final Vector<EnemyLabel> enemiesLabel = new Vector<>();
+    private final Vector<WallsPanel> wallsPanels = new Vector<>();
 
     private final ModelFacade modelFacade;
 
@@ -54,9 +53,13 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         modelFacade.setPlayerStartCords(100,400);
         this.modelFacade.addObserver(this);
 
+        gamePanel = new GamePanel(this.getWidth(), this.getHeight());
+        modelFacade.setGameFieldDimensions(gamePanel.getWidth(), gamePanel.getHeight());
+
         for (int i = 0; i < modelFacade.getWallsCount(); ++i) {
             WallsPanel wallPanel = new WallsPanel(modelFacade.getWallRect(i));
-            this.add(wallPanel);
+            wallsPanels.add(wallPanel);
+            gamePanel.add(wallPanel);
         }
 
         for (int i = 0; i < modelFacade.getEnemiesCount(); ++i) {
@@ -64,26 +67,27 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
             enemyLabel.setLocation(modelFacade.getEnemyX(i), modelFacade.getEnemyY(i));
             modelFacade.setEnemySize(i, enemyLabel.getWidth(), enemyLabel.getHeight());
             enemiesLabel.add(enemyLabel);
-            this.add(enemyLabel);
+            gamePanel.add(enemyLabel);
         }
 
         modelFacade.setPlayerSize(playerLabel.getWidth(), playerLabel.getHeight());
         modelFacade.setDoorSize(doorLabel.getWidth(), doorLabel.getHeight());
-        modelFacade.setGameFieldDimensions(this.getHeight(), this.getWidth());
 
         playerLabel.setBounds(modelFacade.getPlayerX(), modelFacade.getPlayerY(),
                 playerLabel.getWidth(), playerLabel.getHeight());
 
         setPlayerLocation();
-
+        setEnemyLocation();
         doorLabel.setLocation(modelFacade.getDoorX(), modelFacade.getDoorY());
 
         gameTimer.start();
         animationTimer.start();
 
-        this.setJMenuBar(gameMenu);
         this.add(playerLabel);
-        this.add(doorLabel);
+        gamePanel.add(doorLabel);
+
+        this.setJMenuBar(gameMenu);
+        this.add(gamePanel);
         this.setVisible(true);
     }
 
@@ -107,6 +111,14 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         if (e.getSource() == gameTimer) {
             setPlayerLocation();
             setEnemyLocation();
+            gamePanel.setX(gamePanel.getX());
+            gamePanel.setLocation(gamePanel.getX(), gamePanel.getY());
+
+            modelFacade.setDoorCords(doorLabel.getX() + gamePanel.getX(), doorLabel.getY() + gamePanel.getY());
+            for (int i = 0; i < modelFacade.getWallsCount(); ++i) {
+                modelFacade.setWallCords(i, wallsPanels.get(i).getX() + gamePanel.getX(), wallsPanels.get(i).getY() + gamePanel.getY());
+            }
+
         }  else if (e.getSource() == animationTimer) {
             switch (modelFacade.getPlayerDirection()) {
                 case STAND -> {

@@ -1,4 +1,8 @@
-package ru.nsu.votintsev.Model;
+package ru.nsu.votintsev.model.game.objects;
+
+import ru.nsu.votintsev.model.Wall;
+import ru.nsu.votintsev.model.directions.EnemyDirection;
+import ru.nsu.votintsev.model.GameContext;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -6,7 +10,7 @@ import javax.swing.*;
 
 public class Enemy extends GameObject implements ActionListener {
 
-    private final Timer timer = new Timer(1, this);
+    private final Timer timer = new Timer(10, this);
 
     private final int xVelocity = 7;
 
@@ -17,15 +21,12 @@ public class Enemy extends GameObject implements ActionListener {
 
     private EnemyDirection enemyDirection = EnemyDirection.RIGHT;
 
-    private int id;
-
     public Enemy(GameContext context, int id, int x, int y) {
         timer.start();
         ctx = context;
 
         X = x;
         Y = y;
-        this.id = id;
     }
 
     public void setWidth(int width) {
@@ -43,18 +44,29 @@ public class Enemy extends GameObject implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == timer) {
+            boolean findLeft = true;
+            boolean findRight = true;
             for (Wall wall : ctx.getWalls()) {
-                if (wall.getY() < Y + height) {
-                    if ((X <= wall.getX() + wall.getWidth()) || (X + width >= wall.getX())) {
+                if (wall.getY() < Y + height)
+                    if ((X + width + xVelocity >= wall.getX()) || (X - xVelocity <= wall.getX() + wall.getWidth()))
                         enemyDirection = (enemyDirection == EnemyDirection.LEFT) ? EnemyDirection.RIGHT : EnemyDirection.LEFT;
-                    }
-                } else if ((wall.getY() + 1 == Y + height) &&
-                        ((X >= wall.getX()) && (X + width <= wall.getX() + wall.getWidth()))) {
-                    if ((X + xVelocity >= wall.getX() + wall.getWidth()) || (X - xVelocity <= wall.getX())) {
-                        enemyDirection = (enemyDirection == EnemyDirection.LEFT) ? EnemyDirection.RIGHT : EnemyDirection.LEFT;
-                    }
-                }
 
+                if (Y + height == wall.getY())
+                    if ((X >= wall.getX()) && (X + width <= wall.getX() + wall.getWidth())) {
+                        if ((X - xVelocity <= wall.getX()) && (enemyDirection == EnemyDirection.LEFT))
+                            findLeft = false;
+                        if ((X + width + xVelocity >= wall.getX() + wall.getWidth()) && (enemyDirection == EnemyDirection.RIGHT))
+                            findRight = false;
+                    }
+            }
+
+            if (!findLeft) {
+                enemyDirection = EnemyDirection.RIGHT;
+                System.out.println(1);
+            }
+            if (!findRight) {
+                enemyDirection = EnemyDirection.LEFT;
+                System.out.println(2);
             }
 
             if ((X <= 0) || (X + width >= ctx.getGameFieldWidth())){

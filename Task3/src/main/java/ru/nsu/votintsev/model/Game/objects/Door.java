@@ -1,6 +1,6 @@
-package ru.nsu.votintsev.Model;
+package ru.nsu.votintsev.model.game.objects;
 
-public class Door extends GameObject{
+public class Door extends GameObject {
 
     private int width;
     private int height;

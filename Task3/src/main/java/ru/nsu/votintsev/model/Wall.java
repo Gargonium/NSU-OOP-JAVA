@@ -1,4 +1,6 @@
-package ru.nsu.votintsev.Model;
+package ru.nsu.votintsev.model;
+
+import ru.nsu.votintsev.model.game.objects.GameObject;
 
 public class Wall extends GameObject {
     private int width;

@@ -1,6 +1,11 @@
-package ru.nsu.votintsev.Model;
+package ru.nsu.votintsev.model;
 
-import ru.nsu.votintsev.View.Observer;
+import ru.nsu.votintsev.model.directions.EnemyDirection;
+import ru.nsu.votintsev.model.directions.PlayerDirection;
+import ru.nsu.votintsev.model.game.objects.Player;
+import ru.nsu.votintsev.model.game.objects.Door;
+import ru.nsu.votintsev.model.game.objects.Enemy;
+import ru.nsu.votintsev.view.Observer;
 
 import java.awt.*;
 import java.util.Vector;
@@ -47,6 +52,16 @@ public class ModelFacade implements Observable {
         return enemies.get(id).getY();
     }
 
+    public void setWallCords(int id, int x, int y) {
+        walls.get(id).setX(x);
+        walls.get(id).setY(y);
+    }
+
+    public void setDoorCords(int x, int y) {
+        door.setX(x);
+        door.setY(y);
+    }
+
     public void setPlayerSize(int width, int height) {
         player.setSize(width, height);
     }
@@ -64,7 +79,7 @@ public class ModelFacade implements Observable {
         notifyObservers("Change Cords");
     }
 
-    public void setGameFieldDimensions(int gameFieldHeight, int gameFieldWidth) {
+    public void setGameFieldDimensions(int gameFieldWidth, int gameFieldHeight) {
         ctx.setGameFieldDimensions(gameFieldWidth, gameFieldHeight);
     }
 
@@ -86,7 +101,9 @@ public class ModelFacade implements Observable {
     }
 
     private void readWalls() {
-        walls.add(new Wall(100, 450, 2000, 50));
+        walls.add(new Wall(0, 450, 200, 50));
+        walls.add(new Wall(300, 450, 1000, 50));
+        walls.add(new Wall(1400, 450, 200, 50));
     }
 
     private void readEnemies() {

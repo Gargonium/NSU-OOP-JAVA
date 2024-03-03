@@ -1,4 +1,4 @@
-package ru.nsu.votintsev.View;
+package ru.nsu.votintsev.view;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

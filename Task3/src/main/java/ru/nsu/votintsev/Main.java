@@ -1,8 +1,8 @@
 package ru.nsu.votintsev;
 
-import ru.nsu.votintsev.Controller.Controller;
-import ru.nsu.votintsev.Model.ModelFacade;
-import ru.nsu.votintsev.View.GameFrame;
+import ru.nsu.votintsev.controller.Controller;
+import ru.nsu.votintsev.model.ModelFacade;
+import ru.nsu.votintsev.view.GameFrame;
 
 public class Main {
     public static void main(String[] args) {
