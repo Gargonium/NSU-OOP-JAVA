@@ -2,6 +2,7 @@ package ru.nsu.votintsev.model;
 
 import ru.nsu.votintsev.model.game.objects.Door;
 import ru.nsu.votintsev.model.game.objects.Enemy;
+import ru.nsu.votintsev.model.game.objects.Wall;
 
 import java.util.Vector;
 

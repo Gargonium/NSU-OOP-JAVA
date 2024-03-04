@@ -1,16 +1,12 @@
 package ru.nsu.votintsev.model.game.objects;
 
-public abstract class GameObject {
-    protected int X = 0;
-    protected int Y = 0;
+public interface GameObject {
 
-    public void action() {}
+    int getX();
 
-    public int getX() { return X; }
+    int getY();
 
-    public int getY() { return Y;}
+    void setX(int x);
 
-    public void setX(int x) { X = x; }
-
-    public void setY(int y) { Y = y; }
+    void setY(int y);
 }

@@ -1,22 +1,37 @@
-package ru.nsu.votintsev.model;
+package ru.nsu.votintsev.model.game.objects;
 
-import ru.nsu.votintsev.model.game.objects.GameObject;
+public class Wall implements GameObject {
 
-public class Wall extends GameObject {
+    private int X;
+    private int Y;
+
     private int width;
     private int height;
-
-    public Wall() {
-        width = 0;
-        height = 0;
-        X = 0;
-        Y = 0;
-    }
 
     public Wall(int x, int y, int width, int height) {
         this.width = width;
         this.height = height;
         X = x;
+        Y = y;
+    }
+
+    @Override
+    public int getX() {
+        return X;
+    }
+
+    @Override
+    public void setX(int x) {
+        X = x;
+    }
+
+    @Override
+    public int getY() {
+        return Y;
+    }
+
+    @Override
+    public void setY(int y) {
         Y = y;
     }
 

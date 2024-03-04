@@ -1,32 +1,22 @@
 package ru.nsu.votintsev.model.game.objects;
 
 import ru.nsu.votintsev.model.GameContext;
-import ru.nsu.votintsev.model.Wall;
 import ru.nsu.votintsev.model.directions.PlayerDirection;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+public class Player implements GameObject {
 
-public class Player extends GameObject implements ActionListener {
-
-    private final int xVelocity = 7;
-    private final int yVelocity = 5;
-    private boolean moveUp;
-    private boolean moveDown;
-    private boolean moveRight;
-    private boolean moveLeft;
-
-    private int jumpCounter = 20;
-    private boolean isJump = false;
-    private boolean isInAir = true;
+    private int X;
+    private int Y;
 
     private int height;
     private int width;
 
-    private boolean gravity = false;
+    private final static int X_SPEED = 7;
+    private final static int GRAVITY_SPEED = 10;
 
-    private final Timer timer = new Timer(1, this);
+    private boolean moveUp;
+    private boolean moveRight;
+    private boolean moveLeft;
 
     private PlayerDirection playerDirection = PlayerDirection.STAND;
 
@@ -35,21 +25,23 @@ public class Player extends GameObject implements ActionListener {
 
     private final GameContext ctx;
 
-    public Player(GameContext context) {
-        X = startX;
-        Y = startY;
-        timer.start();
+    private boolean isJumping = false;
+    private int jumpSpeed = 0;
+    private static final int JUMP_ACCELERATION = 1;
+    private static final int MAX_JUMP_SPEED = 20;
 
+    public Player(GameContext context) {
         ctx = context;
     }
 
-    public void setStartCords(int x, int y) {
-        startX = x;
-        startY = y;
+    public void setStartCords(int X, int Y) {
+        startX = X;
+        startY = Y;
+        this.X = X;
+        this.Y = Y;
     }
 
-    public void setMovements(boolean isUp, boolean isDown, boolean isRight, boolean isLeft) {
-        moveDown = isDown;
+    public void setMovements(boolean isUp, boolean isRight, boolean isLeft) {
         moveLeft = isLeft;
         moveRight = isRight;
         moveUp = isUp;
@@ -83,72 +75,94 @@ public class Player extends GameObject implements ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == timer) {
-
-            if (moveUp && !isInAir) {
-                isJump = true;
-            }
-
-            if (isJump) {
-                jump();
-            } else {
-                moveMe();
-            }
-
-            checkForWalls();
-        }
+    public int getX() {
+        return X;
     }
 
-    private void checkForWalls() {
-        for (Wall wall : ctx.getWalls()) {
-            if ((X + width > wall.getX()) && (X <= wall.getWidth() + wall.getX())){
-                if ((Y + height <= wall.getY()) || (Y >= wall.getY() + wall.getHeight())){
-                    gravity = true;
-                } else {
-                    gravity = false;
-                    Y = wall.getY() - height;
-                    isInAir = false;
+    @Override
+    public void setX(int x) {
+        X = x;
+    }
+
+    @Override
+    public int getY() {
+        return Y;
+    }
+
+    @Override
+    public void setY(int y) {
+        Y = y;
+    }
+
+    public void checkForCollisionsAndMove() {
+        boolean isOnGround = false;
+        try {
+            for (Wall wall : ctx.getWalls()) {
+                if (X < wall.getX() + wall.getWidth() && X + width > wall.getX() &&
+                        Y <= wall.getY() + wall.getHeight() && Y + height >= wall.getY()) {
+
+                    int overlapX = Math.min(X + width, wall.getX() + wall.getWidth()) - Math.max(X, wall.getX());
+                    int overlapY = Math.min(Y + height, wall.getY() + wall.getHeight()) - Math.max(Y, wall.getY());
+
+                    if (overlapX < overlapY) {
+                        if (X < wall.getX()) {
+                            X = wall.getX() - width;
+                        } else {
+                            X = wall.getX() + wall.getWidth();
+                        }
+                    } else {
+                        if (Y <= wall.getY()) {
+                            Y = wall.getY() - height;
+                            isOnGround = true;
+                        } else {
+                            Y = wall.getY() + wall.getHeight();
+                        }
+                    }
                 }
-            } else if (!gravity) {
-                gravity = true;
-                isInAir = true;
             }
-        }
 
-        moveDown = gravity;
-    }
-
-    private void jump() {
-        jumpCounter--;
-        Y -= yVelocity;
-        isInAir = true;
-        if (jumpCounter == 0) {
-            isJump = false;
-            jumpCounter = 20;
-        }
-        moveDown = false;
-        moveMe();
-    }
-
-    private void moveMe() {
-        if (moveDown) {
-            Y += yVelocity;
-            if (Y >= ctx.getGameFieldHeight()) {
-                death();
+            for (Enemy enemy : ctx.getEnemies()) {
+                if (X <= enemy.getX() + enemy.getWidth() &&
+                        X + width >= enemy.getX() &&
+                        Y <= enemy.getY() + enemy.getHeight() &&
+                        Y + height >= enemy.getY()) {
+                    death();
+                }
             }
+        } catch (Exception ignored) {
+
         }
 
         if (moveLeft) {
             if (X > 0)
-                X -= xVelocity;
+                X -= X_SPEED;
             playerDirection = PlayerDirection.LEFT;
         } else if (moveRight) {
             if (X + width < ctx.getGameFieldWidth())
-                X += xVelocity;
+                X += X_SPEED;
             playerDirection = PlayerDirection.RIGHT;
         } else {
             playerDirection = PlayerDirection.STAND;
+        }
+
+        if (!isOnGround && !isJumping) {
+            Y += GRAVITY_SPEED;
+            if (Y >= ctx.getGameFieldHeight())
+                death();
+        }
+
+        if (moveUp && isOnGround) {
+            isJumping = true;
+            jumpSpeed = MAX_JUMP_SPEED;
+        }
+
+        if (isJumping) {
+            Y -= jumpSpeed;
+            jumpSpeed -= JUMP_ACCELERATION;
+
+            if (jumpSpeed <= 0) {
+                isJumping = false;
+            }
         }
     }
 }

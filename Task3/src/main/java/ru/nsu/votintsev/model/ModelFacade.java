@@ -5,6 +5,7 @@ import ru.nsu.votintsev.model.directions.PlayerDirection;
 import ru.nsu.votintsev.model.game.objects.Player;
 import ru.nsu.votintsev.model.game.objects.Door;
 import ru.nsu.votintsev.model.game.objects.Enemy;
+import ru.nsu.votintsev.model.game.objects.Wall;
 import ru.nsu.votintsev.view.Observer;
 
 import javax.swing.*;
