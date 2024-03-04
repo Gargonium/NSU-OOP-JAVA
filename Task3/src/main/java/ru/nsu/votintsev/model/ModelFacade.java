@@ -22,7 +22,7 @@ public class ModelFacade implements Observable, ActionListener {
     private final Door door;
     private final GameContext ctx;
 
-    private final Timer modelTimer = new Timer(1, this);
+    private final Timer modelTimer = new Timer(10, this);
 
     public ModelFacade() {
         ctx = new GameContext();
@@ -41,9 +41,9 @@ public class ModelFacade implements Observable, ActionListener {
     }
 
     private void readWalls() {
-        walls.add(new Wall(0, 450, 200, 500));
-        walls.add(new Wall(300, 450, 1000, 500));
-        walls.add(new Wall(1400, 450, 200, 500));
+        walls.add(new Wall(0, 450, 200, 64));
+        walls.add(new Wall(300, 450, 1000, 64));
+        walls.add(new Wall(1400, 450, 200, 64));
     }
 
     private void readEnemies() {
@@ -70,16 +70,6 @@ public class ModelFacade implements Observable, ActionListener {
     }
     public int getEnemyY(int id) {
         return enemies.get(id).getY();
-    }
-
-    public void setWallCords(int id, int x, int y) {
-        walls.get(id).setX(x);
-        walls.get(id).setY(y);
-    }
-
-    public void setDoorCords(int x, int y) {
-        door.setX(x);
-        door.setY(y);
     }
 
     public void setPlayerSize(int width, int height) {

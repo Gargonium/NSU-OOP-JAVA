@@ -28,7 +28,7 @@ public class Player implements GameObject {
     private boolean isJumping = false;
     private int jumpSpeed = 0;
     private static final int JUMP_ACCELERATION = 1;
-    private static final int MAX_JUMP_SPEED = 20;
+    private static final int MAX_JUMP_SPEED = 16;
 
     public Player(GameContext context) {
         ctx = context;
@@ -48,7 +48,7 @@ public class Player implements GameObject {
     }
 
     public void setSize(int width, int height) {
-        this.width = width;
+        this.width = width - 10;
         this.height = height;
     }
 

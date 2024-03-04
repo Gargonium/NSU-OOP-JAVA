@@ -15,12 +15,8 @@ import java.util.Vector;
 public class GameFrame extends JFrame implements Observer, ActionListener {
 
     private final PlayerLabel playerLabel = new PlayerLabel();
-    private final DoorLabel doorLabel = new DoorLabel();
 
-    private final GamePanel gamePanel;
-
-    private final Vector<EnemyLabel> enemiesLabel = new Vector<>();
-    private final Vector<WallsPanel> wallsPanels = new Vector<>();
+    private final Vector<EnemyLabel> enemiesLabels = new Vector<>();
 
     private final ModelFacade modelFacade;
 
@@ -51,24 +47,27 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         modelFacade.setPlayerStartCords(100,100);
         this.modelFacade.addObserver(this);
 
-        gamePanel = new GamePanel(this.getWidth(), this.getHeight());
+        // TODO: Turn to Background
+        GamePanel gamePanel = new GamePanel(this.getWidth(), this.getHeight());
         modelFacade.setGameFieldDimensions(gamePanel.getWidth(), gamePanel.getHeight());
 
         for (int i = 0; i < modelFacade.getWallsCount(); ++i) {
-            WallsPanel wallPanel = new WallsPanel(modelFacade.getWallRect(i));
-            wallsPanels.add(wallPanel);
-            gamePanel.add(wallPanel);
+            WallsLabel wallPanel = new WallsLabel(modelFacade.getWallRect(i));
+//            Vector<WallsLabel> wallsLabels = new Vector<>();
+//            wallsLabels.add(wallPanel);
+            this.add(wallPanel);
         }
 
         for (int i = 0; i < modelFacade.getEnemiesCount(); ++i) {
             EnemyLabel enemyLabel = new EnemyLabel();
             enemyLabel.setLocation(modelFacade.getEnemyX(i), modelFacade.getEnemyY(i));
             modelFacade.setEnemySize(i, enemyLabel.getWidth(), enemyLabel.getHeight());
-            enemiesLabel.add(enemyLabel);
-            gamePanel.add(enemyLabel);
+            enemiesLabels.add(enemyLabel);
+            this.add(enemyLabel);
         }
 
         modelFacade.setPlayerSize(playerLabel.getWidth(), playerLabel.getHeight());
+        DoorLabel doorLabel = new DoorLabel();
         modelFacade.setDoorSize(doorLabel.getWidth(), doorLabel.getHeight());
 
         playerLabel.setBounds(modelFacade.getPlayerX(), modelFacade.getPlayerY(),
@@ -81,12 +80,16 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         gameTimer.start();
         animationTimer.start();
 
-        this.add(playerLabel);
-        gamePanel.add(doorLabel);
-
-        this.setJMenuBar(gameMenu);
+        this.add(playerLabel, 0);
+        this.add(doorLabel);
         this.add(gamePanel);
+        this.setJMenuBar(gameMenu);
         this.setVisible(true);
+
+        /* TODO: Идея следующая. У меня GameFrame содержит JPanel для всех уровней, а каждый этот уровень содержит JPanel для всех экранов
+            Фрейм отправляет сигнал о смене уровня, просто удаляя и добавляя панельки
+            Уровни с экранами делают то же самое
+         */
     }
 
     private void setPlayerLocation() {
@@ -95,7 +98,7 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
 
     private void setEnemyLocation() {
         for (int i = 0; i < modelFacade.getEnemiesCount(); ++i) {
-            enemiesLabel.get(i).setLocation(modelFacade.getEnemyX(i), modelFacade.getEnemyY(i));
+            enemiesLabels.get(i).setLocation(modelFacade.getEnemyX(i), modelFacade.getEnemyY(i));
         }
     }
 
@@ -107,16 +110,8 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == gameTimer) {
-            setPlayerLocation();
             setEnemyLocation();
-            gamePanel.setX(gamePanel.getX());
-            gamePanel.setLocation(gamePanel.getX(), gamePanel.getY());
-
-            modelFacade.setDoorCords(doorLabel.getX() + gamePanel.getX(), doorLabel.getY() + gamePanel.getY());
-            for (int i = 0; i < modelFacade.getWallsCount(); ++i) {
-                modelFacade.setWallCords(i, wallsPanels.get(i).getX() + gamePanel.getX(), wallsPanels.get(i).getY() + gamePanel.getY());
-            }
-
+            setPlayerLocation();
         }  else if (e.getSource() == animationTimer) {
             switch (modelFacade.getPlayerDirection()) {
                 case STAND -> {
@@ -135,8 +130,8 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
             }
             for (int i = 0; i < modelFacade.getEnemiesCount(); ++i) {
                 switch (modelFacade.getEnemyDirection(i)) {
-                    case LEFT -> enemiesLabel.get(i).updateEnemySprite(getEnemyRunLeftSprite());
-                    case RIGHT -> enemiesLabel.get(i).updateEnemySprite(getEnemyRunRightSprite());
+                    case LEFT -> enemiesLabels.get(i).updateEnemySprite(getEnemyRunLeftSprite());
+                    case RIGHT -> enemiesLabels.get(i).updateEnemySprite(getEnemyRunRightSprite());
                 }
             }
         }
