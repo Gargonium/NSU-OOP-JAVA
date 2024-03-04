@@ -7,10 +7,13 @@ import ru.nsu.votintsev.model.game.objects.Door;
 import ru.nsu.votintsev.model.game.objects.Enemy;
 import ru.nsu.votintsev.view.Observer;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Vector;
 
-public class ModelFacade implements Observable {
+public class ModelFacade implements Observable, ActionListener {
     private final Vector<Enemy> enemies = new Vector<>();
     private final Vector<Wall> walls = new Vector<>();
     private final Vector<Observer> observers = new Vector<>();
@@ -18,17 +21,33 @@ public class ModelFacade implements Observable {
     private final Door door;
     private final GameContext ctx;
 
+    private final Timer modelTimer = new Timer(1, this);
+
     public ModelFacade() {
         ctx = new GameContext();
 
         ctx.setWalls(walls);
+        ctx.setEnemies(enemies);
 
-        player = new Player(ctx);
         door = new Door();
         ctx.setDoor(door);
+        player = new Player(ctx);
+
+        modelTimer.start();
 
         readWalls();
         readEnemies();
+    }
+
+    private void readWalls() {
+        walls.add(new Wall(0, 450, 200, 500));
+        walls.add(new Wall(300, 450, 1000, 500));
+        walls.add(new Wall(1400, 450, 200, 500));
+    }
+
+    private void readEnemies() {
+        enemies.add(new Enemy(ctx,900, 386));
+        enemies.add(new Enemy(ctx,400, 386));
     }
 
     public int getPlayerX() {
@@ -74,8 +93,8 @@ public class ModelFacade implements Observable {
         enemies.get(id).setHeight(height);
     }
 
-    public void movePlayer(boolean isUp, boolean isDown, boolean isRight, boolean isLeft) {
-        player.setMovements(isUp, isDown, isRight, isLeft);
+    public void movePlayer(boolean isUp, boolean isRight, boolean isLeft) {
+        player.setMovements(isUp, isRight, isLeft);
         notifyObservers("Change Cords");
     }
 
@@ -98,17 +117,6 @@ public class ModelFacade implements Observable {
 
     public int getEnemiesCount() {
         return enemies.size();
-    }
-
-    private void readWalls() {
-        walls.add(new Wall(0, 450, 200, 50));
-        walls.add(new Wall(300, 450, 1000, 50));
-        walls.add(new Wall(1400, 450, 200, 50));
-    }
-
-    private void readEnemies() {
-        enemies.add(new Enemy(ctx, 0,900, 386));
-        enemies.add(new Enemy(ctx, 1,400, 386));
     }
 
     public PlayerDirection getPlayerDirection() {
@@ -137,6 +145,16 @@ public class ModelFacade implements Observable {
     public void notifyObservers(String change) {
         for (Observer observer : observers) {
             observer.update(change);
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == modelTimer) {
+            player.checkForCollisionsAndMove();
+            for (Enemy enemy : enemies) {
+                enemy.checkForCollisionsAndMove();
+            }
         }
     }
 }

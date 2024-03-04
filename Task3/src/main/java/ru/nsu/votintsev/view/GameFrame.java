@@ -17,7 +17,7 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
     private final PlayerLabel playerLabel = new PlayerLabel();
     private final DoorLabel doorLabel = new DoorLabel();
 
-    private GamePanel gamePanel;
+    private final GamePanel gamePanel;
 
     private final Vector<EnemyLabel> enemiesLabel = new Vector<>();
     private final Vector<WallsPanel> wallsPanels = new Vector<>();
@@ -32,8 +32,6 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
 
     private int runEnemyAnimationCount = 0;
 
-    private final GameMenu gameMenu;
-
     private PlayerDirection lastPlayerDirection = PlayerDirection.RIGHT;
 
     public GameFrame(ModelFacade modelFacade, Controller controller) {
@@ -45,12 +43,12 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         this.setSize(screenSize.getSize());
 
-        gameMenu = new GameMenu();
+        GameMenu gameMenu = new GameMenu();
 
         this.addKeyListener(controller);
 
         this.modelFacade = modelFacade;
-        modelFacade.setPlayerStartCords(100,400);
+        modelFacade.setPlayerStartCords(100,100);
         this.modelFacade.addObserver(this);
 
         gamePanel = new GamePanel(this.getWidth(), this.getHeight());

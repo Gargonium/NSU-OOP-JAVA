@@ -1,12 +1,14 @@
 package ru.nsu.votintsev.model;
 
 import ru.nsu.votintsev.model.game.objects.Door;
+import ru.nsu.votintsev.model.game.objects.Enemy;
 
-import java.util.AbstractList;
+import java.util.Vector;
 
 public class GameContext {
 
-    AbstractList<Wall> walls;
+    Vector<Wall> walls;
+    Vector<Enemy> enemies;
     Door door;
 
     private int GAME_FIELD_WIDTH;
@@ -15,12 +17,20 @@ public class GameContext {
     public GameContext() {
 
     }
-    public void setWalls(AbstractList<Wall> walls) {
+    public void setWalls(Vector<Wall> walls) {
         this.walls = walls;
     }
 
-    public AbstractList<Wall> getWalls() {
+    public Vector<Wall> getWalls() {
         return walls;
+    }
+
+    public Vector<Enemy> getEnemies() {
+        return enemies;
+    }
+
+    public void setEnemies(Vector<Enemy> enemies) {
+        this.enemies = enemies;
     }
 
     public void setDoor(Door door) {
