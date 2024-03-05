@@ -2,6 +2,8 @@ package ru.nsu.votintsev.model.game.objects;
 
 public interface GameObject {
 
+    void scaleMe();
+
     int getX();
 
     int getY();
