@@ -8,16 +8,19 @@ import java.util.Vector;
 
 public class GameContext {
 
-    Vector<Wall> walls;
-    Vector<Enemy> enemies;
-    Door door;
+    private Vector<Wall> walls;
+    private Vector<Enemy> enemies;
+    private Door door;
 
     private int GAME_FIELD_WIDTH;
     private int GAME_FIELD_HEIGHT;
 
+    public ModelScaleInator modelScaleInator = new ModelScaleInator();
+
     public GameContext() {
 
     }
+
     public void setWalls(Vector<Wall> walls) {
         this.walls = walls;
     }

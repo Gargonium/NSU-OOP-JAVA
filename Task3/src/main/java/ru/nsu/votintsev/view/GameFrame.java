@@ -3,8 +3,12 @@ package ru.nsu.votintsev.view;
 import ru.nsu.votintsev.controller.Controller;
 import ru.nsu.votintsev.model.ModelFacade;
 import ru.nsu.votintsev.model.directions.PlayerDirection;
-import ru.nsu.votintsev.view.entity.label.*;
-import ru.nsu.votintsev.view.sprite.state.*;
+import ru.nsu.votintsev.view.entity.label.DoorLabel;
+import ru.nsu.votintsev.view.entity.label.EnemyLabel;
+import ru.nsu.votintsev.view.entity.label.PlayerLabel;
+import ru.nsu.votintsev.view.entity.label.WallsLabel;
+import ru.nsu.votintsev.view.sprite.state.EnemySpriteState;
+import ru.nsu.votintsev.view.sprite.state.PlayerSpriteState;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,7 +18,9 @@ import java.util.Vector;
 
 public class GameFrame extends JFrame implements Observer, ActionListener {
 
-    private final PlayerLabel playerLabel = new PlayerLabel();
+    private final ViewScaleInator viewScaleInator = new ViewScaleInator();
+
+    private final PlayerLabel playerLabel = new PlayerLabel(viewScaleInator);
 
     private final Vector<EnemyLabel> enemiesLabels = new Vector<>();
 
@@ -39,6 +45,8 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         this.setSize(screenSize.getSize());
 
+        modelFacade.setScalePercentage(viewScaleInator.getScalePercentWidth(), viewScaleInator.getScalePercentHeight());
+
         GameMenu gameMenu = new GameMenu();
 
         this.addKeyListener(controller);
@@ -52,14 +60,14 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         modelFacade.setGameFieldDimensions(gamePanel.getWidth(), gamePanel.getHeight());
 
         for (int i = 0; i < modelFacade.getWallsCount(); ++i) {
-            WallsLabel wallPanel = new WallsLabel(modelFacade.getWallRect(i));
+            WallsLabel wallPanel = new WallsLabel(modelFacade.getWallRect(i), viewScaleInator);
 //            Vector<WallsLabel> wallsLabels = new Vector<>();
 //            wallsLabels.add(wallPanel);
             this.add(wallPanel);
         }
 
         for (int i = 0; i < modelFacade.getEnemiesCount(); ++i) {
-            EnemyLabel enemyLabel = new EnemyLabel();
+            EnemyLabel enemyLabel = new EnemyLabel(viewScaleInator);
             enemyLabel.setLocation(modelFacade.getEnemyX(i), modelFacade.getEnemyY(i));
             modelFacade.setEnemySize(i, enemyLabel.getWidth(), enemyLabel.getHeight());
             enemiesLabels.add(enemyLabel);
@@ -67,7 +75,7 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         }
 
         modelFacade.setPlayerSize(playerLabel.getWidth(), playerLabel.getHeight());
-        DoorLabel doorLabel = new DoorLabel();
+        DoorLabel doorLabel = new DoorLabel(viewScaleInator);
         modelFacade.setDoorSize(doorLabel.getWidth(), doorLabel.getHeight());
 
         playerLabel.setBounds(modelFacade.getPlayerX(), modelFacade.getPlayerY(),

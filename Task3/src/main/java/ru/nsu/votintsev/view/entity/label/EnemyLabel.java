@@ -1,5 +1,6 @@
 package ru.nsu.votintsev.view.entity.label;
 
+import ru.nsu.votintsev.view.ViewScaleInator;
 import ru.nsu.votintsev.view.sprite.state.EnemySpriteState;
 
 import javax.swing.*;
@@ -7,19 +8,28 @@ import java.util.Objects;
 
 public class EnemyLabel extends JLabel {
     
-    private final Icon enemyRunLeft0 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/enemySprites/enemyLeft/enemyRun0.png")));
-    private final Icon enemyRunLeft1 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/enemySprites/enemyLeft/enemyRun1.png")));
-    private final Icon enemyRunLeft2 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/enemySprites/enemyLeft/enemyRun2.png")));
+    private ImageIcon enemyRunLeft0 = (new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/enemySprites/enemyLeft/enemyRun0.png"))));
+    private ImageIcon enemyRunLeft1 = (new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/enemySprites/enemyLeft/enemyRun1.png"))));
+    private ImageIcon enemyRunLeft2 = (new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/enemySprites/enemyLeft/enemyRun2.png"))));
     
-    private final Icon enemyRunRight0 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/enemySprites/enemyRight/enemyRun0.png")));
-    private final Icon enemyRunRight1 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/enemySprites/enemyRight/enemyRun1.png")));
-    private final Icon enemyRunRight2 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/enemySprites/enemyRight/enemyRun2.png")));
+    private ImageIcon enemyRunRight0 = (new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/enemySprites/enemyRight/enemyRun0.png"))));
+    private ImageIcon enemyRunRight1 = (new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/enemySprites/enemyRight/enemyRun1.png"))));
+    private ImageIcon enemyRunRight2 = (new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/enemySprites/enemyRight/enemyRun2.png"))));
 
-    private Icon enemySprite;
+    private ImageIcon enemySprite;
 
     private EnemySpriteState enemySpriteState = EnemySpriteState.RUN_RIGHT_0;
 
-    public EnemyLabel() {
+    public EnemyLabel(ViewScaleInator viewScaleInator) {
+
+        enemyRunLeft0 = viewScaleInator.scaleImage(enemyRunLeft0);
+        enemyRunLeft1 = viewScaleInator.scaleImage(enemyRunLeft1);
+        enemyRunLeft2 = viewScaleInator.scaleImage(enemyRunLeft2);
+
+        enemyRunRight0 = viewScaleInator.scaleImage(enemyRunRight0);
+        enemyRunRight1 = viewScaleInator.scaleImage(enemyRunRight1);
+        enemyRunRight2 = viewScaleInator.scaleImage(enemyRunRight2);
+
 
         setEnemySprite();
 

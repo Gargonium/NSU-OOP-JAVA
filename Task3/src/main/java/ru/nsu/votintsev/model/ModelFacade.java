@@ -2,10 +2,7 @@ package ru.nsu.votintsev.model;
 
 import ru.nsu.votintsev.model.directions.EnemyDirection;
 import ru.nsu.votintsev.model.directions.PlayerDirection;
-import ru.nsu.votintsev.model.game.objects.Player;
-import ru.nsu.votintsev.model.game.objects.Door;
-import ru.nsu.votintsev.model.game.objects.Enemy;
-import ru.nsu.votintsev.model.game.objects.Wall;
+import ru.nsu.votintsev.model.game.objects.*;
 import ru.nsu.votintsev.view.Observer;
 
 import javax.swing.*;
@@ -22,6 +19,8 @@ public class ModelFacade implements Observable, ActionListener {
     private final Door door;
     private final GameContext ctx;
 
+    private final Vector<GameObject> objects = new Vector<>();
+
     private final Timer modelTimer = new Timer(10, this);
 
     public ModelFacade() {
@@ -30,7 +29,7 @@ public class ModelFacade implements Observable, ActionListener {
         ctx.setWalls(walls);
         ctx.setEnemies(enemies);
 
-        door = new Door();
+        door = new Door(ctx);
         ctx.setDoor(door);
         player = new Player(ctx);
 
@@ -38,12 +37,17 @@ public class ModelFacade implements Observable, ActionListener {
 
         readWalls();
         readEnemies();
+
+        objects.addAll(enemies);
+        objects.addAll(walls);
+        objects.add(player);
+        objects.add(door);
     }
 
     private void readWalls() {
-        walls.add(new Wall(0, 450, 200, 64));
-        walls.add(new Wall(300, 450, 1000, 64));
-        walls.add(new Wall(1400, 450, 200, 64));
+        walls.add(new Wall(ctx, 0, 450, 200, 64));
+        walls.add(new Wall(ctx,300, 450, 1000, 64));
+        walls.add(new Wall(ctx,1400, 450, 200, 64));
     }
 
     private void readEnemies() {
@@ -91,6 +95,12 @@ public class ModelFacade implements Observable, ActionListener {
 
     public void setGameFieldDimensions(int gameFieldWidth, int gameFieldHeight) {
         ctx.setGameFieldDimensions(gameFieldWidth, gameFieldHeight);
+    }
+    public void setScalePercentage(double scalePercentWidth, double scalePercentHeight) {
+        ctx.modelScaleInator.setScalePercentage(scalePercentWidth, scalePercentHeight);
+        for (GameObject object : objects) {
+            object.scaleMe();
+        }
     }
 
     public void setPlayerStartCords(int x, int y) {

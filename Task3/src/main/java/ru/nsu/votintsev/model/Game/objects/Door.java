@@ -1,5 +1,7 @@
 package ru.nsu.votintsev.model.game.objects;
 
+import ru.nsu.votintsev.model.GameContext;
+
 public class Door implements GameObject {
 
     private int X;
@@ -8,9 +10,18 @@ public class Door implements GameObject {
     private int width;
     private int height;
 
-    public Door() {
+    private final GameContext ctx;
+
+    public Door(GameContext ctx) {
+        this.ctx = ctx;
         X = 1000;
         Y = 386;
+    }
+
+    @Override
+    public void scaleMe() {
+        X = ctx.modelScaleInator.scaleByX(X);
+        Y = ctx.modelScaleInator.scaleByY(Y);
     }
 
     @Override

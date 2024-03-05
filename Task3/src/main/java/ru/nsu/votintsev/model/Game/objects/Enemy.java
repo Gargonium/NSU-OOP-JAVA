@@ -1,14 +1,14 @@
 package ru.nsu.votintsev.model.game.objects;
 
-import ru.nsu.votintsev.model.directions.EnemyDirection;
 import ru.nsu.votintsev.model.GameContext;
+import ru.nsu.votintsev.model.directions.EnemyDirection;
 
 public class Enemy implements GameObject {
 
     private int X;
     private int Y;
 
-    private final static int SPEED = 5;
+    private int speed = 5;
 
     private int width;
     private int height;
@@ -22,6 +22,13 @@ public class Enemy implements GameObject {
 
         X = x;
         Y = y;
+    }
+
+    @Override
+    public void scaleMe() {
+        X = ctx.modelScaleInator.scaleByX(X);
+        Y = ctx.modelScaleInator.scaleByY(Y);
+        speed = ctx.modelScaleInator.scaleByX(speed);
     }
 
     @Override
@@ -70,8 +77,8 @@ public class Enemy implements GameObject {
             if (X < wall.getX() + wall.getWidth() && X + width > wall.getX() &&
                     Y < wall.getY() + wall.getHeight() && Y + height > wall.getY())
                 enemyDirection = (enemyDirection == EnemyDirection.LEFT) ? EnemyDirection.RIGHT : EnemyDirection.LEFT;
-            if ((X - SPEED <= wall.getX() && X >= wall.getX())
-                    || (X + width + SPEED >= wall.getX() + wall.getWidth())  && (X + width <= wall.getX() + wall.getWidth())) {
+            if ((X - speed <= wall.getX() && X >= wall.getX())
+                    || (X + width + speed >= wall.getX() + wall.getWidth())  && (X + width <= wall.getX() + wall.getWidth())) {
                 enemyDirection = (enemyDirection == EnemyDirection.LEFT) ? EnemyDirection.RIGHT : EnemyDirection.LEFT;
             }
         }
@@ -81,8 +88,8 @@ public class Enemy implements GameObject {
         }
 
         if (enemyDirection == EnemyDirection.LEFT)
-            X -= SPEED;
+            X -= speed;
         else
-            X += SPEED;
+            X += speed;
     }
 }

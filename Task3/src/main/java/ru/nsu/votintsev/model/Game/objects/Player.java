@@ -11,8 +11,7 @@ public class Player implements GameObject {
     private int height;
     private int width;
 
-    private final static int X_SPEED = 7;
-    private final static int GRAVITY_SPEED = 10;
+    private final GameContext ctx;
 
     private boolean moveUp;
     private boolean moveRight;
@@ -23,12 +22,13 @@ public class Player implements GameObject {
     private int startX = 0;
     private int startY = 0;
 
-    private final GameContext ctx;
+    private int xSpeed = 7;
+    private int gravitySpeed = 10;
 
     private boolean isJumping = false;
     private int jumpSpeed = 0;
-    private static final int JUMP_ACCELERATION = 1;
-    private static final int MAX_JUMP_SPEED = 16;
+    private int jumpAcceleration = 1;
+    private int maxJumpSpeed = 16;
 
     public Player(GameContext context) {
         ctx = context;
@@ -72,6 +72,32 @@ public class Player implements GameObject {
     private void reachDoor() {
         X = startX;
         Y = startY;
+    }
+
+    @Override
+    public void scaleMe() {
+        startX = ctx.modelScaleInator.scaleByX(X);
+        startY = ctx.modelScaleInator.scaleByY(Y);
+        X = startX;
+        Y = startY;
+
+        xSpeed = ctx.modelScaleInator.scaleByX(xSpeed);
+        gravitySpeed = ctx.modelScaleInator.scaleByY(gravitySpeed);
+        jumpAcceleration = ctx.modelScaleInator.scaleByY(jumpAcceleration);
+
+        int jumpHeight = 0;
+        for (int i = 1; i < maxJumpSpeed; ++i) {
+            jumpHeight += i;
+        }
+        jumpHeight = ctx.modelScaleInator.scaleByY(jumpHeight);
+
+        maxJumpSpeed = 0;
+        int jumpSpeedIterator = 1;
+        while (jumpHeight >= 0) {
+            jumpHeight -= jumpSpeedIterator;
+            jumpSpeedIterator++;
+            maxJumpSpeed++;
+        }
     }
 
     @Override
@@ -135,30 +161,30 @@ public class Player implements GameObject {
 
         if (moveLeft) {
             if (X > 0)
-                X -= X_SPEED;
+                X -= xSpeed;
             playerDirection = PlayerDirection.LEFT;
         } else if (moveRight) {
             if (X + width < ctx.getGameFieldWidth())
-                X += X_SPEED;
+                X += xSpeed;
             playerDirection = PlayerDirection.RIGHT;
         } else {
             playerDirection = PlayerDirection.STAND;
         }
 
         if (!isOnGround && !isJumping) {
-            Y += GRAVITY_SPEED;
+            Y += gravitySpeed;
             if (Y >= ctx.getGameFieldHeight())
                 death();
         }
 
         if (moveUp && isOnGround) {
             isJumping = true;
-            jumpSpeed = MAX_JUMP_SPEED;
+            jumpSpeed = maxJumpSpeed;
         }
 
         if (isJumping) {
             Y -= jumpSpeed;
-            jumpSpeed -= JUMP_ACCELERATION;
+            jumpSpeed -= jumpAcceleration;
 
             if (jumpSpeed <= 0) {
                 isJumping = false;

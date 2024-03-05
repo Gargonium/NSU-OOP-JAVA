@@ -1,5 +1,6 @@
 package ru.nsu.votintsev.view.entity.label;
 
+import ru.nsu.votintsev.view.ViewScaleInator;
 import ru.nsu.votintsev.view.sprite.state.PlayerSpriteState;
 
 import javax.swing.*;
@@ -7,23 +8,36 @@ import java.util.Objects;
 
 public class PlayerLabel extends JLabel {
 
-    private final Icon playerStandLeft0 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerLeft/playerStand0.png")));
-    private final Icon playerStandLeft1 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerLeft/playerStand1.png")));
-    private final Icon playerRunLeft0 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerLeft/playerRun0.png")));
-    private final Icon playerRunLeft1 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerLeft/playerRun1.png")));
-    private final Icon playerRunLeft2 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerLeft/playerRun2.png")));
+    private ImageIcon playerStandLeft0 = (new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerLeft/playerStand0.png"))));
+    private ImageIcon playerStandLeft1 = (new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerLeft/playerStand1.png"))));
+    private ImageIcon playerRunLeft0 = (new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerLeft/playerRun0.png"))));
+    private ImageIcon playerRunLeft1 = (new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerLeft/playerRun1.png"))));
+    private ImageIcon playerRunLeft2 = (new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerLeft/playerRun2.png"))));
 
-    private final Icon playerStandRight0 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerRight/playerStand0.png")));
-    private final Icon playerStandRight1 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerRight/playerStand1.png")));
-    private final Icon playerRunRight0 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerRight/playerRun0.png")));
-    private final Icon playerRunRight1 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerRight/playerRun1.png")));
-    private final Icon playerRunRight2 = new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerRight/playerRun2.png")));
+    private ImageIcon playerStandRight0 = (new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerRight/playerStand0.png"))));
+    private ImageIcon playerStandRight1 = (new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerRight/playerStand1.png"))));
+    private ImageIcon playerRunRight0 = (new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerRight/playerRun0.png"))));
+    private ImageIcon playerRunRight1 = (new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerRight/playerRun1.png"))));
+    private ImageIcon playerRunRight2 = (new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/playerSprites/playerRight/playerRun2.png"))));
 
-    private Icon playerSprite;
+    private ImageIcon playerSprite;
 
     private PlayerSpriteState playerSpriteState = PlayerSpriteState.STAND_RIGHT_0;
 
-    public PlayerLabel() {
+    public PlayerLabel(ViewScaleInator viewScaleInator) {
+
+        playerStandLeft0 = viewScaleInator.scaleImage(playerStandLeft0);
+        playerStandLeft1 = viewScaleInator.scaleImage(playerStandLeft1);
+        playerRunLeft0 = viewScaleInator.scaleImage(playerRunLeft0);
+        playerRunLeft1 = viewScaleInator.scaleImage(playerRunLeft1);
+        playerRunLeft2 = viewScaleInator.scaleImage(playerRunLeft2);
+
+        playerStandRight0 = viewScaleInator.scaleImage(playerStandRight0);
+        playerStandRight1 = viewScaleInator.scaleImage(playerStandRight1);
+        playerRunRight0 = viewScaleInator.scaleImage(playerRunRight0);
+        playerRunRight1 = viewScaleInator.scaleImage(playerRunRight1);
+        playerRunRight2 = viewScaleInator.scaleImage(playerRunRight2);
+
 
         setPlayerSprite();
 
