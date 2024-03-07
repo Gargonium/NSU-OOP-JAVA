@@ -5,10 +5,15 @@ public interface GameObject {
     void scaleMe();
 
     int getX();
-
     int getY();
 
-    void setX(int x);
+    int getWidth();
+    int getHeight();
 
+    void setX(int x);
     void setY(int y);
+    void setWidth(int width);
+    void setHeight(int height);
+
+    void checkForCollisionsAndMove();
 }

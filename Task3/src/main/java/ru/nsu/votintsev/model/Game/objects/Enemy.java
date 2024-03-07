@@ -3,93 +3,49 @@ package ru.nsu.votintsev.model.game.objects;
 import ru.nsu.votintsev.model.GameContext;
 import ru.nsu.votintsev.model.directions.EnemyDirection;
 
-public class Enemy implements GameObject {
-
-    private int X;
-    private int Y;
+public class Enemy extends BaseGameObject {
 
     private int speed = 5;
-
-    private int width;
-    private int height;
-
-    private final GameContext ctx;
 
     private EnemyDirection enemyDirection = EnemyDirection.RIGHT;
 
     public Enemy(GameContext context, int x, int y) {
         ctx = context;
 
-        X = x;
-        Y = y;
+        this.x = x;
+        this.y = y;
     }
 
     @Override
     public void scaleMe() {
-        X = ctx.modelScaleInator.scaleByX(X);
-        Y = ctx.modelScaleInator.scaleByY(Y);
+        x = ctx.modelScaleInator.scaleByX(x);
+        y = ctx.modelScaleInator.scaleByY(y);
         speed = ctx.modelScaleInator.scaleByX(speed);
-    }
-
-    @Override
-    public int getX() {
-        return X;
-    }
-
-    @Override
-    public void setX(int x) {
-        X = x;
-    }
-
-    @Override
-    public int getY() {
-        return Y;
-    }
-
-    @Override
-    public void setY(int y) {
-        Y = y;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
     }
 
     public EnemyDirection getEnemyDirection() {
         return enemyDirection;
     }
 
+    @Override
     public void checkForCollisionsAndMove() {
-
         for (Wall wall : ctx.getWalls()) {
-            if (X < wall.getX() + wall.getWidth() && X + width > wall.getX() &&
-                    Y < wall.getY() + wall.getHeight() && Y + height > wall.getY())
+            if (x < wall.getX() + wall.getWidth() && x + width > wall.getX() &&
+                    y < wall.getY() + wall.getHeight() && y + height > wall.getY())
                 enemyDirection = (enemyDirection == EnemyDirection.LEFT) ? EnemyDirection.RIGHT : EnemyDirection.LEFT;
-            if ((X - speed <= wall.getX() && X >= wall.getX())
-                    || (X + width + speed >= wall.getX() + wall.getWidth())  && (X + width <= wall.getX() + wall.getWidth())) {
+            if ((x - speed <= wall.getX() && x >= wall.getX())
+                    || (x + width + speed >= wall.getX() + wall.getWidth())  && (x + width <= wall.getX() + wall.getWidth())) {
                 enemyDirection = (enemyDirection == EnemyDirection.LEFT) ? EnemyDirection.RIGHT : EnemyDirection.LEFT;
             }
         }
 
-        if ((X <= 0) || (X + width >= ctx.getGameFieldWidth())){
+        if ((x <= 0) || (x + width >= ctx.getGameFieldWidth())){
             enemyDirection = (enemyDirection == EnemyDirection.LEFT) ? EnemyDirection.RIGHT : EnemyDirection.LEFT;
         }
 
         if (enemyDirection == EnemyDirection.LEFT)
-            X -= speed;
+            x -= speed;
         else
-            X += speed;
+            x += speed;
     }
 }

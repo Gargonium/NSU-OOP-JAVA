@@ -18,7 +18,6 @@ public class WallsLabel extends JPanel {
         ImageIcon grassIcon = viewScaleInator.scaleImage(new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/landSprites/grass.png"))));
         ImageIcon dirtIcon = viewScaleInator.scaleImage(new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/landSprites/dirt.png"))));
 
-
         this.setLayout(null);
 
         for (int i = 0; i < width /grassIcon.getIconWidth() + 1; ++i) {

@@ -3,6 +3,7 @@ package ru.nsu.votintsev.view;
 import ru.nsu.votintsev.controller.Controller;
 import ru.nsu.votintsev.model.Changes;
 import ru.nsu.votintsev.model.ModelFacade;
+import ru.nsu.votintsev.model.Observer;
 import ru.nsu.votintsev.model.directions.PlayerDirection;
 import ru.nsu.votintsev.view.entity.label.DoorLabel;
 import ru.nsu.votintsev.view.entity.label.EnemyLabel;
@@ -15,14 +16,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameFrame extends JFrame implements Observer, ActionListener {
 
     private final ViewScaleInator viewScaleInator = new ViewScaleInator();
 
     private final PlayerLabel playerLabel = new PlayerLabel(viewScaleInator);
-    private final Vector<EnemyLabel> enemiesLabels = new Vector<>();
+    private final List<EnemyLabel> enemiesLabels = new ArrayList<>();
 
     private final ModelFacade modelFacade;
 

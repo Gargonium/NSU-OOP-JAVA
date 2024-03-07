@@ -7,11 +7,11 @@ import java.awt.event.KeyListener;
 
 public class Controller implements KeyListener {
 
-    ModelFacade modelFacade;
+    private final ModelFacade modelFacade;
 
-    boolean moveUp = false;
-    boolean moveRight = false;
-    boolean moveLeft = false;
+    private boolean moveUp = false;
+    private boolean moveRight = false;
+    private boolean moveLeft = false;
 
     public Controller(ModelFacade modelFacade) {
         this.modelFacade = modelFacade;

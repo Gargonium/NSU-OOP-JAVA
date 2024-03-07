@@ -3,15 +3,7 @@ package ru.nsu.votintsev.model.game.objects;
 import ru.nsu.votintsev.model.GameContext;
 import ru.nsu.votintsev.model.directions.PlayerDirection;
 
-public class Player implements GameObject {
-
-    private int X;
-    private int Y;
-
-    private int height;
-    private int width;
-
-    private final GameContext ctx;
+public class Player extends BaseGameObject {
 
     private boolean moveUp;
     private boolean moveRight;
@@ -37,8 +29,8 @@ public class Player implements GameObject {
     public void setStartCords(int X, int Y) {
         startX = X;
         startY = Y;
-        this.X = X;
-        this.Y = Y;
+        this.x = X;
+        this.y = Y;
     }
 
     public void setMovements(boolean isUp, boolean isRight, boolean isLeft) {
@@ -58,28 +50,28 @@ public class Player implements GameObject {
 
     public void interact() {
         Door door = ctx.getDoor();
-        if (((X + width >= door.getX()) && (X <= door.getX() + door.getWidth())) &&
-                ((Y <= door.getY() + door.getHeight()) && (Y + height >= door.getY()))) {
+        if (((x + width >= door.getX()) && (x <= door.getX() + door.getWidth())) &&
+                ((y <= door.getY() + door.getHeight()) && (y + height >= door.getY()))) {
            reachDoor();
         }
     }
 
     private void death() {
-        X = startX;
-        Y = startY;
+        x = startX;
+        y = startY;
     }
 
     private void reachDoor() {
-        X = startX;
-        Y = startY;
+        x = startX;
+        y = startY;
     }
 
     @Override
     public void scaleMe() {
-        startX = ctx.modelScaleInator.scaleByX(X);
-        startY = ctx.modelScaleInator.scaleByY(Y);
-        X = startX;
-        Y = startY;
+        startX = ctx.modelScaleInator.scaleByX(x);
+        startY = ctx.modelScaleInator.scaleByY(y);
+        x = startX;
+        y = startY;
 
         xSpeed = ctx.modelScaleInator.scaleByX(xSpeed);
         gravitySpeed = ctx.modelScaleInator.scaleByY(gravitySpeed);
@@ -101,57 +93,38 @@ public class Player implements GameObject {
     }
 
     @Override
-    public int getX() {
-        return X;
-    }
-
-    @Override
-    public void setX(int x) {
-        X = x;
-    }
-
-    @Override
-    public int getY() {
-        return Y;
-    }
-
-    @Override
-    public void setY(int y) {
-        Y = y;
-    }
-
     public void checkForCollisionsAndMove() {
         boolean isOnGround = false;
         try {
             for (Wall wall : ctx.getWalls()) {
-                if (X < wall.getX() + wall.getWidth() && X + width > wall.getX() &&
-                        Y <= wall.getY() + wall.getHeight() && Y + height >= wall.getY()) {
+                if (x < wall.getX() + wall.getWidth() && x + width > wall.getX() &&
+                        y <= wall.getY() + wall.getHeight() && y + height >= wall.getY()) {
 
-                    int overlapX = Math.min(X + width, wall.getX() + wall.getWidth()) - Math.max(X, wall.getX());
-                    int overlapY = Math.min(Y + height, wall.getY() + wall.getHeight()) - Math.max(Y, wall.getY());
+                    int overlapX = Math.min(x + width, wall.getX() + wall.getWidth()) - Math.max(x, wall.getX());
+                    int overlapY = Math.min(y + height, wall.getY() + wall.getHeight()) - Math.max(y, wall.getY());
 
                     if (overlapX < overlapY) {
-                        if (X < wall.getX()) {
-                            X = wall.getX() - width;
+                        if (x < wall.getX()) {
+                            x = wall.getX() - width;
                         } else {
-                            X = wall.getX() + wall.getWidth();
+                            x = wall.getX() + wall.getWidth();
                         }
                     } else {
-                        if (Y <= wall.getY()) {
-                            Y = wall.getY() - height;
+                        if (y <= wall.getY()) {
+                            y = wall.getY() - height;
                             isOnGround = true;
                         } else {
-                            Y = wall.getY() + wall.getHeight();
+                            y = wall.getY() + wall.getHeight();
                         }
                     }
                 }
             }
 
             for (Enemy enemy : ctx.getEnemies()) {
-                if (X <= enemy.getX() + enemy.getWidth() &&
-                        X + width >= enemy.getX() &&
-                        Y <= enemy.getY() + enemy.getHeight() &&
-                        Y + height >= enemy.getY()) {
+                if (x <= enemy.getX() + enemy.getWidth() &&
+                        x + width >= enemy.getX() &&
+                        y <= enemy.getY() + enemy.getHeight() &&
+                        y + height >= enemy.getY()) {
                     death();
                 }
             }
@@ -160,20 +133,20 @@ public class Player implements GameObject {
         }
 
         if (moveLeft) {
-            if (X > 0)
-                X -= xSpeed;
+            if (x > 0)
+                x -= xSpeed;
             playerDirection = PlayerDirection.LEFT;
         } else if (moveRight) {
-            if (X + width < ctx.getGameFieldWidth())
-                X += xSpeed;
+            if (x + width < ctx.getGameFieldWidth())
+                x += xSpeed;
             playerDirection = PlayerDirection.RIGHT;
         } else {
             playerDirection = PlayerDirection.STAND;
         }
 
         if (!isOnGround && !isJumping) {
-            Y += gravitySpeed;
-            if (Y >= ctx.getGameFieldHeight())
+            y += gravitySpeed;
+            if (y >= ctx.getGameFieldHeight())
                 death();
         }
 
@@ -183,7 +156,7 @@ public class Player implements GameObject {
         }
 
         if (isJumping) {
-            Y -= jumpSpeed;
+            y -= jumpSpeed;
             jumpSpeed -= jumpAcceleration;
 
             if (jumpSpeed <= 0) {

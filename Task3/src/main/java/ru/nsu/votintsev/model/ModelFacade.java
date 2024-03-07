@@ -3,23 +3,23 @@ package ru.nsu.votintsev.model;
 import ru.nsu.votintsev.model.directions.EnemyDirection;
 import ru.nsu.votintsev.model.directions.PlayerDirection;
 import ru.nsu.votintsev.model.game.objects.*;
-import ru.nsu.votintsev.view.Observer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
+import java.util.List;
+import java.util.ArrayList;
 
 public class ModelFacade implements Observable, ActionListener {
-    private final Vector<Enemy> enemies = new Vector<>();
-    private final Vector<Wall> walls = new Vector<>();
-    private final Vector<Observer> observers = new Vector<>();
+    private final List<Enemy> enemies = new ArrayList<>();
+    private final List<Wall> walls = new ArrayList<>();
+    private final List<Observer> observers = new ArrayList<>();
     private final Player player;
     private final Door door;
     private final GameContext ctx;
 
-    private final Vector<GameObject> objects = new Vector<>();
+    private final List<GameObject> objects = new ArrayList<>();
 
     private final Timer modelTimer = new Timer(10, this);
 
