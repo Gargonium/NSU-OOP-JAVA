@@ -105,11 +105,13 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
 
     @Override
     public void update(Changes change) {
-        switch (change) {
-            case CHANGE_PLAYER_CORDS -> setPlayerLocation();
-            case PLAYER_REACH_DOOR, PLAYER_REACH_SCREEN_SIDE -> {}
-            case CHANGE_ENEMY_CORDS -> setEnemyLocation();
-        }
+        SwingUtilities.invokeLater(() -> {
+            switch (change) {
+                case CHANGE_PLAYER_CORDS -> setPlayerLocation();
+                case PLAYER_REACH_DOOR, PLAYER_REACH_SCREEN_SIDE -> {}
+                case CHANGE_ENEMY_CORDS -> setEnemyLocation();
+            }
+        });
     }
 
     @Override
