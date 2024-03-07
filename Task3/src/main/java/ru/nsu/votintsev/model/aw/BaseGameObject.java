@@ -1,4 +1,4 @@
-package ru.nsu.votintsev.model.game.objects;
+package ru.nsu.votintsev.model.aw;
 
 import ru.nsu.votintsev.model.GameContext;
 
@@ -61,7 +61,5 @@ public abstract class BaseGameObject implements GameObject{
     }
 
     @Override
-    public void checkForCollisionsAndMove() {
-
-    }
+    public void checkForCollisionsAndMove() {}
 }

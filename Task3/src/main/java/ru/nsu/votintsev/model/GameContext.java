@@ -1,8 +1,8 @@
 package ru.nsu.votintsev.model;
 
-import ru.nsu.votintsev.model.game.objects.Door;
-import ru.nsu.votintsev.model.game.objects.Enemy;
-import ru.nsu.votintsev.model.game.objects.Wall;
+import ru.nsu.votintsev.model.aw.Door;
+import ru.nsu.votintsev.model.aw.Enemy;
+import ru.nsu.votintsev.model.aw.Wall;
 
 import java.util.List;
 
