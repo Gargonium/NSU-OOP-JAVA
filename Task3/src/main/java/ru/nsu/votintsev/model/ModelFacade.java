@@ -3,6 +3,8 @@ package ru.nsu.votintsev.model;
 import ru.nsu.votintsev.model.directions.EnemyDirection;
 import ru.nsu.votintsev.model.directions.PlayerDirection;
 import ru.nsu.votintsev.model.game.objects.*;
+import ru.nsu.votintsev.model.observer.interfaces.Observable;
+import ru.nsu.votintsev.model.observer.interfaces.Observer;
 
 import javax.swing.*;
 import java.awt.*;

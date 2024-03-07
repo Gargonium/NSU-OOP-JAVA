@@ -3,7 +3,7 @@ package ru.nsu.votintsev.view;
 import ru.nsu.votintsev.controller.Controller;
 import ru.nsu.votintsev.model.Changes;
 import ru.nsu.votintsev.model.ModelFacade;
-import ru.nsu.votintsev.model.Observer;
+import ru.nsu.votintsev.model.observer.interfaces.Observer;
 import ru.nsu.votintsev.model.directions.PlayerDirection;
 import ru.nsu.votintsev.view.entity.label.DoorLabel;
 import ru.nsu.votintsev.view.entity.label.EnemyLabel;
