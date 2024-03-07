@@ -1,4 +1,4 @@
-package ru.nsu.votintsev.model.aw;
+package ru.nsu.votintsev.model.game.objects;
 
 public interface GameObject {
 
