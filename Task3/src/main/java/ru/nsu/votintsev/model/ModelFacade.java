@@ -43,9 +43,9 @@ public class ModelFacade implements Observable, ActionListener {
     }
 
     private void readWalls() {
-        walls.add(new Wall(ctx, 0, 450, 200, 64));
-        walls.add(new Wall(ctx,300, 450, 1000, 64));
-        walls.add(new Wall(ctx,1400, 450, 200, 64));
+        walls.add(new Wall(ctx, 0, 450, 200, 128));
+        walls.add(new Wall(ctx,300, 450, 1000, 128));
+        walls.add(new Wall(ctx,1400, 450, 200, 100));
     }
 
     private void readEnemies() {
