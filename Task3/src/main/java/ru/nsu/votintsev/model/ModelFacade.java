@@ -33,8 +33,6 @@ public class ModelFacade implements Observable, ActionListener {
         ctx.setDoor(door);
         player = new Player(ctx);
 
-        modelTimer.start();
-
         readWalls();
         readEnemies();
 
@@ -90,7 +88,6 @@ public class ModelFacade implements Observable, ActionListener {
 
     public void movePlayer(boolean isUp, boolean isRight, boolean isLeft) {
         player.setMovements(isUp, isRight, isLeft);
-        notifyObservers("Change Cords");
     }
 
     public void setGameFieldDimensions(int gameFieldWidth, int gameFieldHeight) {
@@ -132,18 +129,17 @@ public class ModelFacade implements Observable, ActionListener {
         player.interact();
     }
 
+    public void startModelTimer() {
+        modelTimer.start();
+    }
+
     @Override
     public void addObserver(Observer observer) {
         observers.add(observer);
     }
 
     @Override
-    public void removeObserver(Observer observer) {
-    observers.remove(observer);
-    }
-
-    @Override
-    public void notifyObservers(String change) {
+    public void notifyObservers(Changes change) {
         for (Observer observer : observers) {
             observer.update(change);
         }
@@ -153,9 +149,11 @@ public class ModelFacade implements Observable, ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == modelTimer) {
             player.checkForCollisionsAndMove();
+            notifyObservers(Changes.CHANGE_PLAYER_CORDS);
             for (Enemy enemy : enemies) {
                 enemy.checkForCollisionsAndMove();
             }
+            notifyObservers(Changes.CHANGE_ENEMY_CORDS);
         }
     }
 }

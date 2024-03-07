@@ -25,15 +25,10 @@ public class Controller implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_E: modelFacade.playerInteract(); break;
-            case KeyEvent.VK_UP:
-            case KeyEvent.VK_W:
-            case KeyEvent.VK_SPACE: moveUp = true; break;
-            case KeyEvent.VK_LEFT:
-            case KeyEvent.VK_A: moveLeft = true; break;
-            case KeyEvent.VK_RIGHT:
-            case KeyEvent.VK_D: moveRight = true; break;
-            default: break;
+            case KeyEvent.VK_E -> modelFacade.playerInteract();
+            case KeyEvent.VK_UP, KeyEvent.VK_W, KeyEvent.VK_SPACE -> moveUp = true;
+            case KeyEvent.VK_LEFT, KeyEvent.VK_A -> moveLeft = true;
+            case KeyEvent.VK_RIGHT, KeyEvent.VK_D -> moveRight = true;
         }
         modelFacade.movePlayer(moveUp, moveRight, moveLeft);
     }
@@ -41,14 +36,9 @@ public class Controller implements KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_UP:
-            case KeyEvent.VK_W:
-            case KeyEvent.VK_SPACE:moveUp = false; break;
-            case KeyEvent.VK_LEFT:
-            case KeyEvent.VK_A: moveLeft = false; break;
-            case KeyEvent.VK_RIGHT:
-            case KeyEvent.VK_D: moveRight = false; break;
-            default: break;
+            case KeyEvent.VK_UP, KeyEvent.VK_W, KeyEvent.VK_SPACE -> moveUp = false;
+            case KeyEvent.VK_LEFT, KeyEvent.VK_A -> moveLeft = false;
+            case KeyEvent.VK_RIGHT, KeyEvent.VK_D -> moveRight = false;
         }
         modelFacade.movePlayer(moveUp, moveRight, moveLeft);
     }

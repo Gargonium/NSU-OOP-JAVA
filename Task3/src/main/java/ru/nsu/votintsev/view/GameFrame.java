@@ -1,6 +1,7 @@
 package ru.nsu.votintsev.view;
 
 import ru.nsu.votintsev.controller.Controller;
+import ru.nsu.votintsev.model.Changes;
 import ru.nsu.votintsev.model.ModelFacade;
 import ru.nsu.votintsev.model.directions.PlayerDirection;
 import ru.nsu.votintsev.view.entity.label.DoorLabel;
@@ -21,17 +22,14 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
     private final ViewScaleInator viewScaleInator = new ViewScaleInator();
 
     private final PlayerLabel playerLabel = new PlayerLabel(viewScaleInator);
-
     private final Vector<EnemyLabel> enemiesLabels = new Vector<>();
 
     private final ModelFacade modelFacade;
 
-    private final Timer gameTimer = new Timer(1, this);
     private final Timer animationTimer = new Timer(100, this);
 
     private int runPlayerAnimationCount = 0;
     private int standAnimationCount = 0;
-
     private int runEnemyAnimationCount = 0;
 
     private PlayerDirection lastPlayerDirection = PlayerDirection.RIGHT;
@@ -55,14 +53,11 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         modelFacade.setPlayerStartCords(100,100);
         this.modelFacade.addObserver(this);
 
-        // TODO: Turn to Background
-        GamePanel gamePanel = new GamePanel(this.getWidth(), this.getHeight());
-        modelFacade.setGameFieldDimensions(gamePanel.getWidth(), gamePanel.getHeight());
+        BackgroundLabel backgroundLabel = new BackgroundLabel(this.getWidth(), this.getHeight());
+        modelFacade.setGameFieldDimensions(this.getWidth(), this.getHeight());
 
         for (int i = 0; i < modelFacade.getWallsCount(); ++i) {
             WallsLabel wallPanel = new WallsLabel(modelFacade.getWallRect(i), viewScaleInator);
-//            Vector<WallsLabel> wallsLabels = new Vector<>();
-//            wallsLabels.add(wallPanel);
             this.add(wallPanel);
         }
 
@@ -84,20 +79,16 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         setPlayerLocation();
         setEnemyLocation();
         doorLabel.setLocation(modelFacade.getDoorX(), modelFacade.getDoorY());
-
-        gameTimer.start();
+        
         animationTimer.start();
 
         this.add(playerLabel, 0);
         this.add(doorLabel);
-        this.add(gamePanel);
+        this.add(backgroundLabel);
         this.setJMenuBar(gameMenu);
         this.setVisible(true);
 
-        /* TODO: Идея следующая. У меня GameFrame содержит JPanel для всех уровней, а каждый этот уровень содержит JPanel для всех экранов
-            Фрейм отправляет сигнал о смене уровня, просто удаляя и добавляя панельки
-            Уровни с экранами делают то же самое
-         */
+        modelFacade.startModelTimer();
     }
 
     private void setPlayerLocation() {
@@ -111,16 +102,17 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
     }
 
     @Override
-    public void update(String changes) {
-
+    public void update(Changes change) {
+        switch (change) {
+            case CHANGE_PLAYER_CORDS -> setPlayerLocation();
+            case PLAYER_REACH_DOOR, PLAYER_REACH_SCREEN_SIDE -> {}
+            case CHANGE_ENEMY_CORDS -> setEnemyLocation();
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == gameTimer) {
-            setEnemyLocation();
-            setPlayerLocation();
-        }  else if (e.getSource() == animationTimer) {
+        if (e.getSource() == animationTimer) {
             switch (modelFacade.getPlayerDirection()) {
                 case STAND -> {
                     PlayerSpriteState playerSpriteState = getPlayerStandSprite();
