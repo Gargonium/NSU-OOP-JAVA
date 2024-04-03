@@ -1,19 +1,19 @@
 package ru.nsu.votintsev.view.entity.label;
 
+import ru.nsu.votintsev.model.ModelRectangle;
 import ru.nsu.votintsev.view.ViewScaleInator;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.Objects;
 
 public class WallsLabel extends JPanel {
 
-    public WallsLabel(Rectangle wall, ViewScaleInator viewScaleInator) {
+    public WallsLabel(ModelRectangle wall, ViewScaleInator viewScaleInator) {
 
-        int x = (int) wall.getX();
-        int y = (int) wall.getY();
-        int width = (int) wall.getWidth();
-        int height = (int) wall.getHeight();
+        int x = wall.getX();
+        int y = wall.getY();
+        int width = wall.getWidth();
+        int height = wall.getHeight();
 
         ImageIcon grassIcon = viewScaleInator.scaleImage(new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/landSprites/grass.png"))));
         ImageIcon dirtIcon = viewScaleInator.scaleImage(new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/landSprites/dirt.png"))));

@@ -6,14 +6,10 @@ import ru.nsu.votintsev.model.game.objects.*;
 import ru.nsu.votintsev.model.observer.interfaces.Observable;
 import ru.nsu.votintsev.model.observer.interfaces.Observer;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.*;
 import java.util.List;
-import java.util.ArrayList;
 
-public class ModelFacade implements Observable, ActionListener {
+public class ModelFacade implements Observable {
     private final List<Enemy> enemies = new ArrayList<>();
     private final List<Wall> walls = new ArrayList<>();
     private final List<Observer> observers = new ArrayList<>();
@@ -23,7 +19,7 @@ public class ModelFacade implements Observable, ActionListener {
 
     private final List<GameObject> objects = new ArrayList<>();
 
-    private final Timer modelTimer = new Timer(10, this);
+    private final Timer modelTimer = new Timer();
 
     public ModelFacade() {
         ctx = new GameContext();
@@ -37,6 +33,7 @@ public class ModelFacade implements Observable, ActionListener {
 
         readWalls();
         readEnemies();
+        readDoor();
 
         objects.addAll(enemies);
         objects.addAll(walls);
@@ -55,11 +52,20 @@ public class ModelFacade implements Observable, ActionListener {
         enemies.add(new Enemy(ctx,400, 386));
     }
 
+    private void readDoor() {
+        door.setY(386);
+        door.setX(1500);
+    }
+
     public int getPlayerX() {
         return player.getX();
     }
     public int getPlayerY() {
         return player.getY();
+    }
+
+    public int getPlayerLives() {
+        return player.getLives();
     }
 
     public int getDoorX() {
@@ -105,10 +111,14 @@ public class ModelFacade implements Observable, ActionListener {
     public void setPlayerStartCords(int x, int y) {
         player.setStartCords(x, y);
     }
+    public void setPlayerPosition(int x, int y) {
+        player.setX(x);
+        player.setY(y);
+    }
 
-    public Rectangle getWallRect(int index) {
+    public ModelRectangle getWallRect(int index) {
         Wall wall = walls.get(index);
-        return new Rectangle(wall.getX(), wall.getY(), wall.getWidth(), wall.getHeight());
+        return new ModelRectangle(wall.getX(), wall.getY(), wall.getWidth(), wall.getHeight());
     }
 
     public int getWallsCount() {
@@ -128,11 +138,17 @@ public class ModelFacade implements Observable, ActionListener {
     }
 
     public void playerInteract() {
-        player.interact();
+        if (player.interact())
+            notifyObservers(Changes.PLAYER_REACH_DOOR);
     }
 
     public void startModelTimer() {
-        modelTimer.start();
+        Date startTime = new Date();
+        modelTimer.schedule(startTimer, startTime, 10);
+    }
+
+    public void stopModelTimer() {
+        modelTimer.cancel();
     }
 
     @Override
@@ -147,15 +163,20 @@ public class ModelFacade implements Observable, ActionListener {
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == modelTimer) {
+    TimerTask startTimer = new TimerTask() {
+        @Override
+        public void run() {
             player.checkForCollisionsAndMove();
             notifyObservers(Changes.CHANGE_PLAYER_CORDS);
             for (Enemy enemy : enemies) {
                 enemy.checkForCollisionsAndMove();
             }
             notifyObservers(Changes.CHANGE_ENEMY_CORDS);
+            if (player.getLives() == 0) {
+                notifyObservers(Changes.PLAYER_DEAD);
+            }
         }
-    }
+    };
+
+
 }

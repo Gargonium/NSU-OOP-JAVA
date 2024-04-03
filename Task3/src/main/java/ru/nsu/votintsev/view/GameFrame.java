@@ -13,10 +13,11 @@ import ru.nsu.votintsev.view.sprite.state.EnemySpriteState;
 import ru.nsu.votintsev.view.sprite.state.PlayerSpriteState;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 
 public class GameFrame extends JFrame implements Observer, ActionListener {
@@ -29,10 +30,15 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
     private final ModelFacade modelFacade;
 
     private final Timer animationTimer = new Timer(100, this);
+    private Calendar gameTime = new GregorianCalendar();
 
     private int runPlayerAnimationCount = 0;
     private int standAnimationCount = 0;
     private int runEnemyAnimationCount = 0;
+
+    private final JLabel livesLabel = new JLabel();
+    private final JLabel timeLabel = new JLabel();
+    private final FinalFrame finalFrame = new FinalFrame();
 
     private PlayerDirection lastPlayerDirection = PlayerDirection.RIGHT;
 
@@ -78,6 +84,11 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         playerLabel.setBounds(modelFacade.getPlayerX(), modelFacade.getPlayerY(),
                 playerLabel.getWidth(), playerLabel.getHeight());
 
+        livesLabel.setBounds(10, 0, 200, 50);
+        livesLabel.setFont(new Font("Comic Sans", Font.PLAIN, 15));
+        timeLabel.setBounds(10, 20, 200, 50);
+        timeLabel.setFont(new Font("Comic Sans", Font.PLAIN, 15));
+
         setPlayerLocation();
         setEnemyLocation();
         doorLabel.setLocation(modelFacade.getDoorX(), modelFacade.getDoorY());
@@ -86,7 +97,9 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
 
         this.add(playerLabel, 0);
         this.add(doorLabel);
-        this.add(backgroundLabel);
+        //this.add(backgroundLabel);
+        this.add(livesLabel);
+        this.add(timeLabel);
         this.setJMenuBar(gameMenu);
         this.setVisible(true);
 
@@ -103,15 +116,31 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         }
     }
 
+    private void changeScreen() {
+    }
+
+    private void changeLvl() {
+    }
+
     @Override
     public void update(Changes change) {
         SwingUtilities.invokeLater(() -> {
             switch (change) {
                 case CHANGE_PLAYER_CORDS -> setPlayerLocation();
-                case PLAYER_REACH_DOOR, PLAYER_REACH_SCREEN_SIDE -> {}
+                case PLAYER_REACH_DOOR -> endGame(true);
+                case PLAYER_REACH_SCREEN_SIDE -> changeLvl();
                 case CHANGE_ENEMY_CORDS -> setEnemyLocation();
+                case PLAYER_DEAD -> endGame(false);
             }
         });
+    }
+
+    private void endGame(boolean isWin) {
+        this.setVisible(false);
+        animationTimer.stop();
+        modelFacade.stopModelTimer();
+        finalFrame.run(isWin);
+        this.dispose();
     }
 
     @Override
@@ -138,7 +167,14 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
                     case RIGHT -> enemiesLabels.get(i).updateEnemySprite(getEnemyRunRightSprite());
                 }
             }
+            livesLabel.setText("Lives: " + modelFacade.getPlayerLives());
+            setTimeOnLabel();
         }
+    }
+
+    private void setTimeOnLabel() {
+        Calendar currentCalendar = new GregorianCalendar();
+        timeLabel.setText("Time: " + (currentCalendar.get(Calendar.SECOND) - gameTime.get(Calendar.SECOND)) + " sec");
     }
 
     private PlayerSpriteState getPlayerStandSprite() {

@@ -22,6 +22,8 @@ public class Player extends BaseGameObject {
     private int jumpAcceleration = 1;
     private int maxJumpSpeed = 16;
 
+    private int lives = 3;
+
     public Player(GameContext context) {
         ctx = context;
     }
@@ -48,17 +50,28 @@ public class Player extends BaseGameObject {
         return playerDirection;
     }
 
-    public void interact() {
+    public int getLives() {
+        return lives;
+    }
+
+    public void setLives(int lives) {
+        this.lives = lives;
+    }
+
+    public boolean interact() {
         Door door = ctx.getDoor();
         if (((x + width >= door.getX()) && (x <= door.getX() + door.getWidth())) &&
                 ((y <= door.getY() + door.getHeight()) && (y + height >= door.getY()))) {
            reachDoor();
+           return true;
         }
+        return false;
     }
 
     private void death() {
         x = startX;
         y = startY;
+        lives--;
     }
 
     private void reachDoor() {
