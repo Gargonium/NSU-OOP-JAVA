@@ -2,7 +2,7 @@ package ru.nsu.votintsev;
 
 import ru.nsu.votintsev.controller.Controller;
 import ru.nsu.votintsev.model.ModelFacade;
-import ru.nsu.votintsev.view.GameFrame;
+import ru.nsu.votintsev.view.swing.GameFrame;
 
 import javax.swing.*;
 

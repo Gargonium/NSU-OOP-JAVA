@@ -1,7 +1,7 @@
-package ru.nsu.votintsev.view.entity.label;
+package ru.nsu.votintsev.view.swing.label.entity;
 
 import ru.nsu.votintsev.model.ModelRectangle;
-import ru.nsu.votintsev.view.ViewScaleInator;
+import ru.nsu.votintsev.view.swing.ViewScaleInator;
 
 import javax.swing.*;
 import java.util.Objects;

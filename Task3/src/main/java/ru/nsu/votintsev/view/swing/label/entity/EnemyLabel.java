@@ -1,7 +1,7 @@
-package ru.nsu.votintsev.view.entity.label;
+package ru.nsu.votintsev.view.swing.label.entity;
 
-import ru.nsu.votintsev.view.ViewScaleInator;
-import ru.nsu.votintsev.view.sprite.state.EnemySpriteState;
+import ru.nsu.votintsev.view.swing.ViewScaleInator;
+import ru.nsu.votintsev.view.swing.state.sprite.EnemySpriteState;
 
 import javax.swing.*;
 import java.util.Objects;

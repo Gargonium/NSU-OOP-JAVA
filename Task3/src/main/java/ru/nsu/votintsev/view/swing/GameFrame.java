@@ -1,16 +1,16 @@
-package ru.nsu.votintsev.view;
+package ru.nsu.votintsev.view.swing;
 
 import ru.nsu.votintsev.controller.Controller;
 import ru.nsu.votintsev.model.Changes;
 import ru.nsu.votintsev.model.ModelFacade;
 import ru.nsu.votintsev.model.observer.interfaces.Observer;
 import ru.nsu.votintsev.model.directions.PlayerDirection;
-import ru.nsu.votintsev.view.entity.label.DoorLabel;
-import ru.nsu.votintsev.view.entity.label.EnemyLabel;
-import ru.nsu.votintsev.view.entity.label.PlayerLabel;
-import ru.nsu.votintsev.view.entity.label.WallsLabel;
-import ru.nsu.votintsev.view.sprite.state.EnemySpriteState;
-import ru.nsu.votintsev.view.sprite.state.PlayerSpriteState;
+import ru.nsu.votintsev.view.swing.label.entity.DoorLabel;
+import ru.nsu.votintsev.view.swing.label.entity.EnemyLabel;
+import ru.nsu.votintsev.view.swing.label.entity.PlayerLabel;
+import ru.nsu.votintsev.view.swing.label.entity.WallsLabel;
+import ru.nsu.votintsev.view.swing.state.sprite.EnemySpriteState;
+import ru.nsu.votintsev.view.swing.state.sprite.PlayerSpriteState;
 
 import javax.swing.*;
 import javax.swing.Timer;

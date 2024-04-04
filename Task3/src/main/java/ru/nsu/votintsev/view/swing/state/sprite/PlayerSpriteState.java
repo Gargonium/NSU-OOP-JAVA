@@ -1,4 +1,4 @@
-package ru.nsu.votintsev.view.sprite.state;
+package ru.nsu.votintsev.view.swing.state.sprite;
 
 public enum PlayerSpriteState {
     STAND_RIGHT_0,

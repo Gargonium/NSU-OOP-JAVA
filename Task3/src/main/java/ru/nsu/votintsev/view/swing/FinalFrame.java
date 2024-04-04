@@ -1,4 +1,4 @@
-package ru.nsu.votintsev.view;
+package ru.nsu.votintsev.view.swing;
 
 import ru.nsu.votintsev.controller.Controller;
 import ru.nsu.votintsev.model.ModelFacade;
