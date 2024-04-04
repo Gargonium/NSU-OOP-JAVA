@@ -7,7 +7,6 @@ import ru.nsu.votintsev.model.observer.interfaces.Observable;
 import ru.nsu.votintsev.model.observer.interfaces.Observer;
 
 import java.util.*;
-import java.util.List;
 
 public class ModelFacade implements Observable {
     private final List<Enemy> enemies = new ArrayList<>();
@@ -20,6 +19,7 @@ public class ModelFacade implements Observable {
     private final List<GameObject> objects = new ArrayList<>();
 
     private final Timer modelTimer = new Timer();
+    private final Calendar gameTime = new GregorianCalendar();
 
     public ModelFacade() {
         ctx = new GameContext();
@@ -111,10 +111,6 @@ public class ModelFacade implements Observable {
     public void setPlayerStartCords(int x, int y) {
         player.setStartCords(x, y);
     }
-    public void setPlayerPosition(int x, int y) {
-        player.setX(x);
-        player.setY(y);
-    }
 
     public ModelRectangle getWallRect(int index) {
         Wall wall = walls.get(index);
@@ -163,7 +159,12 @@ public class ModelFacade implements Observable {
         }
     }
 
-    TimerTask startTimer = new TimerTask() {
+    public int getGameTime() {
+        Calendar currentCalendar = new GregorianCalendar();
+        return currentCalendar.get(Calendar.SECOND) - gameTime.get(Calendar.SECOND);
+    }
+
+    private final TimerTask startTimer = new TimerTask() {
         @Override
         public void run() {
             player.checkForCollisionsAndMove();

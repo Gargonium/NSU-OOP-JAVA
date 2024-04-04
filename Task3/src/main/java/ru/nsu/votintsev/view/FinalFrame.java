@@ -15,7 +15,7 @@ public class FinalFrame extends JFrame implements ActionListener {
 
     private final JButton restartButton = new JButton("RESTART");
 
-    private GridBagConstraints constraints;
+    private final GridBagConstraints constraints;
 
     public FinalFrame() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

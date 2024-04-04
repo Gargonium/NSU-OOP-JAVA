@@ -30,7 +30,6 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
     private final ModelFacade modelFacade;
 
     private final Timer animationTimer = new Timer(100, this);
-    private Calendar gameTime = new GregorianCalendar();
 
     private int runPlayerAnimationCount = 0;
     private int standAnimationCount = 0;
@@ -53,15 +52,12 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
 
         modelFacade.setScalePercentage(viewScaleInator.getScalePercentWidth(), viewScaleInator.getScalePercentHeight());
 
-        GameMenu gameMenu = new GameMenu();
-
         this.addKeyListener(controller);
 
         this.modelFacade = modelFacade;
         modelFacade.setPlayerStartCords(100,100);
         this.modelFacade.addObserver(this);
 
-        BackgroundLabel backgroundLabel = new BackgroundLabel(this.getWidth(), this.getHeight());
         modelFacade.setGameFieldDimensions(this.getWidth(), this.getHeight());
 
         for (int i = 0; i < modelFacade.getWallsCount(); ++i) {
@@ -100,7 +96,6 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         //this.add(backgroundLabel);
         this.add(livesLabel);
         this.add(timeLabel);
-        this.setJMenuBar(gameMenu);
         this.setVisible(true);
 
         modelFacade.startModelTimer();
@@ -116,19 +111,13 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         }
     }
 
-    private void changeScreen() {
-    }
-
-    private void changeLvl() {
-    }
-
     @Override
     public void update(Changes change) {
         SwingUtilities.invokeLater(() -> {
             switch (change) {
                 case CHANGE_PLAYER_CORDS -> setPlayerLocation();
                 case PLAYER_REACH_DOOR -> endGame(true);
-                case PLAYER_REACH_SCREEN_SIDE -> changeLvl();
+                case PLAYER_REACH_SCREEN_SIDE -> {}
                 case CHANGE_ENEMY_CORDS -> setEnemyLocation();
                 case PLAYER_DEAD -> endGame(false);
             }
@@ -168,13 +157,8 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
                 }
             }
             livesLabel.setText("Lives: " + modelFacade.getPlayerLives());
-            setTimeOnLabel();
+            timeLabel.setText("Time: " + modelFacade.getGameTime() + " sec");
         }
-    }
-
-    private void setTimeOnLabel() {
-        Calendar currentCalendar = new GregorianCalendar();
-        timeLabel.setText("Time: " + (currentCalendar.get(Calendar.SECOND) - gameTime.get(Calendar.SECOND)) + " sec");
     }
 
     private PlayerSpriteState getPlayerStandSprite() {

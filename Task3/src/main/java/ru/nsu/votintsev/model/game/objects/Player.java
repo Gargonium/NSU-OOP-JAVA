@@ -54,10 +54,6 @@ public class Player extends BaseGameObject {
         return lives;
     }
 
-    public void setLives(int lives) {
-        this.lives = lives;
-    }
-
     public boolean interact() {
         Door door = ctx.getDoor();
         if (((x + width >= door.getX()) && (x <= door.getX() + door.getWidth())) &&

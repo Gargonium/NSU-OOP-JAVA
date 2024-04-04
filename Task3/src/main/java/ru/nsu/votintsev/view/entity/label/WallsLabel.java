@@ -10,10 +10,10 @@ public class WallsLabel extends JPanel {
 
     public WallsLabel(ModelRectangle wall, ViewScaleInator viewScaleInator) {
 
-        int x = wall.getX();
-        int y = wall.getY();
-        int width = wall.getWidth();
-        int height = wall.getHeight();
+        int x = wall.x();
+        int y = wall.y();
+        int width = wall.width();
+        int height = wall.height();
 
         ImageIcon grassIcon = viewScaleInator.scaleImage(new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/landSprites/grass.png"))));
         ImageIcon dirtIcon = viewScaleInator.scaleImage(new ImageIcon(Objects.requireNonNull(this.getClass().getResource("/Sprites/landSprites/dirt.png"))));
