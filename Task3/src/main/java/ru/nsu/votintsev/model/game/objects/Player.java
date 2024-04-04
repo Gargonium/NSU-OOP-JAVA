@@ -99,6 +99,7 @@ public class Player extends BaseGameObject {
             jumpSpeedIterator++;
             maxJumpSpeed++;
         }
+        maxJumpSpeed+=2;
     }
 
     @Override
