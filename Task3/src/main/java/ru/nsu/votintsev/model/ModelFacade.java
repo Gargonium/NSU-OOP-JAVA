@@ -159,7 +159,7 @@ public class ModelFacade implements Observable {
         }
     }
 
-    public int getGameTime() {
+    public long getGameTime() {
         Calendar currentCalendar = new GregorianCalendar();
         return currentCalendar.get(Calendar.SECOND) - gameTime.get(Calendar.SECOND);
     }

@@ -22,7 +22,7 @@ public class Player extends BaseGameObject {
     private int jumpAcceleration = 1;
     private int maxJumpSpeed = 16;
 
-    private int lives = 3;
+    private int lives = 4;
 
     public Player(GameContext context) {
         ctx = context;
@@ -155,8 +155,9 @@ public class Player extends BaseGameObject {
 
         if (!isOnGround && !isJumping) {
             y += gravitySpeed;
-            if (y >= ctx.getGameFieldHeight())
+            if (y >= ctx.getGameFieldHeight()) {
                 death();
+            }
         }
 
         if (moveUp && isOnGround) {

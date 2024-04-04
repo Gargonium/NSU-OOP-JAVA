@@ -1,6 +1,6 @@
 package ru.nsu.votintsev.view.swing;
 
-import ru.nsu.votintsev.controller.Controller;
+import ru.nsu.votintsev.controller.swing.SwingController;
 import ru.nsu.votintsev.model.Changes;
 import ru.nsu.votintsev.model.ModelFacade;
 import ru.nsu.votintsev.model.observer.interfaces.Observer;
@@ -9,8 +9,8 @@ import ru.nsu.votintsev.view.swing.label.entity.DoorLabel;
 import ru.nsu.votintsev.view.swing.label.entity.EnemyLabel;
 import ru.nsu.votintsev.view.swing.label.entity.PlayerLabel;
 import ru.nsu.votintsev.view.swing.label.entity.WallsLabel;
-import ru.nsu.votintsev.view.swing.state.sprite.EnemySpriteState;
-import ru.nsu.votintsev.view.swing.state.sprite.PlayerSpriteState;
+import ru.nsu.votintsev.view.states.EnemySpriteState;
+import ru.nsu.votintsev.view.states.PlayerSpriteState;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -41,7 +41,7 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
 
     private PlayerDirection lastPlayerDirection = PlayerDirection.RIGHT;
 
-    public GameFrame(ModelFacade modelFacade, Controller controller) {
+    public GameFrame(ModelFacade modelFacade, SwingController controller) {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(null);
         this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
@@ -116,16 +116,15 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         SwingUtilities.invokeLater(() -> {
             switch (change) {
                 case CHANGE_PLAYER_CORDS -> setPlayerLocation();
-                case PLAYER_REACH_DOOR -> endGame(true);
-                case PLAYER_REACH_SCREEN_SIDE -> {}
                 case CHANGE_ENEMY_CORDS -> setEnemyLocation();
+                case PLAYER_REACH_SCREEN_SIDE -> {}
+                case PLAYER_REACH_DOOR -> endGame(true);
                 case PLAYER_DEAD -> endGame(false);
             }
         });
     }
 
     private void endGame(boolean isWin) {
-        this.setVisible(false);
         animationTimer.stop();
         modelFacade.stopModelTimer();
         finalFrame.run(isWin);

@@ -1,6 +1,6 @@
 package ru.nsu.votintsev.view.swing;
 
-import ru.nsu.votintsev.controller.Controller;
+import ru.nsu.votintsev.controller.swing.SwingController;
 import ru.nsu.votintsev.model.ModelFacade;
 
 import javax.swing.*;
@@ -55,7 +55,7 @@ public class FinalFrame extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == restartButton) {
             ModelFacade modelFacade = new ModelFacade();
-            Controller controller = new Controller(modelFacade);
+            SwingController controller = new SwingController(modelFacade);
             SwingUtilities.invokeLater(() -> new GameFrame(modelFacade, controller));
             this.dispose();
         }
