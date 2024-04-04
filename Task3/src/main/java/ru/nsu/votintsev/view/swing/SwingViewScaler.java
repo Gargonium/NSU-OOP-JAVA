@@ -5,7 +5,7 @@ package ru.nsu.votintsev.view.swing;
 import javax.swing.*;
 import java.awt.*;
 
-public class ViewScaleInator {
+public class SwingViewScaler {
 
     private static final int MY_SCREEN_WIDTH = 2048;
     private static final int MY_SCREEN_HEIGHT = 1152;
@@ -13,7 +13,7 @@ public class ViewScaleInator {
     private final double scalePercentWidth;
     private final double scalePercentHeight;
 
-    public ViewScaleInator() {
+    public SwingViewScaler() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         double userScreenWidth = screenSize.getWidth();
         double userScreenHeight = screenSize.getHeight();

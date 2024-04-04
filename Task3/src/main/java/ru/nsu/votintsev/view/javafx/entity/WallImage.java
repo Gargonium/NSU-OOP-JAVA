@@ -4,20 +4,20 @@ import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import ru.nsu.votintsev.model.ModelRectangle;
-import ru.nsu.votintsev.view.javafx.FXViewScaleInator;
+import ru.nsu.votintsev.view.javafx.FXViewScaler;
 
 import java.util.Objects;
 
 public class WallImage {
-    public WallImage(ModelRectangle wall, Group root, FXViewScaleInator fxViewScaleInator) {
+    public WallImage(ModelRectangle wall, Group root, FXViewScaler fxViewScaler) {
 
         int x = wall.x();
         int y = wall.y();
         int width = wall.width();
         int height = wall.height();
 
-        Image grassIcon = fxViewScaleInator.scaleImage(new Image(Objects.requireNonNull(this.getClass().getResourceAsStream("/Sprites/landSprites/grass.png")))).getImage();
-        Image dirtIcon = fxViewScaleInator.scaleImage(new Image(Objects.requireNonNull(this.getClass().getResourceAsStream("/Sprites/landSprites/dirt.png")))).getImage();
+        Image grassIcon = fxViewScaler.scaleImage(new Image(Objects.requireNonNull(this.getClass().getResourceAsStream("/Sprites/landSprites/grass.png")))).getImage();
+        //Image dirtIcon = fxViewScaler.scaleImage(new Image(Objects.requireNonNull(this.getClass().getResourceAsStream("/Sprites/landSprites/dirt.png")))).getImage();
 
         ImageView grass = new ImageView(grassIcon);
         grass.setX(x);

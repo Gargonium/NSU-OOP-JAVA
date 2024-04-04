@@ -2,7 +2,7 @@ package ru.nsu.votintsev.view.javafx.entity;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import ru.nsu.votintsev.view.javafx.FXViewScaleInator;
+import ru.nsu.votintsev.view.javafx.FXViewScaler;
 import ru.nsu.votintsev.view.states.PlayerSpriteState;
 
 import java.util.Objects;
@@ -25,19 +25,19 @@ public class PlayerImage extends ImageView {
 
     private PlayerSpriteState playerSpriteState = PlayerSpriteState.STAND_RIGHT_0;
 
-    public PlayerImage(FXViewScaleInator fxViewScaleInator) {
+    public PlayerImage(FXViewScaler fxViewScaler) {
 
-        playerStandLeft0 = fxViewScaleInator.scaleImage(playerStandLeft0).getImage();
-        playerStandLeft1 = fxViewScaleInator.scaleImage(playerStandLeft1).getImage();
-        playerRunLeft0 = fxViewScaleInator.scaleImage(playerRunLeft0).getImage();
-        playerRunLeft1 = fxViewScaleInator.scaleImage(playerRunLeft1).getImage();
-        playerRunLeft2 = fxViewScaleInator.scaleImage(playerRunLeft2).getImage();
+        playerStandLeft0 = fxViewScaler.scaleImage(playerStandLeft0).getImage();
+        playerStandLeft1 = fxViewScaler.scaleImage(playerStandLeft1).getImage();
+        playerRunLeft0 = fxViewScaler.scaleImage(playerRunLeft0).getImage();
+        playerRunLeft1 = fxViewScaler.scaleImage(playerRunLeft1).getImage();
+        playerRunLeft2 = fxViewScaler.scaleImage(playerRunLeft2).getImage();
 
-        playerStandRight0 = fxViewScaleInator.scaleImage(playerStandRight0).getImage();
-        playerStandRight1 = fxViewScaleInator.scaleImage(playerStandRight1).getImage();
-        playerRunRight0 = fxViewScaleInator.scaleImage(playerRunRight0).getImage();
-        playerRunRight1 = fxViewScaleInator.scaleImage(playerRunRight1).getImage();
-        playerRunRight2 = fxViewScaleInator.scaleImage(playerRunRight2).getImage();
+        playerStandRight0 = fxViewScaler.scaleImage(playerStandRight0).getImage();
+        playerStandRight1 = fxViewScaler.scaleImage(playerStandRight1).getImage();
+        playerRunRight0 = fxViewScaler.scaleImage(playerRunRight0).getImage();
+        playerRunRight1 = fxViewScaler.scaleImage(playerRunRight1).getImage();
+        playerRunRight2 = fxViewScaler.scaleImage(playerRunRight2).getImage();
 
         setPlayerSprite();
 

@@ -14,10 +14,10 @@ public abstract class BaseGameObject implements GameObject{
 
     @Override
     public void scaleMe() {
-        width = ctx.modelScaleInator.scaleByX(width);
-        height = ctx.modelScaleInator.scaleByY(height);
-        x = ctx.modelScaleInator.scaleByX(x);
-        y = ctx.modelScaleInator.scaleByY(y);
+        width = ctx.modelScaler.scaleByX(width);
+        height = ctx.modelScaler.scaleByY(height);
+        x = ctx.modelScaler.scaleByX(x);
+        y = ctx.modelScaler.scaleByY(y);
     }
 
     @Override

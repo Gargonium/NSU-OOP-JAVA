@@ -1,6 +1,6 @@
 package ru.nsu.votintsev.view.swing.label.entity;
 
-import ru.nsu.votintsev.view.swing.ViewScaleInator;
+import ru.nsu.votintsev.view.swing.SwingViewScaler;
 import ru.nsu.votintsev.view.states.EnemySpriteState;
 
 import javax.swing.*;
@@ -20,15 +20,15 @@ public class EnemyLabel extends JLabel {
 
     private EnemySpriteState enemySpriteState = EnemySpriteState.RUN_RIGHT_0;
 
-    public EnemyLabel(ViewScaleInator viewScaleInator) {
+    public EnemyLabel(SwingViewScaler swingViewScaler) {
 
-        enemyRunLeft0 = viewScaleInator.scaleImage(enemyRunLeft0);
-        enemyRunLeft1 = viewScaleInator.scaleImage(enemyRunLeft1);
-        enemyRunLeft2 = viewScaleInator.scaleImage(enemyRunLeft2);
+        enemyRunLeft0 = swingViewScaler.scaleImage(enemyRunLeft0);
+        enemyRunLeft1 = swingViewScaler.scaleImage(enemyRunLeft1);
+        enemyRunLeft2 = swingViewScaler.scaleImage(enemyRunLeft2);
 
-        enemyRunRight0 = viewScaleInator.scaleImage(enemyRunRight0);
-        enemyRunRight1 = viewScaleInator.scaleImage(enemyRunRight1);
-        enemyRunRight2 = viewScaleInator.scaleImage(enemyRunRight2);
+        enemyRunRight0 = swingViewScaler.scaleImage(enemyRunRight0);
+        enemyRunRight1 = swingViewScaler.scaleImage(enemyRunRight1);
+        enemyRunRight2 = swingViewScaler.scaleImage(enemyRunRight2);
 
 
         setEnemySprite();

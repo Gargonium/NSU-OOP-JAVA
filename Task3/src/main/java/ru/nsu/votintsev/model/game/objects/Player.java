@@ -77,20 +77,20 @@ public class Player extends BaseGameObject {
 
     @Override
     public void scaleMe() {
-        startX = ctx.modelScaleInator.scaleByX(x);
-        startY = ctx.modelScaleInator.scaleByY(y);
+        startX = ctx.modelScaler.scaleByX(x);
+        startY = ctx.modelScaler.scaleByY(y);
         x = startX;
         y = startY;
 
-        xSpeed = ctx.modelScaleInator.scaleByX(xSpeed);
-        gravitySpeed = ctx.modelScaleInator.scaleByY(gravitySpeed);
-        jumpAcceleration = ctx.modelScaleInator.scaleByY(jumpAcceleration);
+        xSpeed = ctx.modelScaler.scaleByX(xSpeed);
+        gravitySpeed = ctx.modelScaler.scaleByY(gravitySpeed);
+        jumpAcceleration = ctx.modelScaler.scaleByY(jumpAcceleration);
 
         int jumpHeight = 0;
         for (int i = 1; i < maxJumpSpeed; ++i) {
             jumpHeight += i;
         }
-        jumpHeight = ctx.modelScaleInator.scaleByY(jumpHeight);
+        jumpHeight = ctx.modelScaler.scaleByY(jumpHeight);
 
         maxJumpSpeed = 0;
         int jumpSpeedIterator = 1;

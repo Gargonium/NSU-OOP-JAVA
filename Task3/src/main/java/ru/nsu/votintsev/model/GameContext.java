@@ -15,7 +15,7 @@ public class GameContext {
     private int GAME_FIELD_WIDTH;
     private int GAME_FIELD_HEIGHT;
 
-    public final ModelScaleInator modelScaleInator = new ModelScaleInator();
+    public final ModelScaler modelScaler = new ModelScaler();
 
     public GameContext() {
 

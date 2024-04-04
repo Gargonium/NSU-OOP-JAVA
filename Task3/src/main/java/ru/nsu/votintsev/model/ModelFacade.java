@@ -102,7 +102,7 @@ public class ModelFacade implements Observable {
         ctx.setGameFieldDimensions(gameFieldWidth, gameFieldHeight);
     }
     public void setScalePercentage(double scalePercentWidth, double scalePercentHeight) {
-        ctx.modelScaleInator.setScalePercentage(scalePercentWidth, scalePercentHeight);
+        ctx.modelScaler.setScalePercentage(scalePercentWidth, scalePercentHeight);
         for (GameObject object : objects) {
             object.scaleMe();
         }

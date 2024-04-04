@@ -25,9 +25,9 @@ import java.util.*;
 
 public class GameStage extends Stage implements Observer {
 
-    private FXViewScaleInator fxViewScaleInator = new FXViewScaleInator();
+    private final FXViewScaler fxViewScaler = new FXViewScaler();
 
-    private final PlayerImage playerImage = new PlayerImage(fxViewScaleInator);
+    private final PlayerImage playerImage = new PlayerImage(fxViewScaler);
     private final List<EnemyImage> enemiesImages = new ArrayList<>();
 
     private final ModelFacade modelFacade;
@@ -68,10 +68,10 @@ public class GameStage extends Stage implements Observer {
         modelFacade.setPlayerStartCords(100, 100);
         playerImage.setLayoutX(100);
         playerImage.setLayoutY(100);
-        modelFacade.setScalePercentage(fxViewScaleInator.getScalePercentWidth(), fxViewScaleInator.getScalePercentHeight());
+        modelFacade.setScalePercentage(fxViewScaler.getScalePercentWidth(), fxViewScaler.getScalePercentHeight());
         modelFacade.setGameFieldDimensions((int) this.getWidth(), (int) this.getHeight());
 
-        System.out.println(fxViewScaleInator.getScalePercentWidth() + " " + fxViewScaleInator.getScalePercentHeight());
+        System.out.println(fxViewScaler.getScalePercentWidth() + " " + fxViewScaler.getScalePercentHeight());
 
         animationTimer.schedule(startTimer, new Date(), 100);
 
@@ -86,7 +86,7 @@ public class GameStage extends Stage implements Observer {
         livesText.setText("Lives: null");
 
         modelFacade.setPlayerSize((int) playerImage.getFitWidth(), (int) playerImage.getFitHeight());
-        DoorImage doorImage = new DoorImage(fxViewScaleInator);
+        DoorImage doorImage = new DoorImage(fxViewScaler);
         doorImage.setLayoutX(modelFacade.getDoorX());
         doorImage.setLayoutY(modelFacade.getDoorY());
         modelFacade.setDoorSize((int) doorImage.getFitWidth(), (int) doorImage.getFitHeight());
@@ -98,12 +98,12 @@ public class GameStage extends Stage implements Observer {
         root.getChildren().add(doorImage);
 
         for (int i = 0; i < modelFacade.getWallsCount(); ++i) {
-            WallImage wallImage = new WallImage(modelFacade.getWallRect(i), root, fxViewScaleInator);
+            WallImage wallImage = new WallImage(modelFacade.getWallRect(i), root, fxViewScaler);
             System.out.println(modelFacade.getWallRect(i).y());
         }
 
         for (int i = 0; i < modelFacade.getEnemiesCount(); ++i) {
-            EnemyImage enemyImage = new EnemyImage(fxViewScaleInator);
+            EnemyImage enemyImage = new EnemyImage(fxViewScaler);
             modelFacade.setEnemySize(i, enemyImage.getWidth(), enemyImage.getHeight());
             enemyImage.setLayoutX(modelFacade.getEnemyX(i));
             enemyImage.setLayoutY(modelFacade.getEnemyY(i));

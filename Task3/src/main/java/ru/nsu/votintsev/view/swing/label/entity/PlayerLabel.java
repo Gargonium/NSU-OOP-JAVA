@@ -1,6 +1,6 @@
 package ru.nsu.votintsev.view.swing.label.entity;
 
-import ru.nsu.votintsev.view.swing.ViewScaleInator;
+import ru.nsu.votintsev.view.swing.SwingViewScaler;
 import ru.nsu.votintsev.view.states.PlayerSpriteState;
 
 import javax.swing.*;
@@ -24,19 +24,19 @@ public class PlayerLabel extends JLabel {
 
     private PlayerSpriteState playerSpriteState = PlayerSpriteState.STAND_RIGHT_0;
 
-    public PlayerLabel(ViewScaleInator viewScaleInator) {
+    public PlayerLabel(SwingViewScaler swingViewScaler) {
 
-        playerStandLeft0 = viewScaleInator.scaleImage(playerStandLeft0);
-        playerStandLeft1 = viewScaleInator.scaleImage(playerStandLeft1);
-        playerRunLeft0 = viewScaleInator.scaleImage(playerRunLeft0);
-        playerRunLeft1 = viewScaleInator.scaleImage(playerRunLeft1);
-        playerRunLeft2 = viewScaleInator.scaleImage(playerRunLeft2);
+        playerStandLeft0 = swingViewScaler.scaleImage(playerStandLeft0);
+        playerStandLeft1 = swingViewScaler.scaleImage(playerStandLeft1);
+        playerRunLeft0 = swingViewScaler.scaleImage(playerRunLeft0);
+        playerRunLeft1 = swingViewScaler.scaleImage(playerRunLeft1);
+        playerRunLeft2 = swingViewScaler.scaleImage(playerRunLeft2);
 
-        playerStandRight0 = viewScaleInator.scaleImage(playerStandRight0);
-        playerStandRight1 = viewScaleInator.scaleImage(playerStandRight1);
-        playerRunRight0 = viewScaleInator.scaleImage(playerRunRight0);
-        playerRunRight1 = viewScaleInator.scaleImage(playerRunRight1);
-        playerRunRight2 = viewScaleInator.scaleImage(playerRunRight2);
+        playerStandRight0 = swingViewScaler.scaleImage(playerStandRight0);
+        playerStandRight1 = swingViewScaler.scaleImage(playerStandRight1);
+        playerRunRight0 = swingViewScaler.scaleImage(playerRunRight0);
+        playerRunRight1 = swingViewScaler.scaleImage(playerRunRight1);
+        playerRunRight2 = swingViewScaler.scaleImage(playerRunRight2);
 
 
         setPlayerSprite();

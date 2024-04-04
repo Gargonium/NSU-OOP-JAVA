@@ -1,6 +1,6 @@
 package ru.nsu.votintsev.model;
 
-public class ModelScaleInator {
+public class ModelScaler {
 
     private double scalePercentWidth;
     private double scalePercentHeight;

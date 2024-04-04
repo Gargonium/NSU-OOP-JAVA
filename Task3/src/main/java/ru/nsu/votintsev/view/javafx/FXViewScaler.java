@@ -5,7 +5,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Screen;
 
-public class FXViewScaleInator {
+public class FXViewScaler {
 
     private static final int MY_SCREEN_WIDTH = 2048;
     private static final int MY_SCREEN_HEIGHT = 1112;
@@ -13,7 +13,7 @@ public class FXViewScaleInator {
     private final double scalePercentWidth;
     private final double scalePercentHeight;
 
-    public FXViewScaleInator() {
+    public FXViewScaler() {
 
         Screen screen = Screen.getPrimary();
         Rectangle2D screenSize = screen.getVisualBounds();

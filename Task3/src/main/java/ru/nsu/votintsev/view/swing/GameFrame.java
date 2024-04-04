@@ -22,9 +22,9 @@ import java.util.List;
 
 public class GameFrame extends JFrame implements Observer, ActionListener {
 
-    private final ViewScaleInator viewScaleInator = new ViewScaleInator();
+    private final SwingViewScaler swingViewScaler = new SwingViewScaler();
 
-    private final PlayerLabel playerLabel = new PlayerLabel(viewScaleInator);
+    private final PlayerLabel playerLabel = new PlayerLabel(swingViewScaler);
     private final List<EnemyLabel> enemiesLabels = new ArrayList<>();
 
     private final ModelFacade modelFacade;
@@ -50,7 +50,7 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         this.setSize(screenSize.getSize());
 
-        modelFacade.setScalePercentage(viewScaleInator.getScalePercentWidth(), viewScaleInator.getScalePercentHeight());
+        modelFacade.setScalePercentage(swingViewScaler.getScalePercentWidth(), swingViewScaler.getScalePercentHeight());
 
         this.addKeyListener(controller);
 
@@ -61,12 +61,12 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         modelFacade.setGameFieldDimensions(this.getWidth(), this.getHeight());
 
         for (int i = 0; i < modelFacade.getWallsCount(); ++i) {
-            WallsLabel wallPanel = new WallsLabel(modelFacade.getWallRect(i), viewScaleInator);
+            WallsLabel wallPanel = new WallsLabel(modelFacade.getWallRect(i), swingViewScaler);
             this.add(wallPanel);
         }
 
         for (int i = 0; i < modelFacade.getEnemiesCount(); ++i) {
-            EnemyLabel enemyLabel = new EnemyLabel(viewScaleInator);
+            EnemyLabel enemyLabel = new EnemyLabel(swingViewScaler);
             enemyLabel.setLocation(modelFacade.getEnemyX(i), modelFacade.getEnemyY(i));
             modelFacade.setEnemySize(i, enemyLabel.getWidth(), enemyLabel.getHeight());
             enemiesLabels.add(enemyLabel);
@@ -74,7 +74,7 @@ public class GameFrame extends JFrame implements Observer, ActionListener {
         }
 
         modelFacade.setPlayerSize(playerLabel.getWidth(), playerLabel.getHeight());
-        DoorLabel doorLabel = new DoorLabel(viewScaleInator);
+        DoorLabel doorLabel = new DoorLabel(swingViewScaler);
         modelFacade.setDoorSize(doorLabel.getWidth(), doorLabel.getHeight());
 
         playerLabel.setBounds(modelFacade.getPlayerX(), modelFacade.getPlayerY(),

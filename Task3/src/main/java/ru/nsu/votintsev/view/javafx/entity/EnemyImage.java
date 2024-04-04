@@ -2,7 +2,7 @@ package ru.nsu.votintsev.view.javafx.entity;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import ru.nsu.votintsev.view.javafx.FXViewScaleInator;
+import ru.nsu.votintsev.view.javafx.FXViewScaler;
 import ru.nsu.votintsev.view.states.EnemySpriteState;
 
 import java.util.Objects;
@@ -20,15 +20,15 @@ public class EnemyImage extends ImageView {
 
     private EnemySpriteState enemySpriteState = EnemySpriteState.RUN_RIGHT_0;
 
-    public EnemyImage(FXViewScaleInator fxViewScaleInator) {
+    public EnemyImage(FXViewScaler fxViewScaler) {
 
-        enemyRunLeft0 = fxViewScaleInator.scaleImage(enemyRunLeft0).getImage();
-        enemyRunLeft1 = fxViewScaleInator.scaleImage(enemyRunLeft1).getImage();
-        enemyRunLeft2 = fxViewScaleInator.scaleImage(enemyRunLeft2).getImage();
+        enemyRunLeft0 = fxViewScaler.scaleImage(enemyRunLeft0).getImage();
+        enemyRunLeft1 = fxViewScaler.scaleImage(enemyRunLeft1).getImage();
+        enemyRunLeft2 = fxViewScaler.scaleImage(enemyRunLeft2).getImage();
 
-        enemyRunRight0 = fxViewScaleInator.scaleImage(enemyRunRight0).getImage();
-        enemyRunRight1 = fxViewScaleInator.scaleImage(enemyRunRight1).getImage();
-        enemyRunRight2 = fxViewScaleInator.scaleImage(enemyRunRight2).getImage();
+        enemyRunRight0 = fxViewScaler.scaleImage(enemyRunRight0).getImage();
+        enemyRunRight1 = fxViewScaler.scaleImage(enemyRunRight1).getImage();
+        enemyRunRight2 = fxViewScaler.scaleImage(enemyRunRight2).getImage();
 
         setEnemySprite();
         this.setFitWidth(enemySprite.getWidth());

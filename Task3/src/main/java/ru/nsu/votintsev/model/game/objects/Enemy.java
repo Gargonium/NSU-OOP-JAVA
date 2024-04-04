@@ -18,9 +18,9 @@ public class Enemy extends BaseGameObject {
 
     @Override
     public void scaleMe() {
-        x = ctx.modelScaleInator.scaleByX(x);
-        y = ctx.modelScaleInator.scaleByY(y);
-        speed = ctx.modelScaleInator.scaleByX(speed);
+        x = ctx.modelScaler.scaleByX(x);
+        y = ctx.modelScaler.scaleByY(y);
+        speed = ctx.modelScaler.scaleByX(speed);
     }
 
     public EnemyDirection getEnemyDirection() {
