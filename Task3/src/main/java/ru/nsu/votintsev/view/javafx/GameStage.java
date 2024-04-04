@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
@@ -13,6 +14,10 @@ import ru.nsu.votintsev.model.Changes;
 import ru.nsu.votintsev.model.ModelFacade;
 import ru.nsu.votintsev.model.directions.PlayerDirection;
 import ru.nsu.votintsev.model.observer.interfaces.Observer;
+import ru.nsu.votintsev.view.javafx.entity.DoorImage;
+import ru.nsu.votintsev.view.javafx.entity.EnemyImage;
+import ru.nsu.votintsev.view.javafx.entity.PlayerImage;
+import ru.nsu.votintsev.view.javafx.entity.WallImage;
 import ru.nsu.votintsev.view.states.EnemySpriteState;
 import ru.nsu.votintsev.view.states.PlayerSpriteState;
 
@@ -20,7 +25,9 @@ import java.util.*;
 
 public class GameStage extends Stage implements Observer {
 
-    private final PlayerImage playerImage = new PlayerImage();
+    private FXViewScaleInator fxViewScaleInator = new FXViewScaleInator();
+
+    private final PlayerImage playerImage = new PlayerImage(fxViewScaleInator);
     private final List<EnemyImage> enemiesImages = new ArrayList<>();
 
     private final ModelFacade modelFacade;
@@ -59,9 +66,12 @@ public class GameStage extends Stage implements Observer {
         modelFacade.addObserver(this);
         modelFacade.startModelTimer();
         modelFacade.setPlayerStartCords(100, 100);
-        BadViewScaleInator badViewScaleInator = new BadViewScaleInator();
-        modelFacade.setScalePercentage(badViewScaleInator.getScalePercentWidth(), badViewScaleInator.getScalePercentHeight());
+        playerImage.setLayoutX(100);
+        playerImage.setLayoutY(100);
+        modelFacade.setScalePercentage(fxViewScaleInator.getScalePercentWidth(), fxViewScaleInator.getScalePercentHeight());
         modelFacade.setGameFieldDimensions((int) this.getWidth(), (int) this.getHeight());
+
+        System.out.println(fxViewScaleInator.getScalePercentWidth() + " " + fxViewScaleInator.getScalePercentHeight());
 
         animationTimer.schedule(startTimer, new Date(), 100);
 
@@ -76,9 +86,9 @@ public class GameStage extends Stage implements Observer {
         livesText.setText("Lives: null");
 
         modelFacade.setPlayerSize((int) playerImage.getFitWidth(), (int) playerImage.getFitHeight());
-        DoorImage doorImage = new DoorImage();
-        doorImage.setX(modelFacade.getDoorX());
-        doorImage.setY(modelFacade.getDoorY());
+        DoorImage doorImage = new DoorImage(fxViewScaleInator);
+        doorImage.setLayoutX(modelFacade.getDoorX());
+        doorImage.setLayoutY(modelFacade.getDoorY());
         modelFacade.setDoorSize((int) doorImage.getFitWidth(), (int) doorImage.getFitHeight());
 
         Group root = new Group();
@@ -88,33 +98,39 @@ public class GameStage extends Stage implements Observer {
         root.getChildren().add(doorImage);
 
         for (int i = 0; i < modelFacade.getWallsCount(); ++i) {
-            WallImage wallImage = new WallImage(modelFacade.getWallRect(i), root);
+            WallImage wallImage = new WallImage(modelFacade.getWallRect(i), root, fxViewScaleInator);
+            System.out.println(modelFacade.getWallRect(i).y());
         }
 
         for (int i = 0; i < modelFacade.getEnemiesCount(); ++i) {
-            EnemyImage enemyImage = new EnemyImage();
-            enemyImage.setX(modelFacade.getEnemyX(i));
-            enemyImage.setY(modelFacade.getEnemyY(i));
+            EnemyImage enemyImage = new EnemyImage(fxViewScaleInator);
             modelFacade.setEnemySize(i, enemyImage.getWidth(), enemyImage.getHeight());
+            enemyImage.setLayoutX(modelFacade.getEnemyX(i));
+            enemyImage.setLayoutY(modelFacade.getEnemyY(i));
             enemiesImages.add(enemyImage);
             root.getChildren().add(enemyImage);
         }
 
-        Scene scene = new Scene(root);
+        Pane paneRoot = new Pane(root);
+        Scene scene = new Scene(paneRoot);
         FXController controller = new FXController(scene, modelFacade);
         this.setScene(scene);
+
+        System.out.println(enemiesImages.get(1).getLayoutY());
     }
 
     private void setPlayerLocation() {
-        playerImage.setX(modelFacade.getPlayerX());
-        playerImage.setY(modelFacade.getPlayerY());
+        playerImage.setLayoutX(modelFacade.getPlayerX());
+        playerImage.setLayoutY(modelFacade.getPlayerY());
     }
 
     private void setEnemyLocation() {
-        for (int i = 0; i < enemiesImages.size(); ++i) {
-            enemiesImages.get(i).setX(modelFacade.getEnemyX(i));
-            enemiesImages.get(i).setY(modelFacade.getEnemyY(i));
-        }
+            Platform.runLater(() -> {
+                for (int i = 0; i < enemiesImages.size(); ++i) {
+                    enemiesImages.get(i).setLayoutX(modelFacade.getEnemyX(i));
+                    enemiesImages.get(i).setLayoutY(modelFacade.getEnemyY(i));
+                }
+            });
     }
 
     @Override

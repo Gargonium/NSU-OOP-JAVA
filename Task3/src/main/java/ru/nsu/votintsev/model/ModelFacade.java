@@ -161,7 +161,7 @@ public class ModelFacade implements Observable {
 
     public long getGameTime() {
         Calendar currentCalendar = new GregorianCalendar();
-        return currentCalendar.get(Calendar.SECOND) - gameTime.get(Calendar.SECOND);
+        return (currentCalendar.getTimeInMillis() - gameTime.getTimeInMillis()) / 1000;
     }
 
     private final TimerTask startTimer = new TimerTask() {

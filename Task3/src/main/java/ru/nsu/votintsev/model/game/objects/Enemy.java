@@ -37,6 +37,9 @@ public class Enemy extends BaseGameObject {
                     || (x + width + speed >= wall.getX() + wall.getWidth())  && (x + width <= wall.getX() + wall.getWidth())) {
                 enemyDirection = (enemyDirection == EnemyDirection.LEFT) ? EnemyDirection.RIGHT : EnemyDirection.LEFT;
             }
+            if ((y < wall.getY()) && (y + height > wall.getY())){
+                y = wall.getY() - height;
+            }
         }
 
         if ((x <= 0) || (x + width >= ctx.getGameFieldWidth())){
