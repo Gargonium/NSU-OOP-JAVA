@@ -98,8 +98,8 @@ public class GameStage extends Stage implements Observer {
         root.getChildren().add(doorImage);
 
         for (int i = 0; i < modelFacade.getWallsCount(); ++i) {
-            WallImage wallImage = new WallImage(modelFacade.getWallRect(i), root, fxViewScaler);
-            System.out.println(modelFacade.getWallRect(i).y());
+            WallImage wallImage = new WallImage(modelFacade.getWallRect(i), fxViewScaler);
+            root.getChildren().add(wallImage);
         }
 
         for (int i = 0; i < modelFacade.getEnemiesCount(); ++i) {
@@ -113,10 +113,8 @@ public class GameStage extends Stage implements Observer {
 
         Pane paneRoot = new Pane(root);
         Scene scene = new Scene(paneRoot);
-        FXController controller = new FXController(scene, modelFacade);
+        new FXController(scene, modelFacade);
         this.setScene(scene);
-
-        System.out.println(enemiesImages.get(1).getLayoutY());
     }
 
     private void setPlayerLocation() {
