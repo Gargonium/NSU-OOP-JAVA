@@ -22,6 +22,9 @@ import ru.nsu.votintsev.view.states.EnemySpriteState;
 import ru.nsu.votintsev.view.states.PlayerSpriteState;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class GameStage extends Stage implements Observer {
 
@@ -32,7 +35,7 @@ public class GameStage extends Stage implements Observer {
 
     private final ModelFacade modelFacade;
 
-    private final Timer animationTimer = new Timer();
+    private final ScheduledExecutorService animationTimer = Executors.newScheduledThreadPool(1);
 
     private int runPlayerAnimationCount = 0;
     private int standAnimationCount = 0;
@@ -51,6 +54,11 @@ public class GameStage extends Stage implements Observer {
         Rectangle2D screenSize = screen.getVisualBounds();
         this.setWidth(screenSize.getWidth());
         this.setHeight(screenSize.getHeight());
+
+        setOnCloseRequest(event -> {
+            Platform.exit();
+            System.exit(0);
+        });
 
 //        this.setFullScreen(true);
 //        this.setFullScreenExitHint(null);
@@ -71,9 +79,7 @@ public class GameStage extends Stage implements Observer {
         modelFacade.setScalePercentage(fxViewScaler.getScalePercentWidth(), fxViewScaler.getScalePercentHeight());
         modelFacade.setGameFieldDimensions((int) this.getWidth(), (int) this.getHeight());
 
-        System.out.println(fxViewScaler.getScalePercentWidth() + " " + fxViewScaler.getScalePercentHeight());
-
-        animationTimer.schedule(startTimer, new Date(), 100);
+        animationTimer.scheduleAtFixedRate(this::timerTask, 0, 100, TimeUnit.MILLISECONDS);
 
         livesText.setX(10);
         livesText.setY(30);
@@ -143,7 +149,7 @@ public class GameStage extends Stage implements Observer {
     }
 
     private void endGame(boolean isWin) {
-        animationTimer.cancel();
+        animationTimer.shutdown();
         modelFacade.stopModelTimer();
         Platform.runLater(() -> {
             FinalStage finalStage = new FinalStage(isWin);
@@ -152,35 +158,31 @@ public class GameStage extends Stage implements Observer {
         });
     }
 
-    private final TimerTask startTimer = new TimerTask() {
-        @Override
-        public void run() {
-            switch (modelFacade.getPlayerDirection()) {
-                case STAND -> {
-                    PlayerSpriteState playerSpriteState = getPlayerStandSprite();
-                    standAnimationCount = standAnimationCount == 10 ? 0 : standAnimationCount + 1;
-                    playerImage.updatePlayerSprite(playerSpriteState);
-                }
-                case LEFT -> {
-                    playerImage.updatePlayerSprite(getPlayerRunLeftSprite());
-                    lastPlayerDirection = PlayerDirection.LEFT;
-                }
-                case RIGHT -> {
-                    playerImage.updatePlayerSprite(getPlayerRunRightSprite());
-                    lastPlayerDirection = PlayerDirection.RIGHT;
-                }
+    private void timerTask() {
+        switch (modelFacade.getPlayerDirection()) {
+            case STAND -> {
+                PlayerSpriteState playerSpriteState = getPlayerStandSprite();
+                standAnimationCount = standAnimationCount == 10 ? 0 : standAnimationCount + 1;
+                playerImage.updatePlayerSprite(playerSpriteState);
             }
-            for (int i = 0; i < enemiesImages.size(); ++i) {
-                switch (modelFacade.getEnemyDirection(i)) {
-                    case LEFT -> enemiesImages.get(i).updateEnemySprite(getEnemyRunLeftSprite());
-                    case RIGHT -> enemiesImages.get(i).updateEnemySprite(getEnemyRunRightSprite());
-                }
+            case LEFT -> {
+                playerImage.updatePlayerSprite(getPlayerRunLeftSprite());
+                lastPlayerDirection = PlayerDirection.LEFT;
             }
-            livesText.setText("Lives: " + modelFacade.getPlayerLives());
-            timeText.setText("Time: " + modelFacade.getGameTime() + " sec");
-
+            case RIGHT -> {
+                playerImage.updatePlayerSprite(getPlayerRunRightSprite());
+                lastPlayerDirection = PlayerDirection.RIGHT;
+            }
         }
-    };
+        for (int i = 0; i < enemiesImages.size(); ++i) {
+            switch (modelFacade.getEnemyDirection(i)) {
+                case LEFT -> enemiesImages.get(i).updateEnemySprite(getEnemyRunLeftSprite());
+                case RIGHT -> enemiesImages.get(i).updateEnemySprite(getEnemyRunRightSprite());
+            }
+        }
+        livesText.setText("Lives: " + modelFacade.getPlayerLives());
+        timeText.setText("Time: " + modelFacade.getGameTime() + " sec");
+    }
 
     private PlayerSpriteState getPlayerStandSprite() {
         PlayerSpriteState playerSpriteState = null;

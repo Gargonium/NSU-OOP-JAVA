@@ -27,17 +27,17 @@ public class PlayerImage extends ImageView {
 
     public PlayerImage(FXViewScaler fxViewScaler) {
 
-        playerStandLeft0 = fxViewScaler.scaleImage(playerStandLeft0).getImage();
-        playerStandLeft1 = fxViewScaler.scaleImage(playerStandLeft1).getImage();
-        playerRunLeft0 = fxViewScaler.scaleImage(playerRunLeft0).getImage();
-        playerRunLeft1 = fxViewScaler.scaleImage(playerRunLeft1).getImage();
-        playerRunLeft2 = fxViewScaler.scaleImage(playerRunLeft2).getImage();
+        playerStandLeft0 = fxViewScaler.scaleImage(playerStandLeft0);
+        playerStandLeft1 = fxViewScaler.scaleImage(playerStandLeft1);
+        playerRunLeft0 = fxViewScaler.scaleImage(playerRunLeft0);
+        playerRunLeft1 = fxViewScaler.scaleImage(playerRunLeft1);
+        playerRunLeft2 = fxViewScaler.scaleImage(playerRunLeft2);
 
-        playerStandRight0 = fxViewScaler.scaleImage(playerStandRight0).getImage();
-        playerStandRight1 = fxViewScaler.scaleImage(playerStandRight1).getImage();
-        playerRunRight0 = fxViewScaler.scaleImage(playerRunRight0).getImage();
-        playerRunRight1 = fxViewScaler.scaleImage(playerRunRight1).getImage();
-        playerRunRight2 = fxViewScaler.scaleImage(playerRunRight2).getImage();
+        playerStandRight0 = fxViewScaler.scaleImage(playerStandRight0);
+        playerStandRight1 = fxViewScaler.scaleImage(playerStandRight1);
+        playerRunRight0 = fxViewScaler.scaleImage(playerRunRight0);
+        playerRunRight1 = fxViewScaler.scaleImage(playerRunRight1);
+        playerRunRight2 = fxViewScaler.scaleImage(playerRunRight2);
 
         setPlayerSprite();
 

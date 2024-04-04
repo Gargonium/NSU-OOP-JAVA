@@ -7,6 +7,9 @@ import ru.nsu.votintsev.model.observer.interfaces.Observable;
 import ru.nsu.votintsev.model.observer.interfaces.Observer;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ModelFacade implements Observable {
     private final List<Enemy> enemies = new ArrayList<>();
@@ -18,7 +21,8 @@ public class ModelFacade implements Observable {
 
     private final List<GameObject> objects = new ArrayList<>();
 
-    private final Timer modelTimer = new Timer();
+    private final ScheduledExecutorService modelTimer = Executors.newScheduledThreadPool(1);
+
     private final Calendar gameTime = new GregorianCalendar();
 
     public ModelFacade() {
@@ -139,12 +143,11 @@ public class ModelFacade implements Observable {
     }
 
     public void startModelTimer() {
-        Date startTime = new Date();
-        modelTimer.schedule(startTimer, startTime, 10);
+        modelTimer.scheduleAtFixedRate(this::timerTask, 0, 10, TimeUnit.MILLISECONDS);
     }
 
     public void stopModelTimer() {
-        modelTimer.cancel();
+        modelTimer.shutdown();
     }
 
     @Override
@@ -164,20 +167,16 @@ public class ModelFacade implements Observable {
         return (currentCalendar.getTimeInMillis() - gameTime.getTimeInMillis()) / 1000;
     }
 
-    private final TimerTask startTimer = new TimerTask() {
-        @Override
-        public void run() {
-            player.checkForCollisionsAndMove();
-            notifyObservers(Changes.CHANGE_PLAYER_CORDS);
-            for (Enemy enemy : enemies) {
-                enemy.checkForCollisionsAndMove();
-            }
-            notifyObservers(Changes.CHANGE_ENEMY_CORDS);
-            if (player.getLives() == 0) {
-                notifyObservers(Changes.PLAYER_DEAD);
-            }
+    private void timerTask() {
+        player.checkForCollisionsAndMove();
+        notifyObservers(Changes.CHANGE_PLAYER_CORDS);
+        for (Enemy enemy : enemies) {
+            enemy.checkForCollisionsAndMove();
         }
-    };
-
+        notifyObservers(Changes.CHANGE_ENEMY_CORDS);
+        if (player.getLives() == 0) {
+            notifyObservers(Changes.PLAYER_DEAD);
+        }
+    }
 
 }

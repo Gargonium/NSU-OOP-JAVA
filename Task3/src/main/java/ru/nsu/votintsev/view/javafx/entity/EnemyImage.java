@@ -22,13 +22,13 @@ public class EnemyImage extends ImageView {
 
     public EnemyImage(FXViewScaler fxViewScaler) {
 
-        enemyRunLeft0 = fxViewScaler.scaleImage(enemyRunLeft0).getImage();
-        enemyRunLeft1 = fxViewScaler.scaleImage(enemyRunLeft1).getImage();
-        enemyRunLeft2 = fxViewScaler.scaleImage(enemyRunLeft2).getImage();
+        enemyRunLeft0 = fxViewScaler.scaleImage(enemyRunLeft0);
+        enemyRunLeft1 = fxViewScaler.scaleImage(enemyRunLeft1);
+        enemyRunLeft2 = fxViewScaler.scaleImage(enemyRunLeft2);
 
-        enemyRunRight0 = fxViewScaler.scaleImage(enemyRunRight0).getImage();
-        enemyRunRight1 = fxViewScaler.scaleImage(enemyRunRight1).getImage();
-        enemyRunRight2 = fxViewScaler.scaleImage(enemyRunRight2).getImage();
+        enemyRunRight0 = fxViewScaler.scaleImage(enemyRunRight0);
+        enemyRunRight1 = fxViewScaler.scaleImage(enemyRunRight1);
+        enemyRunRight2 = fxViewScaler.scaleImage(enemyRunRight2);
 
         setEnemySprite();
         this.setFitWidth(enemySprite.getWidth());

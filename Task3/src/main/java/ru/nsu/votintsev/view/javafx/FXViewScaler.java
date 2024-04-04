@@ -8,7 +8,7 @@ import javafx.stage.Screen;
 public class FXViewScaler {
 
     private static final int MY_SCREEN_WIDTH = 2048;
-    private static final int MY_SCREEN_HEIGHT = 1112;
+    private static final int MY_SCREEN_HEIGHT = 1152;
 
     private final double scalePercentWidth;
     private final double scalePercentHeight;
@@ -34,13 +34,14 @@ public class FXViewScaler {
         return scalePercentHeight;
     }
 
-    public ImageView scaleImage(Image originalImage) {
+    public Image scaleImage(Image originalImage) {
         int newImageWidth = (int) (originalImage.getWidth() * scalePercentWidth);
         int newImageHeight = (int) (originalImage.getHeight() * scalePercentHeight);
         ImageView scaledImage = new ImageView(originalImage);
         scaledImage.setFitHeight(newImageHeight);
         scaledImage.setFitWidth(newImageWidth);
-        return scaledImage;
+        System.out.println(scaledImage.getImage().getHeight());
+        return scaledImage.getImage();
     }
 
 }

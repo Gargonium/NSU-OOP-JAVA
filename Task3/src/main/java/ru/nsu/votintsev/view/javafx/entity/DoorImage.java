@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public class DoorImage extends ImageView {
     public DoorImage(FXViewScaler fxViewScaler) {
-        Image doorIcon = fxViewScaler.scaleImage(new Image(Objects.requireNonNull(this.getClass().getResourceAsStream("/Sprites/door.png")))).getImage();
+        Image doorIcon = fxViewScaler.scaleImage(new Image(Objects.requireNonNull(this.getClass().getResourceAsStream("/Sprites/door.png"))));
         this.setImage(doorIcon);
         this.setFitHeight(doorIcon.getHeight());
         this.setFitWidth(doorIcon.getWidth());

@@ -15,8 +15,8 @@ public class WallImage extends ImageView{
         int width = wall.width();
         int height = wall.height();
 
-        Image grassIcon = fxViewScaler.scaleImage(new Image(Objects.requireNonNull(this.getClass().getResourceAsStream("/Sprites/landSprites/grass.png")))).getImage();
-        //Image dirtIcon = fxViewScaler.scaleImage(new Image(Objects.requireNonNull(this.getClass().getResourceAsStream("/Sprites/landSprites/dirt.png")))).getImage();
+        Image grassIcon = fxViewScaler.scaleImage(new Image(Objects.requireNonNull(this.getClass().getResourceAsStream("/Sprites/landSprites/grass.png"))));
+        //Image dirtIcon = fxViewScaler.scaleImage(new Image(Objects.requireNonNull(this.getClass().getResourceAsStream("/Sprites/landSprites/dirt.png"))));
 
         this.setImage(grassIcon);
         this.setX(x);

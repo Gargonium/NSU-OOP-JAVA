@@ -17,6 +17,7 @@ public class SwingViewScaler {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         double userScreenWidth = screenSize.getWidth();
         double userScreenHeight = screenSize.getHeight();
+
         scalePercentWidth = userScreenWidth / MY_SCREEN_WIDTH;
         scalePercentHeight = userScreenHeight / MY_SCREEN_HEIGHT;
     }
