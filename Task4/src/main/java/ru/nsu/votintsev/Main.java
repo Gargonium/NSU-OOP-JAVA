@@ -1,7 +1,9 @@
 package ru.nsu.votintsev;
 
+import ru.nsu.votintsev.view.FactoryFrame;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        new FactoryFrame();
     }
 }
