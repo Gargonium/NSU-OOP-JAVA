@@ -16,7 +16,7 @@ public class FactoryFrame extends JFrame implements Observer {
     private final JPanel requestPanel = new JPanel();
     private final JLabel requestSpeedLabel = new JLabel("Request Speed");
     private final JSlider requestSlider = new JSlider(0,10,5000,1000);
-    private JLabel requestSliderValue = new JLabel(requestSlider.getValue() + "ms");
+    private final JLabel requestSliderValue = new JLabel(requestSlider.getValue() + "ms");
 
     private final JPanel deliveryPanel = new JPanel();
     private final JLabel deliverySpeed = new JLabel("Delivery Speed");
@@ -24,17 +24,17 @@ public class FactoryFrame extends JFrame implements Observer {
     private final JPanel bodyPanel = new JPanel();
     private final JLabel bodyLabel = new JLabel("Body       ");
     private final JSlider bodySlider = new JSlider(0,10,5000,1000);
-    private JLabel bodySliderValue = new JLabel(bodySlider.getValue() + "ms");
+    private final JLabel bodySliderValue = new JLabel(bodySlider.getValue() + "ms");
 
     private final JPanel accessoriesPanel = new JPanel();
     private final JLabel accessoriesLabel = new JLabel("Accessories");
     private final JSlider accessoriesSlider = new JSlider(0,10,5000,1000);
-    private JLabel accessoriesSliderValue = new JLabel(accessoriesSlider.getValue() + "ms");
+    private final JLabel accessoriesSliderValue = new JLabel(accessoriesSlider.getValue() + "ms");
 
     private final JPanel motorsPanel = new JPanel();
     private final JLabel motorsLabel = new JLabel("Motors   ");
     private final JSlider motorsSlider = new JSlider(0,10,5000,1000);
-    private JLabel motorsSliderValue = new JLabel(motorsSlider.getValue() + "ms");
+    private final JLabel motorsSliderValue = new JLabel(motorsSlider.getValue() + "ms");
 
     private final Controller controller;
     private final FactoryController factoryController;

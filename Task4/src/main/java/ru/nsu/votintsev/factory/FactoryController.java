@@ -2,9 +2,9 @@ package ru.nsu.votintsev.factory;
 
 import ru.nsu.votintsev.factory.dealer.AutoDealer;
 import ru.nsu.votintsev.factory.storage.AccessoryStorage;
-import ru.nsu.votintsev.factory.storage.auto.AutoStorage;
 import ru.nsu.votintsev.factory.storage.BodyStorage;
 import ru.nsu.votintsev.factory.storage.MotorStorage;
+import ru.nsu.votintsev.factory.storage.auto.AutoStorage;
 import ru.nsu.votintsev.factory.storage.auto.AutoStorageController;
 import ru.nsu.votintsev.factory.supplier.AccessorySupplier;
 import ru.nsu.votintsev.factory.supplier.BodySupplier;
@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -32,14 +31,14 @@ public class FactoryController {
     private final MotorStorage motorStorage = new MotorStorage();
     private final AutoStorage autoStorage = new AutoStorage();
 
-    private MotorSupplier motorSupplier = new MotorSupplier(motorStorage);
-    private BodySupplier bodySupplier = new BodySupplier(bodyStorage);
-    private List<AccessorySupplier> accessorySuppliers = new ArrayList<>();
+    private final MotorSupplier motorSupplier = new MotorSupplier(motorStorage);
+    private final BodySupplier bodySupplier = new BodySupplier(bodyStorage);
+    private final List<AccessorySupplier> accessorySuppliers = new ArrayList<>();
 
-    private List<AutoWorker> autoWorkers = new ArrayList<>();
+    private final List<AutoWorker> autoWorkers = new ArrayList<>();
     private final AutoStorageController autoStorageController = new AutoStorageController(autoWorkers, autoStorage);
 
-    private List<AutoDealer> autoDealers = new ArrayList<>();
+    private final List<AutoDealer> autoDealers = new ArrayList<>();
 
     private int accessoriesSupplierCount;
     private int dealerCount;
@@ -62,13 +61,13 @@ public class FactoryController {
         for (int i = 0; i < workerCount; i++) {
             AutoWorker autoWorker = new AutoWorker(bodyStorage, accessoryStorage, motorStorage, autoStorage, i);
             autoWorkers.add(autoWorker);
-            supplierTP.scheduleAtFixedRate(autoWorker, 0, 10, TimeUnit.MILLISECONDS);
+            workerTP.scheduleAtFixedRate(autoWorker, 0, 10, TimeUnit.MILLISECONDS);
             //workerTP.execute(new AutoWorker(bodyStorage, accessoryStorage, motorStorage, autoStorage));
         }
         for (int i = 0; i < dealerCount; i++) {
             AutoDealer autoDealer = new AutoDealer(autoStorage, autoStorageController, i);
             autoDealers.add(autoDealer);
-            supplierTP.scheduleAtFixedRate(autoDealer, 0, 10, TimeUnit.MILLISECONDS);
+            dealerTP.scheduleAtFixedRate(autoDealer, 0, 10, TimeUnit.MILLISECONDS);
             //dealerTP.execute(new AutoDealer(autoStorage, autoStorageController, i));
         }
     }

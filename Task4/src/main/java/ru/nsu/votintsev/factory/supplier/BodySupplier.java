@@ -1,6 +1,6 @@
 package ru.nsu.votintsev.factory.supplier;
 
-import ru.nsu.votintsev.factory.product.Accessory;
+import ru.nsu.votintsev.factory.product.Body;
 import ru.nsu.votintsev.factory.storage.BodyStorage;
 
 public class BodySupplier extends BasicSupplier implements Runnable {
@@ -17,8 +17,8 @@ public class BodySupplier extends BasicSupplier implements Runnable {
     public void run() {
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastTime >= speed) {
-            bodyStorage.addToStorage(new Accessory(productId));
-            //System.out.println("BodySupplier add body#" + productId);
+            bodyStorage.addToStorage(new Body(productId));
+            System.out.println("BodySupplier add body#" + productId);
             productId++;
             lastTime = currentTime;
         }

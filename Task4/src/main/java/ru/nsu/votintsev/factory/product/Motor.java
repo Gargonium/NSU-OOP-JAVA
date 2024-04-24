@@ -1,6 +1,12 @@
 package ru.nsu.votintsev.factory.product;
 
-public class Motor extends BasicProduct {
+import lombok.Getter;
+
+@Getter
+public class Motor implements Product {
+
+    private final int id;
+
     public Motor(int id) {
         this.id = id;
     }

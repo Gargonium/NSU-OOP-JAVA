@@ -32,7 +32,7 @@ public class AutoWorker implements Worker, Runnable, Observer {
     public void update(Changes change) {
         if (change == Changes.NEED_NEW_AUTO) {
             Body body = bodyStorage.getBody();
-            Accessory accessory = accessoryStorage.getAccesory();
+            Accessory accessory = accessoryStorage.getAccessory();
             Motor motor = motorStorage.getMotor();
             synchronized (productId) {
                 autoStorage.addToStorage(new Auto(body.getId(), motor.getId(), accessory.getId(), productId));

@@ -20,7 +20,7 @@ public class AccessorySupplier extends BasicSupplier implements Runnable {
         if (currentTime - lastTime >= speed) {
             synchronized (productId) {
                 accessoriesStorage.addToStorage(new Accessory(productId));
-                //System.out.println("AccessorySupplier #" + id + " add accessory #" + productId);
+                System.out.println("AccessorySupplier #" + id + " add accessory #" + productId);
                 productId++;
             }
             lastTime = currentTime;

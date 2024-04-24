@@ -1,18 +1,13 @@
 package ru.nsu.votintsev.factory.product;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-public class Auto extends BasicProduct {
-
+@RequiredArgsConstructor
+public class Auto implements Product {
     private final int bodyId;
     private final int motorId;
     private final int accessoryId;
-
-    public Auto(int bodyId, int motorId, int accessoryId,  int id) {
-        this.bodyId = bodyId;
-        this.motorId = motorId;
-        this.accessoryId = accessoryId;
-        this.id = id;
-    }
+    private final int id;
 }
