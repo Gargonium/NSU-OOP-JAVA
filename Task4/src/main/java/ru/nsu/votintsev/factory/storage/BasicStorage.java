@@ -5,10 +5,10 @@ import ru.nsu.votintsev.factory.product.Product;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-public class BasicStorage implements Storage {
+public abstract class BasicStorage implements Storage {
 
-    private BlockingQueue<Product> storage;
-    private int size;
+    protected BlockingQueue<Product> storage;
+    protected int size;
 
     @Override
     public void setSize(int size) {

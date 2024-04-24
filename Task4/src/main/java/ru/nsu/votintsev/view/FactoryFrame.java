@@ -1,76 +1,86 @@
 package ru.nsu.votintsev.view;
 
+import ru.nsu.votintsev.factory.FactoryController;
+import ru.nsu.votintsev.factory.pattern.observer.Changes;
+import ru.nsu.votintsev.factory.pattern.observer.Observer;
+
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 
-public class FactoryFrame extends JFrame implements ChangeListener {
+public class FactoryFrame extends JFrame implements Observer {
 
     private final JPanel infoPanel = new JPanel();
-    private final JLabel carsDone = new JLabel("Cars Done: 0");
-    private final JLabel taskToBeComplete = new JLabel("Task to be Complete: 0");
+    private final JLabel carsDoneLabel = new JLabel("Cars Done: 0");
+    private final JLabel taskToBeCompleteLabel = new JLabel("Task to be Complete: 0");
 
     private final JPanel requestPanel = new JPanel();
-    private final JLabel requestSpeed = new JLabel("Request Speed");
-    private final JSlider requestSlider = new JSlider(0,0,1000,0);
-    private final JLabel requestSliderValue = new JLabel("0");
+    private final JLabel requestSpeedLabel = new JLabel("Request Speed");
+    private final JSlider requestSlider = new JSlider(0,10,5000,1000);
+    private JLabel requestSliderValue = new JLabel(requestSlider.getValue() + "ms");
 
     private final JPanel deliveryPanel = new JPanel();
     private final JLabel deliverySpeed = new JLabel("Delivery Speed");
 
-    private final JPanel bodyworksPanel = new JPanel();
-    private final JLabel bodyworks = new JLabel("BodyWorks");
-    private final JSlider bodyworksSlider = new JSlider(0,0,1000,0);
-    private final JLabel bodyworksSliderValue = new JLabel("0");
+    private final JPanel bodyPanel = new JPanel();
+    private final JLabel bodyLabel = new JLabel("Body       ");
+    private final JSlider bodySlider = new JSlider(0,10,5000,1000);
+    private JLabel bodySliderValue = new JLabel(bodySlider.getValue() + "ms");
 
     private final JPanel accessoriesPanel = new JPanel();
-    private final JLabel accessories = new JLabel("Accessories");
-    private final JSlider accessoriesSlider = new JSlider(0,0,1000,0);
-    private final JLabel accessoriesSliderValue = new JLabel("0");
+    private final JLabel accessoriesLabel = new JLabel("Accessories");
+    private final JSlider accessoriesSlider = new JSlider(0,10,5000,1000);
+    private JLabel accessoriesSliderValue = new JLabel(accessoriesSlider.getValue() + "ms");
 
-    private final JPanel enginesPanel = new JPanel();
-    private final JLabel engines = new JLabel("Engines");
-    private final JSlider enginesSlider = new JSlider(0,0,1000,0);
-    private final JLabel enginesSliderValue = new JLabel("0");
+    private final JPanel motorsPanel = new JPanel();
+    private final JLabel motorsLabel = new JLabel("Motors   ");
+    private final JSlider motorsSlider = new JSlider(0,10,5000,1000);
+    private JLabel motorsSliderValue = new JLabel(motorsSlider.getValue() + "ms");
 
-    public FactoryFrame() {
+    private final Controller controller;
+    private final FactoryController factoryController;
+
+    public FactoryFrame(Controller controller, FactoryController factoryController) {
+        this.controller = controller;
+        this.factoryController = factoryController;
         this.setSize(600,600);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
         this.setLayout(new GridLayout(2,2));
 
-        requestSlider.addChangeListener(this);
-        bodyworksSlider.addChangeListener(this);
-        accessoriesSlider.addChangeListener(this);
-        enginesSlider.addChangeListener(this);
+        requestSlider.addChangeListener(controller);
+        bodySlider.addChangeListener(controller);
+        accessoriesSlider.addChangeListener(controller);
+        motorsSlider.addChangeListener(controller);
+
+        controller.setSliders(accessoriesSlider, motorsSlider, bodySlider, requestSlider);
+        controller.setFactoryFrame(this);
 
         infoPanel.setLayout(new GridLayout(2,1));
-        infoPanel.add(carsDone);
-        infoPanel.add(taskToBeComplete);
+        infoPanel.add(carsDoneLabel);
+        infoPanel.add(taskToBeCompleteLabel);
 
-        requestPanel.add(requestSpeed);
+        requestPanel.add(requestSpeedLabel);
         requestPanel.add(requestSlider);
         requestPanel.add(requestSliderValue);
 
         deliveryPanel.setLayout(new GridLayout(4, 1));
         deliveryPanel.add(deliverySpeed);
 
-        bodyworksPanel.add(bodyworks);
-        bodyworksPanel.add(bodyworksSlider);
-        bodyworksPanel.add(bodyworksSliderValue);
+        bodyPanel.add(bodyLabel);
+        bodyPanel.add(bodySlider);
+        bodyPanel.add(bodySliderValue);
 
-        accessoriesPanel.add(accessories);
+        accessoriesPanel.add(accessoriesLabel);
         accessoriesPanel.add(accessoriesSlider);
         accessoriesPanel.add(accessoriesSliderValue);
 
-        enginesPanel.add(engines);
-        enginesPanel.add(enginesSlider);
-        enginesPanel.add(enginesSliderValue);
+        motorsPanel.add(motorsLabel);
+        motorsPanel.add(motorsSlider);
+        motorsPanel.add(motorsSliderValue);
 
-        deliveryPanel.add(bodyworksPanel);
+        deliveryPanel.add(bodyPanel);
         deliveryPanel.add(accessoriesPanel);
-        deliveryPanel.add(enginesPanel);
+        deliveryPanel.add(motorsPanel);
 
         this.add(infoPanel);
         this.add(requestPanel);
@@ -79,14 +89,24 @@ public class FactoryFrame extends JFrame implements ChangeListener {
     }
 
     @Override
-    public void stateChanged(ChangeEvent e) {
-        if (e.getSource() == accessoriesSlider)
-            accessoriesSliderValue.setText(String.valueOf(accessoriesSlider.getValue()));
-        else if (e.getSource() == enginesSlider)
-            enginesSliderValue.setText(String.valueOf(enginesSlider.getValue()));
-        else if (e.getSource() == bodyworksSlider)
-            bodyworksSliderValue.setText(String.valueOf(bodyworksSlider.getValue()));
-        else if (e.getSource() == requestSlider)
-            requestSliderValue.setText(String.valueOf(requestSlider.getValue()));
+    public void update(Changes change) {
+        switch (change) {
+            case UPDATE_BODY_SPEED -> {
+                bodySliderValue.setText(bodySlider.getValue() + "ms");
+                factoryController.setBodySpeed(bodySlider.getValue());
+            }
+            case UPDATE_MOTORS_SPEED -> {
+                motorsSliderValue.setText(motorsSlider.getValue() + "ms");
+                factoryController.setMotorSpeed(motorsSlider.getValue());
+            }
+            case UPDATE_ACCESSORIES_SPEED -> {
+                accessoriesSliderValue.setText(accessoriesSlider.getValue() + "ms");
+                factoryController.setAccessorySpeed(accessoriesSlider.getValue());
+            }
+            case UPDATE_REQUEST_SPEED -> {
+                requestSliderValue.setText(requestSlider.getValue() + "ms");
+                factoryController.setDealerSpeed(requestSlider.getValue());
+            }
+        }
     }
 }

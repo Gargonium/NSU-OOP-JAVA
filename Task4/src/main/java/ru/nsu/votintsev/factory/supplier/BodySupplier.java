@@ -10,19 +10,17 @@ public class BodySupplier extends BasicSupplier implements Runnable {
 
     public BodySupplier(BodyStorage bodyStorage) {
         this.bodyStorage = bodyStorage;
-        speed = 1000;
+        speed = 2000;
     }
 
     @Override
     public void run() {
-        lastTime = System.currentTimeMillis();
-        while (true) {
-            if (System.currentTimeMillis() - lastTime == speed) {
-                bodyStorage.addToStorage(new Accessory(productId));
-                System.out.println("BodySupplier add body#" + productId);
-                productId++;
-                lastTime = System.currentTimeMillis();
-            }
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastTime >= speed) {
+            bodyStorage.addToStorage(new Accessory(productId));
+            //System.out.println("BodySupplier add body#" + productId);
+            productId++;
+            lastTime = currentTime;
         }
     }
 }

@@ -1,5 +1,14 @@
 package ru.nsu.votintsev.factory.storage;
 
-public class MotorStorage extends BasicStorage {
+import ru.nsu.votintsev.factory.product.Motor;
 
+public class MotorStorage extends BasicStorage {
+    public Motor getMotor() {
+        try {
+            return (Motor) storage.take();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

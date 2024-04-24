@@ -10,19 +10,17 @@ public class MotorSupplier extends BasicSupplier implements Runnable {
 
     public MotorSupplier(MotorStorage motorStorage) {
         this.motorStorage = motorStorage;
-        speed = 1000;
+        speed = 2000;
     }
 
     @Override
     public void run() {
-        lastTime = System.currentTimeMillis();
-        while (true) {
-            if (System.currentTimeMillis() - lastTime == speed) {
-                motorStorage.addToStorage(new Accessory(productId));
-                System.out.println("MotorSupplier add motor#" + productId);
-                productId++;
-                lastTime = System.currentTimeMillis();
-            }
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastTime >= speed) {
+            motorStorage.addToStorage(new Accessory(productId));
+            //System.out.println("MotorSupplier add motor#" + productId);
+            productId++;
+            lastTime = currentTime;
         }
     }
 }

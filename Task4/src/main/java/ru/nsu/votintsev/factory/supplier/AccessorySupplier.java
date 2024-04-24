@@ -16,16 +16,14 @@ public class AccessorySupplier extends BasicSupplier implements Runnable {
 
     @Override
     public void run() {
-        lastTime = System.currentTimeMillis();
-        while (true) {
-            if (System.currentTimeMillis() - lastTime == speed) {
-                synchronized (productId) {
-                    accessoriesStorage.addToStorage(new Accessory(productId));
-                    System.out.println("AccessorySupplier #" + id + " add accessory #" + productId);
-                    productId++;
-                }
-                lastTime = System.currentTimeMillis();
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastTime >= speed) {
+            synchronized (productId) {
+                accessoriesStorage.addToStorage(new Accessory(productId));
+                //System.out.println("AccessorySupplier #" + id + " add accessory #" + productId);
+                productId++;
             }
+            lastTime = currentTime;
         }
     }
 }
