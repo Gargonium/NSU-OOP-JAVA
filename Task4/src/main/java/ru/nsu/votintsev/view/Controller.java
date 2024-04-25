@@ -1,5 +1,7 @@
 package ru.nsu.votintsev.view;
 
+import lombok.Setter;
+import ru.nsu.votintsev.factory.FactoryController;
 import ru.nsu.votintsev.factory.pattern.observer.Changes;
 import ru.nsu.votintsev.factory.pattern.observer.Observable;
 import ru.nsu.votintsev.factory.pattern.observer.Observer;
@@ -7,53 +9,77 @@ import ru.nsu.votintsev.factory.pattern.observer.Observer;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class Controller implements ChangeListener, Observable {
+public class Controller implements ChangeListener, Observable, ActionListener {
 
     private JSlider accessoriesSlider;
-    private JSlider enginesSlider;
+    private JSlider motorsSlider;
     private JSlider bodySlider;
     private JSlider requestSlider;
+    private JButton factoryControlButton;
+    private boolean isFactoryRunning = false;
+    private int buttonState = 0;
 
-    private final List<Observer> observers = new ArrayList<>();
+    private Observer observer;
 
-    private FactoryFrame factoryFrame;
+    @Setter
+    private FactoryController factoryController;
 
-    public void setFactoryFrame(FactoryFrame factoryFrame) {
-        this.factoryFrame = factoryFrame;
-        addObserver(factoryFrame);
-    }
-
-    public void setSliders(JSlider accessoriesSlider, JSlider enginesSlider, JSlider bodySlider, JSlider requestSlider) {
+    public void setSliders(JSlider accessoriesSlider, JSlider motorsSlider, JSlider bodySlider, JSlider requestSlider) {
         this.accessoriesSlider = accessoriesSlider;
-        this.enginesSlider = enginesSlider;
+        this.motorsSlider = motorsSlider;
         this.bodySlider = bodySlider;
         this.requestSlider = requestSlider;
     }
 
-    @Override
-    public void stateChanged(ChangeEvent e) {
-        if (e.getSource() == accessoriesSlider)
-            notifyObservers(Changes.UPDATE_ACCESSORIES_SPEED);
-        else if (e.getSource() == enginesSlider)
-            notifyObservers(Changes.UPDATE_MOTORS_SPEED);
-        else if (e.getSource() == bodySlider)
-            notifyObservers(Changes.UPDATE_BODY_SPEED);
-        else if (e.getSource() == requestSlider)
-            notifyObservers(Changes.UPDATE_REQUEST_SPEED);
+    public void setButton(JButton factoryControlButton) {
+        this.factoryControlButton = factoryControlButton;
     }
 
     @Override
-    public void addObserver(Observer observer) {
-        observers.add(observer);
+    public void stateChanged(ChangeEvent e) {
+        if (e.getSource() == accessoriesSlider) {
+            notifyObservers(Changes.UPDATE_ACCESSORIES_SPEED);
+            factoryController.setAccessorySpeed(accessoriesSlider.getValue());
+        }
+        else if (e.getSource() == motorsSlider) {
+            notifyObservers(Changes.UPDATE_MOTORS_SPEED);
+            factoryController.setMotorSpeed(motorsSlider.getValue());
+        }
+        else if (e.getSource() == bodySlider) {
+            notifyObservers(Changes.UPDATE_BODY_SPEED);
+            factoryController.setBodySpeed(bodySlider.getValue());
+        }
+        else if (e.getSource() == requestSlider) {
+            notifyObservers(Changes.UPDATE_REQUEST_SPEED);
+            factoryController.setDealerSpeed(requestSlider.getValue());
+        }
     }
 
     @Override
     public void notifyObservers(Changes change) {
-        for (Observer observer : observers) {
-            observer.update(change);
+        observer.update(change);
+    }
+
+    @Override
+    public void addObserver(Observer observer) {
+        this.observer = observer;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == factoryControlButton) {
+            if (buttonState == 0 || buttonState == 2) {
+                factoryController.startFactory();
+                factoryControlButton.setText("Stop Factory");
+                buttonState = 1;
+            } else {
+                factoryController.shutdownFactory();
+                factoryControlButton.setText("Restart Factory");
+                buttonState = 2;
+            }
         }
     }
 }

@@ -22,54 +22,63 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class FactoryController {
-    private final ScheduledExecutorService supplierTP;
-    private final ScheduledExecutorService workerTP;
-    private final ScheduledExecutorService dealerTP;
+
+    private int accessoriesSupplierCount;
+    private int dealerCount;
+    private int workerCount;
+    private boolean logAll;
+
+    private ScheduledExecutorService supplierTP;
+    private ScheduledExecutorService workerTP;
+    private ScheduledExecutorService dealerTP;
 
     private final AccessoryStorage accessoryStorage = new AccessoryStorage();
     private final BodyStorage bodyStorage = new BodyStorage();
     private final MotorStorage motorStorage = new MotorStorage();
     private final AutoStorage autoStorage = new AutoStorage();
 
-    private final MotorSupplier motorSupplier = new MotorSupplier(motorStorage);
-    private final BodySupplier bodySupplier = new BodySupplier(bodyStorage);
+    private final MotorSupplier motorSupplier;
+    private final BodySupplier bodySupplier;
     private final List<AccessorySupplier> accessorySuppliers = new ArrayList<>();
 
     private final List<AutoWorker> autoWorkers = new ArrayList<>();
-    private final AutoStorageController autoStorageController = new AutoStorageController(autoWorkers, autoStorage);
+    private final AutoStorageController autoStorageController = new AutoStorageController(autoStorage);
 
     private final List<AutoDealer> autoDealers = new ArrayList<>();
 
-    private int accessoriesSupplierCount;
-    private int dealerCount;
-    private int workerCount;
-
     public FactoryController() {
         readConfig();
+        motorSupplier = new MotorSupplier(motorStorage, logAll);
+        bodySupplier = new BodySupplier(bodyStorage, logAll);
+    }
 
+    public void startFactory() {
         supplierTP = Executors.newScheduledThreadPool(accessoriesSupplierCount + 2);
         workerTP = Executors.newScheduledThreadPool(workerCount);
         dealerTP = Executors.newScheduledThreadPool(dealerCount);
 
         for (int i = 0; i < accessoriesSupplierCount; i++) {
-            AccessorySupplier accessorySupplier = new AccessorySupplier(i, accessoryStorage);
+            AccessorySupplier accessorySupplier = new AccessorySupplier(i, accessoryStorage, logAll);
             accessorySuppliers.add(accessorySupplier);
-            supplierTP.scheduleAtFixedRate(accessorySupplier, 0, 10, TimeUnit.MILLISECONDS);
+            supplierTP.scheduleAtFixedRate(accessorySupplier, 0, 100, TimeUnit.MILLISECONDS);
         }
-        supplierTP.scheduleAtFixedRate(motorSupplier, 0, 10, TimeUnit.MILLISECONDS);
-        supplierTP.scheduleAtFixedRate(bodySupplier, 0, 10, TimeUnit.MILLISECONDS);
+        supplierTP.scheduleAtFixedRate(motorSupplier, 0, 100, TimeUnit.MILLISECONDS);
+        supplierTP.scheduleAtFixedRate(bodySupplier, 0, 100, TimeUnit.MILLISECONDS);
         for (int i = 0; i < workerCount; i++) {
-            AutoWorker autoWorker = new AutoWorker(bodyStorage, accessoryStorage, motorStorage, autoStorage, i);
+            AutoWorker autoWorker = new AutoWorker(bodyStorage, accessoryStorage, motorStorage, autoStorage, i, logAll);
+            autoStorageController.addObserver(autoWorker);
             autoWorkers.add(autoWorker);
-            workerTP.scheduleAtFixedRate(autoWorker, 0, 10, TimeUnit.MILLISECONDS);
+            workerTP.scheduleAtFixedRate(autoWorker, 0, 100, TimeUnit.MILLISECONDS);
             //workerTP.execute(new AutoWorker(bodyStorage, accessoryStorage, motorStorage, autoStorage));
         }
         for (int i = 0; i < dealerCount; i++) {
-            AutoDealer autoDealer = new AutoDealer(autoStorage, autoStorageController, i);
+            AutoDealer autoDealer = new AutoDealer(autoStorage, i);
+            autoDealer.addObserver(autoStorageController);
             autoDealers.add(autoDealer);
-            dealerTP.scheduleAtFixedRate(autoDealer, 0, 10, TimeUnit.MILLISECONDS);
+            dealerTP.scheduleAtFixedRate(autoDealer, 0, 100, TimeUnit.MILLISECONDS);
             //dealerTP.execute(new AutoDealer(autoStorage, autoStorageController, i));
         }
+        autoStorageController.firstStart();
     }
 
     private void readConfig() {
@@ -82,9 +91,11 @@ public class FactoryController {
             motorStorage.setSize(Integer.parseInt(prop.getProperty("MotorStorageSize")));
             autoStorage.setSize(Integer.parseInt(prop.getProperty("AutoStorageSize")));
 
-            accessoriesSupplierCount = Integer.parseInt(prop.getProperty("AccessorySuppliers"));
-            dealerCount = Integer.parseInt(prop.getProperty("Dealers"));
-            workerCount = Integer.parseInt(prop.getProperty("Workers"));
+            accessoriesSupplierCount = Integer.parseInt(prop.getProperty("AccessorySuppliersCount"));
+            dealerCount = Integer.parseInt(prop.getProperty("DealersCount"));
+            workerCount = Integer.parseInt(prop.getProperty("WorkersCount"));
+
+            logAll = Boolean.parseBoolean(prop.getProperty("LogAll"));
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -109,5 +120,14 @@ public class FactoryController {
         for (AutoDealer autoDealer : autoDealers) {
             autoDealer.changeSpeed(speed);
         }
+    }
+
+    public void shutdownFactory() {
+        if (supplierTP != null)
+            supplierTP.shutdown();
+        if (dealerTP != null)
+            dealerTP.shutdown();
+        if (workerTP != null)
+            workerTP.shutdown();
     }
 }

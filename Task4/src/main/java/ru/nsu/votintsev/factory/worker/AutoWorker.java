@@ -12,7 +12,8 @@ import ru.nsu.votintsev.factory.storage.BodyStorage;
 import ru.nsu.votintsev.factory.storage.MotorStorage;
 import ru.nsu.votintsev.factory.storage.auto.AutoStorage;
 
-@RequiredArgsConstructor
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class AutoWorker implements Worker, Runnable, Observer {
 
     private final BodyStorage bodyStorage;
@@ -20,8 +21,21 @@ public class AutoWorker implements Worker, Runnable, Observer {
     private final MotorStorage motorStorage;
     private final AutoStorage autoStorage;
 
-    private static Integer productId = 0;
+    private int productId;
+    private static AtomicInteger lastProductId = new AtomicInteger(-1);
     private final int id;
+
+    private final boolean logging;
+
+    public AutoWorker(BodyStorage bodyStorage, AccessoryStorage accessoryStorage, MotorStorage motorStorage, AutoStorage autoStorage, int id, boolean logging) {
+        this.bodyStorage = bodyStorage;
+        this.accessoryStorage = accessoryStorage;
+        this.motorStorage = motorStorage;
+        this.autoStorage = autoStorage;
+        this.id = id;
+        this.logging = logging;
+        productId = lastProductId.incrementAndGet();
+    }
 
     @Override
     public void run() {
@@ -34,11 +48,10 @@ public class AutoWorker implements Worker, Runnable, Observer {
             Body body = bodyStorage.getBody();
             Accessory accessory = accessoryStorage.getAccessory();
             Motor motor = motorStorage.getMotor();
-            synchronized (productId) {
-                autoStorage.addToStorage(new Auto(body.getId(), motor.getId(), accessory.getId(), productId));
+            autoStorage.addToStorage(new Auto(body.getId(), motor.getId(), accessory.getId(), productId));
+            if (logging)
                 System.out.println("AutoWorker #" + id + " add auto #" + productId);
-                productId++;
-            }
+            productId = lastProductId.incrementAndGet();
         }
     }
 }

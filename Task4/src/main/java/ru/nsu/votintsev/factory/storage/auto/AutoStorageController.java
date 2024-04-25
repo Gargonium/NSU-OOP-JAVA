@@ -1,29 +1,32 @@
 package ru.nsu.votintsev.factory.storage.auto;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import ru.nsu.votintsev.factory.pattern.observer.Changes;
 import ru.nsu.votintsev.factory.pattern.observer.Observable;
 import ru.nsu.votintsev.factory.pattern.observer.Observer;
-import ru.nsu.votintsev.factory.worker.AutoWorker;
 
 import java.util.List;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AutoStorageController implements Observable, Observer {
 
-    private List<AutoWorker> autoWorkers;
-    private AutoStorage autoStorage;
+    private List<Observer> observers;
+    private final AutoStorage autoStorage;
 
-    @Override
-    public void addObserver(Observer observer) {
-
+    public void firstStart() {
+        notifyObservers(Changes.NEED_NEW_AUTO);
     }
 
     @Override
     public void notifyObservers(Changes change) {
-        for (AutoWorker autoWorker : autoWorkers) {
-            autoWorker.update(change);
+        for (Observer observer : observers) {
+            observer.update(change);
         }
+    }
+
+    @Override
+    public void addObserver(Observer observer) {
+        observers.add(observer);
     }
 
     @Override

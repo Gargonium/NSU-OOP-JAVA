@@ -5,7 +5,6 @@ import ru.nsu.votintsev.factory.pattern.observer.Changes;
 import ru.nsu.votintsev.factory.pattern.observer.Observable;
 import ru.nsu.votintsev.factory.pattern.observer.Observer;
 import ru.nsu.votintsev.factory.product.Auto;
-import ru.nsu.votintsev.factory.product.Product;
 import ru.nsu.votintsev.factory.storage.auto.AutoStorage;
 import ru.nsu.votintsev.factory.storage.auto.AutoStorageController;
 
@@ -16,7 +15,7 @@ import java.util.Date;
 public class AutoDealer implements Dealer, Runnable, Observable {
 
     private final AutoStorage autoStorage;
-    private final AutoStorageController autoStorageController;
+    private Observer observer;
     private int speed = 1000;
     private long lastTime = System.currentTimeMillis();
     private final int id;
@@ -37,12 +36,13 @@ public class AutoDealer implements Dealer, Runnable, Observable {
     }
 
     @Override
-    public void addObserver(Observer observer) {
+    public void notifyObservers(Changes change) {
+        observer.update(Changes.AUTO_SEND);
     }
 
     @Override
-    public void notifyObservers(Changes change) {
-        autoStorageController.update(Changes.AUTO_SEND);
+    public void addObserver(Observer observer) {
+        this.observer = observer;
     }
 
     @Override

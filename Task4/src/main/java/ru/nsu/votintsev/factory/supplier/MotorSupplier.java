@@ -8,8 +8,11 @@ public class MotorSupplier extends BasicSupplier implements Runnable {
     private final MotorStorage motorStorage;
     protected static int productId = 0;
 
-    public MotorSupplier(MotorStorage motorStorage) {
+    private final boolean logging;
+
+    public MotorSupplier(MotorStorage motorStorage, boolean logging) {
         this.motorStorage = motorStorage;
+        this.logging = logging;
         speed = 2000;
     }
 
@@ -18,7 +21,8 @@ public class MotorSupplier extends BasicSupplier implements Runnable {
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastTime >= speed) {
             motorStorage.addToStorage(new Motor(productId));
-            System.out.println("MotorSupplier add motor#" + productId);
+            if (logging)
+                System.out.println("MotorSupplier add motor#" + productId);
             productId++;
             lastTime = currentTime;
         }

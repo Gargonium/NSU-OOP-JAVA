@@ -8,8 +8,11 @@ public class BodySupplier extends BasicSupplier implements Runnable {
     private final BodyStorage bodyStorage;
     protected static int productId = 0;
 
-    public BodySupplier(BodyStorage bodyStorage) {
+    private final boolean logging;
+
+    public BodySupplier(BodyStorage bodyStorage, boolean logging) {
         this.bodyStorage = bodyStorage;
+        this.logging = logging;
         speed = 2000;
     }
 
@@ -18,7 +21,8 @@ public class BodySupplier extends BasicSupplier implements Runnable {
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastTime >= speed) {
             bodyStorage.addToStorage(new Body(productId));
-            System.out.println("BodySupplier add body#" + productId);
+            if (logging)
+                System.out.println("BodySupplier add body#" + productId);
             productId++;
             lastTime = currentTime;
         }
