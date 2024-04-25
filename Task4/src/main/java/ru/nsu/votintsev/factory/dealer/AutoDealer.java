@@ -1,12 +1,12 @@
 package ru.nsu.votintsev.factory.dealer;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import ru.nsu.votintsev.factory.pattern.observer.Changes;
 import ru.nsu.votintsev.factory.pattern.observer.Observable;
 import ru.nsu.votintsev.factory.pattern.observer.Observer;
 import ru.nsu.votintsev.factory.product.Auto;
 import ru.nsu.votintsev.factory.storage.auto.AutoStorage;
-import ru.nsu.votintsev.factory.storage.auto.AutoStorageController;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,6 +20,7 @@ public class AutoDealer implements Dealer, Runnable, Observable {
     private long lastTime = System.currentTimeMillis();
     private final int id;
 
+    @SneakyThrows
     @Override
     public void run() {
         long currentTime = System.currentTimeMillis();

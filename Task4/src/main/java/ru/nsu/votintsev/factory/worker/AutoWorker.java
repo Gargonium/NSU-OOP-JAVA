@@ -2,6 +2,7 @@ package ru.nsu.votintsev.factory.worker;
 
 import lombok.RequiredArgsConstructor;
 import ru.nsu.votintsev.factory.pattern.observer.Changes;
+import ru.nsu.votintsev.factory.pattern.observer.Observable;
 import ru.nsu.votintsev.factory.pattern.observer.Observer;
 import ru.nsu.votintsev.factory.product.Accessory;
 import ru.nsu.votintsev.factory.product.Auto;
@@ -14,7 +15,7 @@ import ru.nsu.votintsev.factory.storage.auto.AutoStorage;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AutoWorker implements Worker, Runnable, Observer {
+public class AutoWorker implements Worker, Runnable, Observer, Observable {
 
     private final BodyStorage bodyStorage;
     private final AccessoryStorage accessoryStorage;
@@ -24,6 +25,8 @@ public class AutoWorker implements Worker, Runnable, Observer {
     private int productId;
     private static AtomicInteger lastProductId = new AtomicInteger(-1);
     private final int id;
+
+    private Observer observer;
 
     private final boolean logging;
 
@@ -52,6 +55,17 @@ public class AutoWorker implements Worker, Runnable, Observer {
             if (logging)
                 System.out.println("AutoWorker #" + id + " add auto #" + productId);
             productId = lastProductId.incrementAndGet();
+            notifyObservers(Changes.AUTO_PRODUCED);
         }
+    }
+
+    @Override
+    public void notifyObservers(Changes change) {
+        observer.update(change);
+    }
+
+    @Override
+    public void addObserver(Observer observer) {
+        this.observer = observer;
     }
 }

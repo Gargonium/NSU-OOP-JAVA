@@ -5,12 +5,13 @@ import ru.nsu.votintsev.factory.pattern.observer.Changes;
 import ru.nsu.votintsev.factory.pattern.observer.Observable;
 import ru.nsu.votintsev.factory.pattern.observer.Observer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
 public class AutoStorageController implements Observable, Observer {
 
-    private List<Observer> observers;
+    private List<Observer> observers = new ArrayList<>();
     private final AutoStorage autoStorage;
 
     public void firstStart() {

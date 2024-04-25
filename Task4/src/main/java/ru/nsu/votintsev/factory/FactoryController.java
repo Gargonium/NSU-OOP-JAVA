@@ -1,6 +1,10 @@
 package ru.nsu.votintsev.factory;
 
+import lombok.Getter;
 import ru.nsu.votintsev.factory.dealer.AutoDealer;
+import ru.nsu.votintsev.factory.pattern.observer.Changes;
+import ru.nsu.votintsev.factory.pattern.observer.Observable;
+import ru.nsu.votintsev.factory.pattern.observer.Observer;
 import ru.nsu.votintsev.factory.storage.AccessoryStorage;
 import ru.nsu.votintsev.factory.storage.BodyStorage;
 import ru.nsu.votintsev.factory.storage.MotorStorage;
@@ -21,7 +25,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class FactoryController {
+public class FactoryController implements Observer, Observable {
 
     private int accessoriesSupplierCount;
     private int dealerCount;
@@ -46,10 +50,30 @@ public class FactoryController {
 
     private final List<AutoDealer> autoDealers = new ArrayList<>();
 
+    private Observer observer;
+
+    @Getter
+    private int autoProduced = 0;
+    @Getter
+    private int bodyProduced = 0;
+    @Getter
+    private int accessoryProduced = 0;
+    @Getter
+    private int motorProduced = 0;
+    @Getter
+    private int taskInProceed = 0;
+
     public FactoryController() {
         readConfig();
         motorSupplier = new MotorSupplier(motorStorage, logAll);
+        motorSupplier.addObserver(this);
         bodySupplier = new BodySupplier(bodyStorage, logAll);
+        bodySupplier.addObserver(this);
+
+        autoStorage.addObserver(this);
+        accessoryStorage.addObserver(this);
+        motorStorage.addObserver(this);
+        bodyStorage.addObserver(this);
     }
 
     public void startFactory() {
@@ -60,14 +84,16 @@ public class FactoryController {
         for (int i = 0; i < accessoriesSupplierCount; i++) {
             AccessorySupplier accessorySupplier = new AccessorySupplier(i, accessoryStorage, logAll);
             accessorySuppliers.add(accessorySupplier);
+            accessorySupplier.addObserver(this);
             supplierTP.scheduleAtFixedRate(accessorySupplier, 0, 100, TimeUnit.MILLISECONDS);
         }
         supplierTP.scheduleAtFixedRate(motorSupplier, 0, 100, TimeUnit.MILLISECONDS);
         supplierTP.scheduleAtFixedRate(bodySupplier, 0, 100, TimeUnit.MILLISECONDS);
         for (int i = 0; i < workerCount; i++) {
             AutoWorker autoWorker = new AutoWorker(bodyStorage, accessoryStorage, motorStorage, autoStorage, i, logAll);
-            autoStorageController.addObserver(autoWorker);
             autoWorkers.add(autoWorker);
+            autoStorageController.addObserver(autoWorker);
+            autoWorker.addObserver(this);
             workerTP.scheduleAtFixedRate(autoWorker, 0, 100, TimeUnit.MILLISECONDS);
             //workerTP.execute(new AutoWorker(bodyStorage, accessoryStorage, motorStorage, autoStorage));
         }
@@ -78,6 +104,7 @@ public class FactoryController {
             dealerTP.scheduleAtFixedRate(autoDealer, 0, 100, TimeUnit.MILLISECONDS);
             //dealerTP.execute(new AutoDealer(autoStorage, autoStorageController, i));
         }
+        autoStorageController.addObserver(this);
         autoStorageController.firstStart();
     }
 
@@ -129,5 +156,46 @@ public class FactoryController {
             dealerTP.shutdown();
         if (workerTP != null)
             workerTP.shutdown();
+    }
+
+    @Override
+    public void update(Changes change) {
+        switch (change) {
+            case AUTO_PRODUCED -> {
+                autoProduced++;
+                taskInProceed--;
+            }
+            case BODY_PRODUCED -> bodyProduced++;
+            case MOTOR_PRODUCED -> motorProduced++;
+            case ACCESSORY_PRODUCED -> accessoryProduced++;
+            case NEED_NEW_AUTO -> taskInProceed += workerCount + 1;
+        }
+        notifyObservers(change);
+    }
+
+    @Override
+    public void notifyObservers(Changes change) {
+        observer.update(change);
+    }
+
+    @Override
+    public void addObserver(Observer observer) {
+        this.observer = observer;
+    }
+
+    public int getAutoStorageOccupancy() {
+        return autoStorage.onStorage();
+    }
+
+    public int getBodyStorageOccupancy() {
+        return bodyStorage.onStorage();
+    }
+
+    public int getAccessoryStorageOccupancy() {
+        return accessoryStorage.onStorage();
+    }
+
+    public int getMotorStorageOccupancy() {
+        return motorStorage.onStorage();
     }
 }

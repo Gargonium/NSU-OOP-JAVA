@@ -71,14 +71,20 @@ public class Controller implements ChangeListener, Observable, ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == factoryControlButton) {
-            if (buttonState == 0 || buttonState == 2) {
-                factoryController.startFactory();
-                factoryControlButton.setText("Stop Factory");
-                buttonState = 1;
-            } else {
-                factoryController.shutdownFactory();
-                factoryControlButton.setText("Restart Factory");
-                buttonState = 2;
+            switch (buttonState) {
+                case 0 -> {
+                    factoryController.startFactory();
+                    factoryControlButton.setText("Stop Factory");
+                    buttonState = 1;
+                }
+                case 1 -> {
+                    factoryController.shutdownFactory();
+                    factoryControlButton.setText("Exit");
+                    buttonState = 2;
+                }
+                case 2 -> {
+                    System.exit(1);
+                }
             }
         }
     }

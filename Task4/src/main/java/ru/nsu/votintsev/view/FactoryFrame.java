@@ -39,7 +39,8 @@ public class FactoryFrame extends JFrame implements Observer {
     public FactoryFrame(Controller controller, FactoryController factoryController) {
         this.controller = controller;
         this.factoryController = factoryController;
-        this.setSize(600,500);
+        factoryController.addObserver(this);
+        this.setSize(460,500);
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.setResizable(false);
         this.setLayout(null);
@@ -66,7 +67,7 @@ public class FactoryFrame extends JFrame implements Observer {
         controller.setFactoryController(factoryController);
         controller.setButton(factoryControlButton);
 
-        factoryControlButton.setBounds(400, 400, 150, 50);
+        factoryControlButton.setBounds(290, 400, 150, 50);
 
         bodyLabel.setBounds(0, 0, 400, 50);
         bodySlider.setBounds(0, 50, 400, 50);
@@ -116,6 +117,15 @@ public class FactoryFrame extends JFrame implements Observer {
             case UPDATE_MOTORS_SPEED -> motorsSliderValue.setText(motorsSlider.getValue() + "ms");
             case UPDATE_ACCESSORIES_SPEED -> accessoriesSliderValue.setText(accessoriesSlider.getValue() + "ms");
             case UPDATE_REQUEST_SPEED -> requestSliderValue.setText(requestSlider.getValue() + "ms");
+            case NEED_NEW_AUTO -> taskToBeCompleteLabel.setText("Task to be Complete: " + factoryController.getTaskInProceed());
+            case AUTO_PRODUCED -> {
+                requestSpeedLabel.setText("Request: onStorage: " + factoryController.getAutoStorageOccupancy() + " Produced: " + factoryController.getAutoProduced());
+                taskToBeCompleteLabel.setText("Task to be Complete: " + factoryController.getTaskInProceed());
+            }
+            case AUTO_STORAGE_UPDATE -> requestSpeedLabel.setText("Request: onStorage: " + factoryController.getAutoStorageOccupancy() + " Produced: " + factoryController.getAutoProduced());
+            case BODY_PRODUCED, BODY_STORAGE_UPDATE -> bodyLabel.setText("Body: onStorage: " + factoryController.getBodyStorageOccupancy() + " Produced: " + factoryController.getBodyProduced());
+            case MOTOR_PRODUCED, MOTOR_STORAGE_UPDATE -> motorsLabel.setText("Motor: onStorage: " + factoryController.getMotorStorageOccupancy() + " Produced: " + factoryController.getMotorProduced());
+            case ACCESSORY_PRODUCED, ACCESSORY_STORAGE_UPDATE -> accessoriesLabel.setText("Accessory: onStorage: " + factoryController.getAccessoryStorageOccupancy() + " Produced: " + factoryController.getAccessoryProduced());
         }
     }
 }
