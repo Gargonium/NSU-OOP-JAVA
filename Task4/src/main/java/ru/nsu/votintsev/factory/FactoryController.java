@@ -1,7 +1,7 @@
 package ru.nsu.votintsev.factory;
 
 import lombok.Getter;
-import ru.nsu.votintsev.executor.service.MyThreadPool;
+import ru.nsu.votintsev.mythreadpool.MyThreadPool;
 import ru.nsu.votintsev.factory.dealer.AutoDealer;
 import ru.nsu.votintsev.factory.pattern.observer.Changes;
 import ru.nsu.votintsev.factory.pattern.observer.Observable;

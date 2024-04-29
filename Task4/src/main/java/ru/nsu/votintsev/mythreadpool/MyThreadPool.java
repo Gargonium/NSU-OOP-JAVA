@@ -1,4 +1,4 @@
-package ru.nsu.votintsev.executor.service;
+package ru.nsu.votintsev.mythreadpool;
 
 import java.util.ArrayList;
 import java.util.Collection;
