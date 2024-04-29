@@ -1,6 +1,5 @@
 package ru.nsu.votintsev.factory.supplier;
 
-import lombok.SneakyThrows;
 import ru.nsu.votintsev.factory.pattern.observer.Changes;
 import ru.nsu.votintsev.factory.pattern.observer.Observable;
 import ru.nsu.votintsev.factory.pattern.observer.Observer;
@@ -25,11 +24,14 @@ public class BodySupplier extends BasicSupplier implements Runnable, Observable 
 
     public void shutdown() {isRunning = false;}
 
-    @SneakyThrows
     @Override
     public void run() {
         while (isRunning) {
-            Thread.sleep(speed);
+            try {
+                Thread.sleep(speed);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             bodyStorage.addToStorage(new Body(productId));
             if (logging)
                 System.out.println("BodySupplier add body#" + productId);

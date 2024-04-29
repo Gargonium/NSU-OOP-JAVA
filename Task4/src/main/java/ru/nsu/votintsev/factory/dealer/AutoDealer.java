@@ -1,7 +1,6 @@
 package ru.nsu.votintsev.factory.dealer;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import ru.nsu.votintsev.factory.pattern.observer.Changes;
 import ru.nsu.votintsev.factory.pattern.observer.Observable;
 import ru.nsu.votintsev.factory.pattern.observer.Observer;
@@ -23,12 +22,16 @@ public class AutoDealer implements Dealer, Runnable, Observable {
 
     public void shutdown() {isRunning = false;}
 
-    @SneakyThrows
     @Override
     public void run() {
         while (isRunning) {
-            Thread.sleep(speed);
-            Auto auto = autoStorage.getAuto();
+            Auto auto;
+            try {
+                Thread.sleep(speed);
+                auto = autoStorage.getAuto();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             Date dateNow = new Date();
             SimpleDateFormat formatForDateNow = new SimpleDateFormat("hh:mm:ss a");
             System.out.println(

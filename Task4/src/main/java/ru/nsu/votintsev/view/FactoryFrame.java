@@ -5,7 +5,6 @@ import ru.nsu.votintsev.factory.pattern.observer.Changes;
 import ru.nsu.votintsev.factory.pattern.observer.Observer;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -16,8 +15,6 @@ public class FactoryFrame extends JFrame implements Observer {
     private final JLabel requestSpeedLabel = new JLabel("Request: onStorage: 0 Produced: 0");
     private final JSlider requestSlider = new JSlider(0,100,5000,1000);
     private final JLabel requestSliderValue = new JLabel(requestSlider.getValue() + "ms");
-
-    private final JLabel deliverySpeed = new JLabel("Delivery Speed");
 
     private final JLabel bodyLabel = new JLabel("Body: onStorage: 0 Produced: 0");
     private final JSlider bodySlider = new JSlider(0,100,5000,1000);
@@ -31,13 +28,9 @@ public class FactoryFrame extends JFrame implements Observer {
     private final JSlider motorsSlider = new JSlider(0,100,5000,1000);
     private final JLabel motorsSliderValue = new JLabel(motorsSlider.getValue() + "ms");
 
-    private final JButton factoryControlButton = new JButton("Start Factory");
-
-    private final Controller controller;
     private final FactoryController factoryController;
 
     public FactoryFrame(Controller controller, FactoryController factoryController) {
-        this.controller = controller;
         this.factoryController = factoryController;
         factoryController.addObserver(this);
         this.setSize(460,500);
@@ -59,6 +52,7 @@ public class FactoryFrame extends JFrame implements Observer {
         accessoriesSlider.addChangeListener(controller);
         motorsSlider.addChangeListener(controller);
 
+        JButton factoryControlButton = new JButton("Start Factory");
         factoryControlButton.addActionListener(controller);
         factoryControlButton.setFocusable(false);
 
@@ -117,7 +111,7 @@ public class FactoryFrame extends JFrame implements Observer {
             case UPDATE_MOTORS_SPEED -> motorsSliderValue.setText(motorsSlider.getValue() + "ms");
             case UPDATE_ACCESSORIES_SPEED -> accessoriesSliderValue.setText(accessoriesSlider.getValue() + "ms");
             case UPDATE_REQUEST_SPEED -> requestSliderValue.setText(requestSlider.getValue() + "ms");
-            case NEED_NEW_AUTO -> taskToBeCompleteLabel.setText("Task to be Complete: " + factoryController.getTaskInProceed());
+            case START_PRODUCING_AUTO -> taskToBeCompleteLabel.setText("Task to be Complete: " + factoryController.getTaskInProceed());
             case AUTO_PRODUCED -> {
                 requestSpeedLabel.setText("Request: onStorage: " + factoryController.getAutoStorageOccupancy() + " Produced: " + factoryController.getAutoProduced());
                 taskToBeCompleteLabel.setText("Task to be Complete: " + factoryController.getTaskInProceed());

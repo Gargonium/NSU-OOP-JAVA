@@ -1,6 +1,5 @@
 package ru.nsu.votintsev.factory.worker;
 
-import lombok.SneakyThrows;
 import ru.nsu.votintsev.factory.pattern.observer.Changes;
 import ru.nsu.votintsev.factory.pattern.observer.Observable;
 import ru.nsu.votintsev.factory.pattern.observer.Observer;
@@ -48,12 +47,11 @@ public class AutoWorker implements Worker, Runnable, Observable {
 
     public void shutdown() {isRunning = false;}
 
-    @SneakyThrows
     @Override
     public void run() {
         while (isRunning) {
             isWaiting = false;
-            notifyObservers(Changes.NEED_NEW_AUTO);
+            notifyObservers(Changes.START_PRODUCING_AUTO);
             Body body = bodyStorage.getBody();
             Accessory accessory = accessoryStorage.getAccessory();
             Motor motor = motorStorage.getMotor();
@@ -64,7 +62,11 @@ public class AutoWorker implements Worker, Runnable, Observable {
             notifyObservers(Changes.AUTO_PRODUCED);
             synchronized (this) {
                 isWaiting = true;
-                this.wait();
+                try {
+                    this.wait();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }

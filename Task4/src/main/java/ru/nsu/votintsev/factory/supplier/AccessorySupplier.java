@@ -1,6 +1,5 @@
 package ru.nsu.votintsev.factory.supplier;
 
-import lombok.SneakyThrows;
 import ru.nsu.votintsev.factory.pattern.observer.Changes;
 import ru.nsu.votintsev.factory.pattern.observer.Observable;
 import ru.nsu.votintsev.factory.pattern.observer.Observer;
@@ -30,11 +29,14 @@ public class AccessorySupplier extends BasicSupplier implements Runnable, Observ
 
     public void shutdown() {isRunning = false;}
 
-    @SneakyThrows
     @Override
     public void run() {
         while (isRunning) {
-            Thread.sleep(speed);
+            try {
+                Thread.sleep(speed);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             accessoriesStorage.addToStorage(new Accessory(productId));
             if (logging)
                 System.out.println("AccessorySupplier #" + id + " add accessory #" + productId);

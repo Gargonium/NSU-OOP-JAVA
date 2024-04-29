@@ -1,6 +1,7 @@
 package ru.nsu.votintsev.factory;
 
 import lombok.Getter;
+import ru.nsu.votintsev.executor.service.MyThreadPool;
 import ru.nsu.votintsev.factory.dealer.AutoDealer;
 import ru.nsu.votintsev.factory.pattern.observer.Changes;
 import ru.nsu.votintsev.factory.pattern.observer.Observable;
@@ -22,7 +23,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class FactoryController implements Observer, Observable {
@@ -77,9 +77,10 @@ public class FactoryController implements Observer, Observable {
     }
 
     public void startFactory() {
-        supplierTP = Executors.newFixedThreadPool(accessoriesSupplierCount + 2);
-        workerTP = Executors.newFixedThreadPool(workerCount);
-        dealerTP = Executors.newFixedThreadPool(dealerCount);
+
+        supplierTP = new MyThreadPool(accessoriesSupplierCount + 2);
+        workerTP = new MyThreadPool(workerCount);
+        dealerTP = new MyThreadPool(dealerCount);
 
         for (int i = 0; i < accessoriesSupplierCount; i++) {
             AccessorySupplier accessorySupplier = new AccessorySupplier(i, accessoryStorage, logAll);
@@ -176,7 +177,7 @@ public class FactoryController implements Observer, Observable {
             case BODY_PRODUCED -> bodyProduced.incrementAndGet();
             case MOTOR_PRODUCED -> motorProduced.incrementAndGet();
             case ACCESSORY_PRODUCED -> accessoryProduced.incrementAndGet();
-            case NEED_NEW_AUTO -> taskInProceed.incrementAndGet();
+            case START_PRODUCING_AUTO -> taskInProceed.incrementAndGet();
         }
         notifyObservers(change);
     }
