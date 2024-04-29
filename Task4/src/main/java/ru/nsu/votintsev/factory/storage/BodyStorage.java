@@ -31,7 +31,7 @@ public class BodyStorage implements Storage, Observable {
             storage.put(product);
             notifyObservers(Changes.BODY_STORAGE_UPDATE);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -41,9 +41,8 @@ public class BodyStorage implements Storage, Observable {
             notifyObservers(Changes.BODY_STORAGE_UPDATE);
             return body;
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     @Override

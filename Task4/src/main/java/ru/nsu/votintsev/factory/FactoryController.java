@@ -1,7 +1,6 @@
 package ru.nsu.votintsev.factory;
 
 import lombok.Getter;
-import ru.nsu.votintsev.executor.service.MyThreadPool;
 import ru.nsu.votintsev.factory.dealer.AutoDealer;
 import ru.nsu.votintsev.factory.pattern.observer.Changes;
 import ru.nsu.votintsev.factory.pattern.observer.Observable;
@@ -15,6 +14,7 @@ import ru.nsu.votintsev.factory.supplier.AccessorySupplier;
 import ru.nsu.votintsev.factory.supplier.BodySupplier;
 import ru.nsu.votintsev.factory.supplier.MotorSupplier;
 import ru.nsu.votintsev.factory.worker.AutoWorker;
+import ru.nsu.votintsev.mythreadpool.MyThreadPool;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

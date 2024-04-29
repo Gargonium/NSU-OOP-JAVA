@@ -32,7 +32,7 @@ public class AutoStorage implements Storage, Observable {
             storage.put(product);
             notifyObservers(Changes.AUTO_STORAGE_UPDATE);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 

@@ -30,7 +30,7 @@ public class AccessoryStorage implements Storage, Observable {
             storage.put(product);
             notifyObservers(Changes.ACCESSORY_STORAGE_UPDATE);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -40,9 +40,8 @@ public class AccessoryStorage implements Storage, Observable {
             notifyObservers(Changes.ACCESSORY_STORAGE_UPDATE);
             return accessory;
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     @Override

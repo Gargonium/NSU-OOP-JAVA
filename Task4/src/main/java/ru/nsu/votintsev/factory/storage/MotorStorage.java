@@ -30,7 +30,7 @@ public class MotorStorage implements Storage, Observable {
             storage.put(product);
             notifyObservers(Changes.MOTOR_STORAGE_UPDATE);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -40,9 +40,8 @@ public class MotorStorage implements Storage, Observable {
             notifyObservers(Changes.MOTOR_STORAGE_UPDATE);
             return motor;
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     @Override

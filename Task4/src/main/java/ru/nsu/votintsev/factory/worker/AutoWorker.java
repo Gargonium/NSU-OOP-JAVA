@@ -55,13 +55,13 @@ public class AutoWorker implements Worker, Runnable, Observable {
             Body body = bodyStorage.getBody();
             Accessory accessory = accessoryStorage.getAccessory();
             Motor motor = motorStorage.getMotor();
-            autoStorage.addToStorage(new Auto(body.getId(), motor.getId(), accessory.getId(), productId));
             if (logging)
                 System.out.println("AutoWorker #" + id + " add auto #" + productId);
             productId = lastProductId.incrementAndGet();
-            notifyObservers(Changes.AUTO_PRODUCED);
             synchronized (this) {
                 isWaiting = true;
+                autoStorage.addToStorage(new Auto(body.getId(), motor.getId(), accessory.getId(), productId));
+                notifyObservers(Changes.AUTO_PRODUCED);
                 try {
                     this.wait();
                 } catch (InterruptedException e) {
