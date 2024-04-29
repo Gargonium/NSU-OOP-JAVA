@@ -19,7 +19,6 @@ public class Controller implements ChangeListener, Observable, ActionListener {
     private JSlider bodySlider;
     private JSlider requestSlider;
     private JButton factoryControlButton;
-    private boolean isFactoryRunning = false;
     private int buttonState = 0;
 
     private Observer observer;
@@ -73,7 +72,7 @@ public class Controller implements ChangeListener, Observable, ActionListener {
         if (e.getSource() == factoryControlButton) {
             switch (buttonState) {
                 case 0 -> {
-                    factoryController.startFactory();
+                    new Thread(() -> factoryController.startFactory()).start();
                     factoryControlButton.setText("Stop Factory");
                     buttonState = 1;
                 }
@@ -82,9 +81,7 @@ public class Controller implements ChangeListener, Observable, ActionListener {
                     factoryControlButton.setText("Exit");
                     buttonState = 2;
                 }
-                case 2 -> {
-                    System.exit(1);
-                }
+                case 2 -> System.exit(1);
             }
         }
     }

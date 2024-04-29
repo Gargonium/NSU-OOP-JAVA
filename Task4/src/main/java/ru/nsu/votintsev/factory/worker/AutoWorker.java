@@ -1,6 +1,6 @@
 package ru.nsu.votintsev.factory.worker;
 
-import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import ru.nsu.votintsev.factory.pattern.observer.Changes;
 import ru.nsu.votintsev.factory.pattern.observer.Observable;
 import ru.nsu.votintsev.factory.pattern.observer.Observer;
@@ -13,9 +13,11 @@ import ru.nsu.votintsev.factory.storage.BodyStorage;
 import ru.nsu.votintsev.factory.storage.MotorStorage;
 import ru.nsu.votintsev.factory.storage.auto.AutoStorage;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AutoWorker implements Worker, Runnable, Observer, Observable {
+public class AutoWorker implements Worker, Runnable, Observable {
 
     private final BodyStorage bodyStorage;
     private final AccessoryStorage accessoryStorage;
@@ -23,12 +25,14 @@ public class AutoWorker implements Worker, Runnable, Observer, Observable {
     private final AutoStorage autoStorage;
 
     private int productId;
-    private static AtomicInteger lastProductId = new AtomicInteger(-1);
+    private static final AtomicInteger lastProductId = new AtomicInteger(-1);
     private final int id;
 
-    private Observer observer;
+    private final List<Observer> observers = new ArrayList<>();
 
     private final boolean logging;
+    private boolean isWaiting = false;
+    private boolean isRunning = true;
 
     public AutoWorker(BodyStorage bodyStorage, AccessoryStorage accessoryStorage, MotorStorage motorStorage, AutoStorage autoStorage, int id, boolean logging) {
         this.bodyStorage = bodyStorage;
@@ -40,14 +44,16 @@ public class AutoWorker implements Worker, Runnable, Observer, Observable {
         productId = lastProductId.incrementAndGet();
     }
 
+    public boolean isWaiting() {return isWaiting;}
+
+    public void shutdown() {isRunning = false;}
+
+    @SneakyThrows
     @Override
     public void run() {
-
-    }
-
-    @Override
-    public void update(Changes change) {
-        if (change == Changes.NEED_NEW_AUTO) {
+        while (isRunning) {
+            isWaiting = false;
+            notifyObservers(Changes.NEED_NEW_AUTO);
             Body body = bodyStorage.getBody();
             Accessory accessory = accessoryStorage.getAccessory();
             Motor motor = motorStorage.getMotor();
@@ -56,16 +62,21 @@ public class AutoWorker implements Worker, Runnable, Observer, Observable {
                 System.out.println("AutoWorker #" + id + " add auto #" + productId);
             productId = lastProductId.incrementAndGet();
             notifyObservers(Changes.AUTO_PRODUCED);
+            synchronized (this) {
+                isWaiting = true;
+                this.wait();
+            }
         }
     }
 
     @Override
     public void notifyObservers(Changes change) {
-        observer.update(change);
+        for (Observer observer : observers)
+            observer.update(change);
     }
 
     @Override
     public void addObserver(Observer observer) {
-        this.observer = observer;
+        observers.add(observer);
     }
 }

@@ -1,5 +1,6 @@
 package ru.nsu.votintsev.factory.supplier;
 
+import lombok.SneakyThrows;
 import ru.nsu.votintsev.factory.pattern.observer.Changes;
 import ru.nsu.votintsev.factory.pattern.observer.Observable;
 import ru.nsu.votintsev.factory.pattern.observer.Observer;
@@ -12,11 +13,12 @@ public class AccessorySupplier extends BasicSupplier implements Runnable, Observ
     private final int id;
     private final AccessoryStorage accessoriesStorage;
     private int productId;
-    private static AtomicInteger lastProductId = new AtomicInteger(-1);
+    private static final AtomicInteger lastProductId = new AtomicInteger(-1);
 
     private Observer observer;
 
     private final boolean logging;
+    private boolean isRunning = true;
 
     public AccessorySupplier(int id, AccessoryStorage accessoriesStorage, boolean logging) {
         this.id = id;
@@ -26,15 +28,17 @@ public class AccessorySupplier extends BasicSupplier implements Runnable, Observ
         productId = lastProductId.incrementAndGet();
     }
 
+    public void shutdown() {isRunning = false;}
+
+    @SneakyThrows
     @Override
     public void run() {
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - lastTime >= speed) {
+        while (isRunning) {
+            Thread.sleep(speed);
             accessoriesStorage.addToStorage(new Accessory(productId));
             if (logging)
                 System.out.println("AccessorySupplier #" + id + " add accessory #" + productId);
             productId = lastProductId.incrementAndGet();
-            lastTime = currentTime;
             notifyObservers(Changes.ACCESSORY_PRODUCED);
         }
     }

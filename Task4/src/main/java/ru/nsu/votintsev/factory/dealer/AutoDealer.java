@@ -17,14 +17,17 @@ public class AutoDealer implements Dealer, Runnable, Observable {
     private final AutoStorage autoStorage;
     private Observer observer;
     private int speed = 1000;
-    private long lastTime = System.currentTimeMillis();
     private final int id;
+
+    private boolean isRunning = true;
+
+    public void shutdown() {isRunning = false;}
 
     @SneakyThrows
     @Override
     public void run() {
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - lastTime >= speed) {
+        while (isRunning) {
+            Thread.sleep(speed);
             Auto auto = autoStorage.getAuto();
             Date dateNow = new Date();
             SimpleDateFormat formatForDateNow = new SimpleDateFormat("hh:mm:ss a");
@@ -32,7 +35,6 @@ public class AutoDealer implements Dealer, Runnable, Observable {
                     formatForDateNow.format(dateNow) + ": Dealer " + id + ": Auto " + auto.getId() +
                             " (Body: " + auto.getBodyId() + ", Motor: " + auto.getMotorId() + ", Accessory: " + auto.getAccessoryId() + ")");
             notifyObservers(Changes.AUTO_SEND);
-            lastTime = currentTime;
         }
     }
 

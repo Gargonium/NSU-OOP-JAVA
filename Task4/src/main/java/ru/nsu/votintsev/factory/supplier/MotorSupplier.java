@@ -1,5 +1,6 @@
 package ru.nsu.votintsev.factory.supplier;
 
+import lombok.SneakyThrows;
 import ru.nsu.votintsev.factory.pattern.observer.Changes;
 import ru.nsu.votintsev.factory.pattern.observer.Observable;
 import ru.nsu.votintsev.factory.pattern.observer.Observer;
@@ -14,6 +15,7 @@ public class MotorSupplier extends BasicSupplier implements Runnable, Observable
     private Observer observer;
 
     private final boolean logging;
+    private boolean isRunning = true;
 
     public MotorSupplier(MotorStorage motorStorage, boolean logging) {
         this.motorStorage = motorStorage;
@@ -21,15 +23,17 @@ public class MotorSupplier extends BasicSupplier implements Runnable, Observable
         speed = 2000;
     }
 
+    public void shutdown() {isRunning = false;}
+
+    @SneakyThrows
     @Override
     public void run() {
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - lastTime >= speed) {
+        while (isRunning) {
+            Thread.sleep(speed);
             motorStorage.addToStorage(new Motor(productId));
             if (logging)
                 System.out.println("MotorSupplier add motor#" + productId);
             productId++;
-            lastTime = currentTime;
             notifyObservers(Changes.MOTOR_PRODUCED);
         }
     }

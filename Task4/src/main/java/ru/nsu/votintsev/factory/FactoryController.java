@@ -15,15 +15,16 @@ import ru.nsu.votintsev.factory.supplier.BodySupplier;
 import ru.nsu.votintsev.factory.supplier.MotorSupplier;
 import ru.nsu.votintsev.factory.worker.AutoWorker;
 
+import javax.swing.*;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class FactoryController implements Observer, Observable {
 
@@ -32,9 +33,9 @@ public class FactoryController implements Observer, Observable {
     private int workerCount;
     private boolean logAll;
 
-    private ScheduledExecutorService supplierTP;
-    private ScheduledExecutorService workerTP;
-    private ScheduledExecutorService dealerTP;
+    private ExecutorService supplierTP;
+    private ExecutorService workerTP;
+    private ExecutorService dealerTP;
 
     private final AccessoryStorage accessoryStorage = new AccessoryStorage();
     private final BodyStorage bodyStorage = new BodyStorage();
@@ -53,15 +54,15 @@ public class FactoryController implements Observer, Observable {
     private Observer observer;
 
     @Getter
-    private int autoProduced = 0;
+    private AtomicInteger autoProduced = new AtomicInteger(0);
     @Getter
-    private int bodyProduced = 0;
+    private AtomicInteger bodyProduced = new AtomicInteger(0);
     @Getter
-    private int accessoryProduced = 0;
+    private AtomicInteger accessoryProduced = new AtomicInteger(0);
     @Getter
-    private int motorProduced = 0;
+    private AtomicInteger motorProduced = new AtomicInteger(0);
     @Getter
-    private int taskInProceed = 0;
+    private AtomicInteger taskInProceed = new AtomicInteger(0);
 
     public FactoryController() {
         readConfig();
@@ -77,35 +78,31 @@ public class FactoryController implements Observer, Observable {
     }
 
     public void startFactory() {
-        supplierTP = Executors.newScheduledThreadPool(accessoriesSupplierCount + 2);
-        workerTP = Executors.newScheduledThreadPool(workerCount);
-        dealerTP = Executors.newScheduledThreadPool(dealerCount);
+        supplierTP = Executors.newFixedThreadPool(accessoriesSupplierCount + 2);
+        workerTP = Executors.newFixedThreadPool(workerCount);
+        dealerTP = Executors.newFixedThreadPool(dealerCount);
 
         for (int i = 0; i < accessoriesSupplierCount; i++) {
             AccessorySupplier accessorySupplier = new AccessorySupplier(i, accessoryStorage, logAll);
             accessorySuppliers.add(accessorySupplier);
             accessorySupplier.addObserver(this);
-            supplierTP.scheduleAtFixedRate(accessorySupplier, 0, 100, TimeUnit.MILLISECONDS);
+            supplierTP.execute(accessorySupplier);
         }
-        supplierTP.scheduleAtFixedRate(motorSupplier, 0, 100, TimeUnit.MILLISECONDS);
-        supplierTP.scheduleAtFixedRate(bodySupplier, 0, 100, TimeUnit.MILLISECONDS);
+        supplierTP.execute(motorSupplier);
+        supplierTP.execute(bodySupplier);
         for (int i = 0; i < workerCount; i++) {
             AutoWorker autoWorker = new AutoWorker(bodyStorage, accessoryStorage, motorStorage, autoStorage, i, logAll);
             autoWorkers.add(autoWorker);
-            autoStorageController.addObserver(autoWorker);
             autoWorker.addObserver(this);
-            workerTP.scheduleAtFixedRate(autoWorker, 0, 100, TimeUnit.MILLISECONDS);
-            //workerTP.execute(new AutoWorker(bodyStorage, accessoryStorage, motorStorage, autoStorage));
+            workerTP.execute(autoWorker);
         }
+        autoStorageController.setAutoWorkers(autoWorkers);
         for (int i = 0; i < dealerCount; i++) {
             AutoDealer autoDealer = new AutoDealer(autoStorage, i);
             autoDealer.addObserver(autoStorageController);
             autoDealers.add(autoDealer);
-            dealerTP.scheduleAtFixedRate(autoDealer, 0, 100, TimeUnit.MILLISECONDS);
-            //dealerTP.execute(new AutoDealer(autoStorage, autoStorageController, i));
+            dealerTP.execute(autoDealer);
         }
-        autoStorageController.addObserver(this);
-        autoStorageController.firstStart();
     }
 
     private void readConfig() {
@@ -125,7 +122,7 @@ public class FactoryController implements Observer, Observable {
             logAll = Boolean.parseBoolean(prop.getProperty("LogAll"));
         }
         catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -150,6 +147,18 @@ public class FactoryController implements Observer, Observable {
     }
 
     public void shutdownFactory() {
+        for (AccessorySupplier accessorySupplier : accessorySuppliers) {
+            accessorySupplier.shutdown();
+        }
+        motorSupplier.shutdown();
+        bodySupplier.shutdown();
+        for (AutoWorker autoWorker : autoWorkers) {
+            autoWorker.shutdown();
+        }
+        for (AutoDealer autoDealer : autoDealers) {
+            autoDealer.shutdown();
+        }
+
         if (supplierTP != null)
             supplierTP.shutdown();
         if (dealerTP != null)
@@ -162,20 +171,20 @@ public class FactoryController implements Observer, Observable {
     public void update(Changes change) {
         switch (change) {
             case AUTO_PRODUCED -> {
-                autoProduced++;
-                taskInProceed--;
+                autoProduced.incrementAndGet();
+                taskInProceed.decrementAndGet();
             }
-            case BODY_PRODUCED -> bodyProduced++;
-            case MOTOR_PRODUCED -> motorProduced++;
-            case ACCESSORY_PRODUCED -> accessoryProduced++;
-            case NEED_NEW_AUTO -> taskInProceed += workerCount + 1;
+            case BODY_PRODUCED -> bodyProduced.incrementAndGet();
+            case MOTOR_PRODUCED -> motorProduced.incrementAndGet();
+            case ACCESSORY_PRODUCED -> accessoryProduced.incrementAndGet();
+            case NEED_NEW_AUTO -> taskInProceed.incrementAndGet();
         }
         notifyObservers(change);
     }
 
     @Override
     public void notifyObservers(Changes change) {
-        observer.update(change);
+        SwingUtilities.invokeLater(() -> observer.update(change));
     }
 
     @Override
