@@ -15,7 +15,6 @@ import ru.nsu.votintsev.factory.supplier.BodySupplier;
 import ru.nsu.votintsev.factory.supplier.MotorSupplier;
 import ru.nsu.votintsev.factory.worker.AutoWorker;
 
-import javax.swing.*;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -184,7 +183,7 @@ public class FactoryController implements Observer, Observable {
 
     @Override
     public void notifyObservers(Changes change) {
-        SwingUtilities.invokeLater(() -> observer.update(change));
+        observer.update(change);
     }
 
     @Override
