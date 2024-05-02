@@ -73,13 +73,19 @@ public class MyThreadPool implements ExecutorService {
     @Override
     public void shutdown() {
         isShutdown.set(true);
+        synchronized (this) {
+            notify();
+        }
     }
 
     @Override
     public List<Runnable> shutdownNow() {
         isShutdown.set(true);
-        for (WorkerThread workerThread : tasks) {
-            workerThread.interrupt();
+        synchronized (this) {
+            for (WorkerThread workerThread : tasks) {
+                workerThread.interrupt();
+            }
+            notify();
         }
         List<Runnable> tasks = new ArrayList<>();
         taskQueue.drainTo(tasks);
@@ -99,8 +105,14 @@ public class MyThreadPool implements ExecutorService {
     @Override
     public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
         long endTime = System.currentTimeMillis() + unit.toMillis(timeout);
-        while (!isTerminated() && System.currentTimeMillis() < endTime) {
-            Thread.sleep(100); // polling interval
+        synchronized (this) {
+            while (!isTerminated() && System.currentTimeMillis() < endTime) {
+                long remainingTime = endTime - System.currentTimeMillis();
+                if (remainingTime <= 0) {
+                    break;
+                }
+                wait(remainingTime);
+            }
         }
         return isTerminated();
     }
