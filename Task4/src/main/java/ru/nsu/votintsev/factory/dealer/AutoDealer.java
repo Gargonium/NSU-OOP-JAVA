@@ -20,24 +20,27 @@ public class AutoDealer implements Dealer, Runnable, Observable {
 
     private boolean isRunning = true;
 
-    public void shutdown() {isRunning = false;}
+    public void shutdown() {
+        isRunning = false;
+    }
 
     @Override
     public void run() {
-        while (isRunning) {
-            Auto auto;
+        while (isRunning && !Thread.currentThread().isInterrupted()) {
             try {
                 Thread.sleep(speed);
-                auto = autoStorage.getAuto();
+                Auto auto = autoStorage.getAuto();
+                if (auto == null)
+                    continue;
+                Date dateNow = new Date();
+                SimpleDateFormat formatForDateNow = new SimpleDateFormat("hh:mm:ss a");
+                System.out.println(
+                        formatForDateNow.format(dateNow) + ": Dealer " + id + ": Auto " + auto.getId() +
+                                " (Body: " + auto.getBodyId() + ", Motor: " + auto.getMotorId() + ", Accessory: " + auto.getAccessoryId() + ")");
+                notifyObservers(Changes.AUTO_SEND);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                break;
             }
-            Date dateNow = new Date();
-            SimpleDateFormat formatForDateNow = new SimpleDateFormat("hh:mm:ss a");
-            System.out.println(
-                    formatForDateNow.format(dateNow) + ": Dealer " + id + ": Auto " + auto.getId() +
-                            " (Body: " + auto.getBodyId() + ", Motor: " + auto.getMotorId() + ", Accessory: " + auto.getAccessoryId() + ")");
-            notifyObservers(Changes.AUTO_SEND);
         }
     }
 

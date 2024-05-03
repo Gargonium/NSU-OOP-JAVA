@@ -26,13 +26,14 @@ public class MotorSupplier extends BasicSupplier implements Runnable, Observable
 
     @Override
     public void run() {
-        while (isRunning) {
+        while (isRunning && !Thread.currentThread().isInterrupted()) {
             try {
                 Thread.sleep(speed);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                break;
             }
-            motorStorage.addToStorage(new Motor(productId));
+            if (!motorStorage.addToStorage(new Motor(productId)))
+                continue;
             if (logging)
                 System.out.println("MotorSupplier add motor#" + productId);
             productId++;

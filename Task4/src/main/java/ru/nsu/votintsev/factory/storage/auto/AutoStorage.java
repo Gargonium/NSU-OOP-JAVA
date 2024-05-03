@@ -8,6 +8,7 @@ import ru.nsu.votintsev.factory.storage.Storage;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class AutoStorage implements Storage, Observable {
 
@@ -27,10 +28,11 @@ public class AutoStorage implements Storage, Observable {
         return size - storage.remainingCapacity();
     }
 
-    public void addToStorage(Auto product) {
+    public boolean addToStorage(Auto product) {
         try {
-            storage.put(product);
-            notifyObservers(Changes.AUTO_STORAGE_UPDATE);
+            boolean result = storage.offer(product, 4000, TimeUnit.MILLISECONDS);
+            if (result) notifyObservers(Changes.MOTOR_STORAGE_UPDATE);
+            return result;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -41,7 +43,7 @@ public class AutoStorage implements Storage, Observable {
     }
 
     public Auto getAuto() throws InterruptedException {
-        Auto auto = storage.take();
+        Auto auto = storage.poll(4000, TimeUnit.MILLISECONDS);
         notifyObservers(Changes.AUTO_STORAGE_UPDATE);
         return auto;
     }

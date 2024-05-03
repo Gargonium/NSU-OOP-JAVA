@@ -7,6 +7,7 @@ import ru.nsu.votintsev.factory.product.Accessory;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class AccessoryStorage implements Storage, Observable {
     private BlockingQueue<Accessory> storage;
@@ -25,23 +26,20 @@ public class AccessoryStorage implements Storage, Observable {
         return size - storage.remainingCapacity();
     }
 
-    public void addToStorage(Accessory product) {
+    public boolean addToStorage(Accessory product) {
         try {
-            storage.put(product);
-            notifyObservers(Changes.ACCESSORY_STORAGE_UPDATE);
+            boolean result = storage.offer(product, 4000, TimeUnit.MILLISECONDS);
+            if (result) notifyObservers(Changes.MOTOR_STORAGE_UPDATE);
+            return result;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public Accessory getAccessory() {
-        try {
-            Accessory accessory = storage.take();
-            notifyObservers(Changes.ACCESSORY_STORAGE_UPDATE);
-            return accessory;
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+    public Accessory getAccessory() throws InterruptedException {
+        Accessory accessory = storage.poll(4000, TimeUnit.MILLISECONDS);
+        notifyObservers(Changes.ACCESSORY_STORAGE_UPDATE);
+        return accessory;
     }
 
     @Override

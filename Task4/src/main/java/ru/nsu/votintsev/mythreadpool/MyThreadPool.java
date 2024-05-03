@@ -6,8 +6,13 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class MyThreadPool implements ExecutorService {
+
+    private final ReentrantLock reentrantLock = new ReentrantLock();
+    private final Condition condition = reentrantLock.newCondition();
 
     private final BlockingQueue<Runnable> taskQueue;
     private final int maxThreads;
@@ -30,7 +35,7 @@ public class MyThreadPool implements ExecutorService {
         if (isShutdown.get()) {
             throw new RejectedExecutionException("ThreadPool is shutdown");
         }
-
+        reentrantLock.lock();
         try {
             taskQueue.put(command);
             if (tasksCounter.get() < maxThreads) {
@@ -38,6 +43,8 @@ public class MyThreadPool implements ExecutorService {
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
+        } finally {
+            reentrantLock.unlock();
         }
     }
 
@@ -45,8 +52,13 @@ public class MyThreadPool implements ExecutorService {
         if (isShutdown.get()) {
             throw new RejectedExecutionException("ThreadPool is shutdown");
         }
-        while (!taskQueue.isEmpty() || tasksCounter.get() < maxThreads) {
-            addNewThread();
+        reentrantLock.lock();
+        try {
+            while (!taskQueue.isEmpty() || tasksCounter.get() < maxThreads) {
+                addNewThread();
+            }
+        } finally {
+            reentrantLock.unlock();
         }
     }
 
@@ -60,36 +72,52 @@ public class MyThreadPool implements ExecutorService {
         @Override
         public void run() {
             tasksCounter.incrementAndGet();
-            while (!isShutdown.get() || !taskQueue.isEmpty()) {
-                Runnable task = taskQueue.poll();
-                if (task != null)
-                    task.run();
+            try {
+                while (!isShutdown.get() && !Thread.currentThread().isInterrupted()) {
+                    Runnable currentTask = taskQueue.poll();
+                    if (currentTask == null)
+                        break;
+                    currentTask.run();
+                }
+            } finally {
+                threadEnd(this);
             }
-            tasksCounter.decrementAndGet();
-            tasks.remove(this);
         }
     }
+
+    private void threadEnd(WorkerThread workerThread) {
+        reentrantLock.lock();
+        try {
+            tasksCounter.decrementAndGet();
+            tasks.remove(workerThread);
+            condition.signalAll();
+        } finally {
+            reentrantLock.unlock();
+        }
+    }
+
 
     @Override
     public void shutdown() {
         isShutdown.set(true);
-        synchronized (this) {
-            notify();
-        }
     }
 
     @Override
     public List<Runnable> shutdownNow() {
         isShutdown.set(true);
-        synchronized (this) {
-            for (WorkerThread workerThread : tasks) {
-                workerThread.interrupt();
+        reentrantLock.lock();
+        try {
+            if (!isTerminated()) {
+                for (WorkerThread workerThread : tasks) {
+                    workerThread.interrupt();
+                }
             }
-            notify();
+        } finally {
+            reentrantLock.unlock();
         }
-        List<Runnable> tasks = new ArrayList<>();
-        taskQueue.drainTo(tasks);
-        return tasks;
+        List<Runnable> remainingTasks = new ArrayList<>();
+        taskQueue.drainTo(remainingTasks);
+        return remainingTasks;
     }
 
     @Override
@@ -99,21 +127,22 @@ public class MyThreadPool implements ExecutorService {
 
     @Override
     public boolean isTerminated() {
-        return isShutdown.get() && taskQueue.isEmpty();
+        return isShutdown.get() && tasks.isEmpty();
     }
 
     @Override
     public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
         long endTime = System.currentTimeMillis() + unit.toMillis(timeout);
-        synchronized (this) {
-            while (!isTerminated() && System.currentTimeMillis() < endTime) {
-                long remainingTime = endTime - System.currentTimeMillis();
-                if (remainingTime <= 0) {
-                    break;
-                }
-                wait(remainingTime);
+        reentrantLock.lock();
+        try {
+            while (!tasks.isEmpty() && (endTime - System.currentTimeMillis() > 0)) {
+                condition.await(endTime - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
             }
+        } finally {
+            reentrantLock.unlock();
         }
+        if (tasks.isEmpty())
+            shutdown();
         return isTerminated();
     }
 

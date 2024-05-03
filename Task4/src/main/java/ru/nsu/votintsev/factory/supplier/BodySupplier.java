@@ -26,13 +26,14 @@ public class BodySupplier extends BasicSupplier implements Runnable, Observable 
 
     @Override
     public void run() {
-        while (isRunning) {
+        while (isRunning && !Thread.currentThread().isInterrupted()) {
             try {
                 Thread.sleep(speed);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                break;
             }
-            bodyStorage.addToStorage(new Body(productId));
+            if (!bodyStorage.addToStorage(new Body(productId)))
+                continue;
             if (logging)
                 System.out.println("BodySupplier add body#" + productId);
             productId++;

@@ -13,19 +13,19 @@ public class FactoryFrame extends JFrame implements Observer {
     private final JLabel taskToBeCompleteLabel = new JLabel("Task to be Complete: 0");
 
     private final JLabel requestSpeedLabel = new JLabel("Request: onStorage: 0 Produced: 0");
-    private final JSlider requestSlider = new JSlider(0,100,5000,1000);
+    private final JSlider requestSlider = new JSlider(0,100,3000,1000);
     private final JLabel requestSliderValue = new JLabel(requestSlider.getValue() + "ms");
 
     private final JLabel bodyLabel = new JLabel("Body: onStorage: 0 Produced: 0");
-    private final JSlider bodySlider = new JSlider(0,100,5000,1000);
+    private final JSlider bodySlider = new JSlider(0,100,3000,1000);
     private final JLabel bodySliderValue = new JLabel(bodySlider.getValue() + "ms");
 
     private final JLabel accessoriesLabel = new JLabel("Accessory: onStorage: 0 Produced: 0");
-    private final JSlider accessoriesSlider = new JSlider(0,100,5000,1000);
+    private final JSlider accessoriesSlider = new JSlider(0,100,3000,1000);
     private final JLabel accessoriesSliderValue = new JLabel(accessoriesSlider.getValue() + "ms");
 
     private final JLabel motorsLabel = new JLabel("Motor: onStorage: 0 Produced: 0");
-    private final JSlider motorsSlider = new JSlider(0,100,5000,1000);
+    private final JSlider motorsSlider = new JSlider(0,100,3000,1000);
     private final JLabel motorsSliderValue = new JLabel(motorsSlider.getValue() + "ms");
 
     private final FactoryController factoryController;

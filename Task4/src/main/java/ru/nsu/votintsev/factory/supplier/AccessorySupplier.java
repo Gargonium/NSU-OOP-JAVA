@@ -31,13 +31,14 @@ public class AccessorySupplier extends BasicSupplier implements Runnable, Observ
 
     @Override
     public void run() {
-        while (isRunning) {
+        while (isRunning && !Thread.currentThread().isInterrupted()) {
             try {
                 Thread.sleep(speed);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                break;
             }
-            accessoriesStorage.addToStorage(new Accessory(productId));
+            if (!accessoriesStorage.addToStorage(new Accessory(productId)))
+                continue;
             if (logging)
                 System.out.println("AccessorySupplier #" + id + " add accessory #" + productId);
             productId = lastProductId.incrementAndGet();

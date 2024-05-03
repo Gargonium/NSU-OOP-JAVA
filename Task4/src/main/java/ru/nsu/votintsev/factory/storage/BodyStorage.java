@@ -7,6 +7,7 @@ import ru.nsu.votintsev.factory.product.Body;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class BodyStorage implements Storage, Observable {
 
@@ -26,23 +27,20 @@ public class BodyStorage implements Storage, Observable {
         return size - storage.remainingCapacity();
     }
 
-    public void addToStorage(Body product) {
+    public boolean addToStorage(Body product) {
         try {
-            storage.put(product);
-            notifyObservers(Changes.BODY_STORAGE_UPDATE);
+            boolean result = storage.offer(product, 4000, TimeUnit.MILLISECONDS);
+            if (result) notifyObservers(Changes.MOTOR_STORAGE_UPDATE);
+            return result;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public Body getBody() {
-        try {
-            Body body = storage.take();
-            notifyObservers(Changes.BODY_STORAGE_UPDATE);
-            return body;
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+    public Body getBody() throws InterruptedException {
+        Body body = storage.poll(4000, TimeUnit.MILLISECONDS);
+        notifyObservers(Changes.BODY_STORAGE_UPDATE);
+        return body;
     }
 
     @Override

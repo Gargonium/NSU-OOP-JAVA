@@ -7,6 +7,7 @@ import ru.nsu.votintsev.factory.product.Motor;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class MotorStorage implements Storage, Observable {
     private BlockingQueue<Motor> storage;
@@ -25,23 +26,20 @@ public class MotorStorage implements Storage, Observable {
         return size - storage.remainingCapacity();
     }
 
-    public void addToStorage(Motor product) {
+    public boolean addToStorage(Motor product) {
         try {
-            storage.put(product);
-            notifyObservers(Changes.MOTOR_STORAGE_UPDATE);
+            boolean result = storage.offer(product, 4000, TimeUnit.MILLISECONDS);
+            if (result) notifyObservers(Changes.MOTOR_STORAGE_UPDATE);
+            return result;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public Motor getMotor() {
-        try {
-            Motor motor = storage.take();
-            notifyObservers(Changes.MOTOR_STORAGE_UPDATE);
-            return motor;
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+    public Motor getMotor() throws InterruptedException {
+        Motor motor = storage.poll(4000, TimeUnit.MILLISECONDS);
+        notifyObservers(Changes.MOTOR_STORAGE_UPDATE);
+        return motor;
     }
 
     @Override

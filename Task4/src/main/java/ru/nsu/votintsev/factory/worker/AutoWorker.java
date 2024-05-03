@@ -43,30 +43,42 @@ public class AutoWorker implements Worker, Runnable, Observable {
         productId = lastProductId.incrementAndGet();
     }
 
-    public boolean isWaiting() {return isWaiting;}
+    public boolean isWaiting() {
+        return isWaiting;
+    }
 
-    public void shutdown() {isRunning = false;}
+    public void shutdown() {
+        isRunning = false;
+    }
 
     @Override
     public void run() {
-        while (isRunning) {
-            isWaiting = false;
-            notifyObservers(Changes.START_PRODUCING_AUTO);
-            Body body = bodyStorage.getBody();
-            Accessory accessory = accessoryStorage.getAccessory();
-            Motor motor = motorStorage.getMotor();
-            if (logging)
-                System.out.println("AutoWorker #" + id + " add auto #" + productId);
-            productId = lastProductId.incrementAndGet();
-            synchronized (this) {
-                isWaiting = true;
-                autoStorage.addToStorage(new Auto(body.getId(), motor.getId(), accessory.getId(), productId));
-                notifyObservers(Changes.AUTO_PRODUCED);
-                try {
+        while (isRunning && !Thread.currentThread().isInterrupted()) {
+            try {
+                isWaiting = false;
+                notifyObservers(Changes.START_PRODUCING_AUTO);
+                Body body;
+                Accessory accessory;
+                Motor motor;
+
+                body = bodyStorage.getBody();
+                accessory = accessoryStorage.getAccessory();
+                motor = motorStorage.getMotor();
+                if (body == null || accessory == null || motor == null)
+                    continue;
+
+                if (logging)
+                    System.out.println("AutoWorker #" + id + " add auto #" + productId);
+                productId = lastProductId.incrementAndGet();
+                synchronized (this) {
+                    isWaiting = true;
+                    if (!autoStorage.addToStorage(new Auto(body.getId(), motor.getId(), accessory.getId(), productId)))
+                        continue;
+                    notifyObservers(Changes.AUTO_PRODUCED);
                     this.wait();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
                 }
+            } catch (InterruptedException e) {
+                break;
             }
         }
     }

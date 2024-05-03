@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class FactoryController implements Observer, Observable {
@@ -165,6 +166,18 @@ public class FactoryController implements Observer, Observable {
             dealerTP.shutdown();
         if (workerTP != null)
             workerTP.shutdown();
+
+        try {
+            assert dealerTP != null;
+            System.out.println(dealerTP.awaitTermination(10000, TimeUnit.MILLISECONDS));
+            assert workerTP != null;
+            System.out.println(workerTP.awaitTermination(10000, TimeUnit.MILLISECONDS));
+            assert supplierTP != null;
+            System.out.println(supplierTP.awaitTermination(5000, TimeUnit.MILLISECONDS));
+
+        } catch (InterruptedException ignored) {
+
+        }
     }
 
     @Override
