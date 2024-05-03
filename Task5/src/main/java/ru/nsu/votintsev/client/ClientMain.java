@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class ClientMain {
     public static void main(String[] args) {
-        try (Socket socket = new Socket("192.168.56.1", 8886)) {
+        try (Socket socket = new Socket("localhost", 8886)) {
 
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
@@ -29,3 +29,21 @@ public class ClientMain {
         }
     }
 }
+
+/*
+            // Получаем потоки для ввода и вывода
+            BufferedInputStream in = new BufferedInputStream(socket.getInputStream());
+            BufferedOutputStream fileOut = new BufferedOutputStream(new FileOutputStream("received_file.txt"));
+
+            // Получаем файл от сервера
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = in.read(buffer)) != -1) {
+                fileOut.write(buffer, 0, bytesRead);
+            }
+            fileOut.flush();
+
+            // Закрываем соединение
+            in.close();
+            fileOut.close();
+ */

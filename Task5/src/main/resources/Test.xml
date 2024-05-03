@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<users>
+    <user id="0">
+        <country>Russia</country>
+        <name>Gargonium</name>
+    </user>
+    <user id="1">
+        <country>Ukraine</country>
+        <name>OmNomDom</name>
+    </user>
+</users>
