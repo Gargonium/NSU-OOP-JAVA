@@ -3,6 +3,7 @@ package ru.nsu.votintsev.client;
 import jakarta.xml.bind.JAXBException;
 import ru.nsu.votintsev.FileExchanger;
 import ru.nsu.votintsev.XMLParser;
+import ru.nsu.votintsev.xmlclasses.Command;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -23,8 +24,6 @@ public class Client {
 
     private final ScheduledExecutorService clientTP = Executors.newScheduledThreadPool(2);
 
-    private final static File file = new File("src\\main\\resources\\ClientProtocol.xml");
-
     public Client(Socket socket) throws SocketException {
         this.socket = socket;
         try {
@@ -35,7 +34,8 @@ public class Client {
         }
     }
 
-    public void run() throws JAXBException, IOException { // У клиента надо в 2 отдельных потока захуярить приём и отправку сообщений
+    public void run() throws JAXBException, IOException {
+        File file = new File("src\\main\\resources\\ClientProtocol" + Thread.currentThread().threadId() + ".xml");
         ClientThreadInput clientThreadInput = new ClientThreadInput(xmlParser, fileExchanger, out, file);
         clientTP.scheduleWithFixedDelay(clientThreadInput, 0, 100, TimeUnit.MILLISECONDS);
 
@@ -44,7 +44,18 @@ public class Client {
         while (!socket.isClosed()) {
             try {
                 Thread.sleep(500);
-            } catch (InterruptedException ignored) {}
+            } catch (InterruptedException ignored) {
+            }
+
         }
+        logOut(file);
+        file.delete();
+    }
+
+    public void logOut(File file) throws JAXBException, IOException {
+        Command command = new Command();
+        command.setCommand("logout");
+        xmlParser.parseToXML(command, file);
+        fileExchanger.sendFile(out, file);
     }
 }

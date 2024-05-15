@@ -2,25 +2,37 @@ package ru.nsu.votintsev.server;
 
 import jakarta.xml.bind.JAXBException;
 import ru.nsu.votintsev.*;
-import ru.nsu.votintsev.client.xmlclasses.Event;
-import ru.nsu.votintsev.server.xmlclasses.Command;
+import ru.nsu.votintsev.xmlclasses.Error;
+import ru.nsu.votintsev.xmlclasses.Event;
+import ru.nsu.votintsev.xmlclasses.Command;
+import ru.nsu.votintsev.xmlclasses.Success;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Map;
+import java.util.Objects;
 
 class ServerThread extends Thread {
     private final Socket clientSocket;
 
-    private final FileExchanger fileExchanger = new FileExchanger();
-    private final XMLParser xmlParser = new XMLParser();
-
-    private final File file = new File("src\\main\\resources\\ServerProtocol.xml");
+    private final FileExchanger fileExchanger;
+    private final XMLParser xmlParser;
+    private final ServerSender serverSender;
 
     private final DataOutputStream out;
     private final DataInputStream in;
 
-    public ServerThread(Socket clientSocket) {
+    private String userName;
+    private int passwordHash;
+
+    private final Map<String, Integer> usersDataBase;
+
+    public ServerThread(Socket clientSocket, FileExchanger fileExchanger, XMLParser xmlParser, ServerSender serverSender, Map<String, Integer> usersDataBase) {
         this.clientSocket = clientSocket;
+        this.fileExchanger = fileExchanger;
+        this.xmlParser = xmlParser;
+        this.serverSender = serverSender;
+        this.usersDataBase = usersDataBase;
         try {
             out = new DataOutputStream(clientSocket.getOutputStream());
             in = new DataInputStream(clientSocket.getInputStream());
@@ -30,15 +42,17 @@ class ServerThread extends Thread {
     }
 
     public void run() {
+        File file = new File("src\\main\\resources\\ServerProtocol" + Thread.currentThread().threadId() + ".xml");
         try {
-            while (clientSocket.isConnected()) { // Сервер должен просто ждать прихода сообщения
+            while (clientSocket.isConnected()) {
                 try {
                     fileExchanger.receiveFile(in, file);
                     Command command = (Command) xmlParser.parseFromXML(Command.class, file);
                     switch (command.getCommand()) {
-                        case "login" -> loginCommand();
+                        case "login" -> loginCommand(command, file);
                         case "list" -> listCommand();
-                        case "message" -> messageCommand(command);
+                        case "message" -> messageCommand(command, file);
+                        case "logout" -> logoutCommand(file);
                     }
                 } catch (JAXBException e) {
                     System.out.println(e.getMessage());
@@ -48,32 +62,68 @@ class ServerThread extends Thread {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+        file.delete();
     }
 
-    public void loginCommand() {
-        /// Нужен список пользователей
+    private void loginCommand(Command command, File file) throws IOException, JAXBException {
+        userName = command.getUserName();
+        passwordHash = command.getUserPassword().hashCode();
+
+        if (usersDataBase.containsKey(userName)) {
+            if (passwordHash == usersDataBase.get(userName))
+                successSend(file);
+            else
+                errorSend("Wrong password", file);
+        }
+        else {
+            if ((Objects.equals(userName, "Server")) || (userName.isEmpty()) || (userName.equals("null")))
+                errorSend("Invalid name", file);
+            else {
+                usersDataBase.put(userName, passwordHash);
+                successSend(file);
+            }
+        }
+
+        Event event = new Event();
+        event.setEvent("userlogin");
+        event.setName(userName);
+        xmlParser.parseToXML(event, file);
+        serverSender.sendToAll(file);
     }
 
-    public void listCommand() {
+    private void listCommand() {
         /// Тут как-то совсем сложно
     }
 
-    public void messageCommand(Command command) throws JAXBException, IOException {
+    private void messageCommand(Command command, File file) throws JAXBException, IOException {
         String message = command.getMessage();
         Event event = new Event();
         event.setEvent("message");
         event.setMessage(message);
-        event.setFrom("UserName"); ////////////////////////////////////////////// Нужно знать от кого это сообщение
+        event.setFrom(userName);
         xmlParser.parseToXML(event, file);
-        fileExchanger.sendFile(out, file); //////////////////////////// Нужно отправлять всем пользователям
-        //////////////// Нужно как-то отправлять success и error
+        serverSender.sendToAll(file);
     }
 
-    public void successEmpty() {
-
+    private void successSend(File file) throws JAXBException, IOException {
+        Success success = new Success();
+        xmlParser.parseToXML(success, file);
+        fileExchanger.sendFile(out, file);
     }
 
-    public void error(String reason) {
+    private void errorSend(String reason, File file) throws JAXBException, IOException {
+        Error error = new Error();
+        error.setMessage(reason);
+        xmlParser.parseToXML(error, file);
+        fileExchanger.sendFile(out, file);
+    }
 
+    private void logoutCommand(File file) throws JAXBException, IOException {
+        Event event = new Event();
+        event.setEvent("userlogout");
+        event.setName(userName);
+        xmlParser.parseToXML(event, file);
+        serverSender.sendToAll(file);
+        successSend(file);
     }
 }

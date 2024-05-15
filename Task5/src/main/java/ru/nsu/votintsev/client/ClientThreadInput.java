@@ -3,12 +3,13 @@ package ru.nsu.votintsev.client;
 import jakarta.xml.bind.JAXBException;
 import ru.nsu.votintsev.FileExchanger;
 import ru.nsu.votintsev.XMLParser;
-import ru.nsu.votintsev.server.xmlclasses.Command;
+import ru.nsu.votintsev.xmlclasses.Command;
 
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ClientThreadInput implements Runnable {
     private final XMLParser xmlParser;
@@ -16,6 +17,11 @@ public class ClientThreadInput implements Runnable {
     private final Scanner scanner = new Scanner(System.in);
     private final DataOutputStream out;
     private final File file;
+
+    private String clientName;
+    private String password;
+
+    private final AtomicBoolean isRegistred = new AtomicBoolean(false);
 
     public ClientThreadInput(XMLParser xmlParser, FileExchanger fileExchanger, DataOutputStream out, File file) {
         this.xmlParser = xmlParser;
@@ -27,12 +33,23 @@ public class ClientThreadInput implements Runnable {
     @Override
     public void run() {
         try {
-            String message;
-            if ((message = scanner.nextLine()) != null)
-                sendMessage(message);
+
+            if (!isRegistred.get()) {
+                System.out.print("Name: ");
+                clientName = scanner.nextLine();
+                System.out.print("Password: ");
+                password = scanner.nextLine();
+                isRegistred.set(true);
+                sendName();
+            }
+            else {
+                String message;
+                if ((message = scanner.nextLine()) != null)
+                    sendMessage(message);
+            }
         } catch (IOException | JAXBException e) {
             System.out.println(e.getMessage());
-            System.out.println("scanner huila");
+            System.out.println("Scanner problem");
         }
     }
 
@@ -40,6 +57,15 @@ public class ClientThreadInput implements Runnable {
         Command command = new Command();
         command.setCommand("message");
         command.setMessage(message);
+        xmlParser.parseToXML(command, file);
+        fileExchanger.sendFile(out, file);
+    }
+
+    private void sendName() throws JAXBException, IOException {
+        Command command = new Command();
+        command.setCommand("login");
+        command.setUserName(clientName);
+        command.setUserPassword(password);
         xmlParser.parseToXML(command, file);
         fileExchanger.sendFile(out, file);
     }

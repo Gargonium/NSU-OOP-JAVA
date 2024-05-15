@@ -1,9 +1,11 @@
 package ru.nsu.votintsev.client;
 
-import jakarta.xml.bind.JAXBException;
 import ru.nsu.votintsev.FileExchanger;
 import ru.nsu.votintsev.XMLParser;
-import ru.nsu.votintsev.client.xmlclasses.Event;
+import ru.nsu.votintsev.xmlclasses.ClientClasses;
+import ru.nsu.votintsev.xmlclasses.Error;
+import ru.nsu.votintsev.xmlclasses.Event;
+import ru.nsu.votintsev.xmlclasses.Success;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -14,6 +16,7 @@ public class ClientThreadOutput implements Runnable {
     private final DataInputStream in;
     private final XMLParser xmlParser;
     private final File file;
+    private final ClientClasses parser = new ClientClasses();
 
     public ClientThreadOutput(FileExchanger fileExchanger, DataInputStream in, XMLParser xmlParser, File file) {
         this.fileExchanger = fileExchanger;
@@ -26,11 +29,20 @@ public class ClientThreadOutput implements Runnable {
     public void run() {
         try {
             fileExchanger.receiveFile(in, file);
-            Event event = (Event) xmlParser.parseFromXML(Event.class, file);
-            switch (event.getEvent()) {
-                case "message" -> messageEvent(event);
+
+            switch (parser.parseFromXML(xmlParser, file)) {
+                case Event event -> {
+                    switch (event.getEvent()) {
+                        case "message" -> messageEvent(event);
+                        case "userlogout" -> logoutEvent(event);
+                        case "userlogin" -> loginEvent(event);
+                    }
+                }
+                case Error error -> System.out.println(error.getMessage());
+                case Success success -> {}
+                default -> throw new IllegalStateException("Unexpected value" );
             }
-        } catch (IOException | JAXBException e) {
+        } catch (IOException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -38,5 +50,15 @@ public class ClientThreadOutput implements Runnable {
     private void messageEvent(Event event) {
         String message = event.getMessage();
         System.out.println("From: " + event.getFrom() + "\nMessage: " + message);
+    }
+
+    private void logoutEvent(Event event) {
+        String name = event.getName();
+        System.out.println(name + " disconnect");
+    }
+
+    private void loginEvent(Event event) {
+        String name = event.getName();
+        System.out.println(name + " connect");
     }
 }
