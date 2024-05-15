@@ -1,14 +1,15 @@
-package ru.nsu.votintsev.client.xmlclasses;
+package ru.nsu.votintsev.xmlclasses;
 
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class Event {
-    private String event;
-    private String message;
-    private String from;
+public non-sealed class Event extends ClientClasses {
+    private String event = "null";
+    private String message = "null";
+    private String from = "null";
+    private String name = "null";
 
     public String getEvent() {
         return event;
@@ -35,5 +36,14 @@ public class Event {
     @XmlElement(name="from")
     public void setFrom(String from) {
         this.from = from;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @XmlElement(name="name")
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -1,4 +1,4 @@
-package ru.nsu.votintsev.server.xmlclasses;
+package ru.nsu.votintsev.xmlclasses;
 
 
 import jakarta.xml.bind.annotation.XmlAttribute;
@@ -7,11 +7,9 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class Command {
-    private String command;
-
+    private String command = "null";
     private String userName = "null";
     private String userPassword = "null";
-
     private String message = "null";
 
     public String getCommand() {

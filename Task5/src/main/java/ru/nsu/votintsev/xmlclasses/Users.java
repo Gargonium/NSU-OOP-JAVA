@@ -1,4 +1,4 @@
-package ru.nsu.votintsev.server.xmlclasses;
+package ru.nsu.votintsev.xmlclasses;
 
 import jakarta.xml.bind.annotation.*;
 
