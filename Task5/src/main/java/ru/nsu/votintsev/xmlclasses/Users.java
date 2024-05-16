@@ -1,17 +1,21 @@
 package ru.nsu.votintsev.xmlclasses;
 
-import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 public class Users {
-    @XmlElement(name = "user")
-    private List<User> userList = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
 
-    public List<User> getUserList() {
-        return userList;
+    public List<User> getUsers() {
+        return users;
+    }
+
+    @XmlElement(name="user")
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 }

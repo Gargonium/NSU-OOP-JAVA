@@ -3,7 +3,6 @@ package ru.nsu.votintsev.client;
 import jakarta.xml.bind.JAXBException;
 import ru.nsu.votintsev.FileExchanger;
 import ru.nsu.votintsev.XMLParser;
-import ru.nsu.votintsev.xmlclasses.Command;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -48,14 +47,6 @@ public class Client {
             }
 
         }
-        logOut(file);
         file.delete();
-    }
-
-    public void logOut(File file) throws JAXBException, IOException {
-        Command command = new Command();
-        command.setCommand("logout");
-        xmlParser.parseToXML(command, file);
-        fileExchanger.sendFile(out, file);
     }
 }

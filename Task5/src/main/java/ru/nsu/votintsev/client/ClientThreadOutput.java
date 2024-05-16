@@ -2,10 +2,8 @@ package ru.nsu.votintsev.client;
 
 import ru.nsu.votintsev.FileExchanger;
 import ru.nsu.votintsev.XMLParser;
-import ru.nsu.votintsev.xmlclasses.ClientClasses;
+import ru.nsu.votintsev.xmlclasses.*;
 import ru.nsu.votintsev.xmlclasses.Error;
-import ru.nsu.votintsev.xmlclasses.Event;
-import ru.nsu.votintsev.xmlclasses.Success;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -39,11 +37,20 @@ public class ClientThreadOutput implements Runnable {
                     }
                 }
                 case Error error -> System.out.println(error.getMessage());
-                case Success success -> {}
+                case Success success -> {
+                    if (success.getUsers() != null)
+                        listSuccess(success);
+                }
                 default -> throw new IllegalStateException("Unexpected value" );
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    private void listSuccess(Success success) {
+        for (User user : success.getUsers().getUsers()) {
+            System.out.println(user.getName());
         }
     }
 

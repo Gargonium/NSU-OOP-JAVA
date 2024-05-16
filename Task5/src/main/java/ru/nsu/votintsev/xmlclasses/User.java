@@ -5,7 +5,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class User {
-    private String name;
+    private String name = "null";
 
     public String getName() {
         return name;

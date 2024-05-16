@@ -8,6 +8,7 @@ import ru.nsu.votintsev.xmlclasses.Command;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -45,7 +46,12 @@ public class ClientThreadInput implements Runnable {
             else {
                 String message;
                 if ((message = scanner.nextLine()) != null)
-                    sendMessage(message);
+                    if (message.equals("/list"))
+                        list(file);
+                    else if (Objects.equals(message, "/logout"))
+                        logout(file);
+                    else
+                        sendMessage(message);
             }
         } catch (IOException | JAXBException e) {
             System.out.println(e.getMessage());
@@ -66,6 +72,21 @@ public class ClientThreadInput implements Runnable {
         command.setCommand("login");
         command.setUserName(clientName);
         command.setUserPassword(password);
+        xmlParser.parseToXML(command, file);
+        fileExchanger.sendFile(out, file);
+    }
+
+    private void logout(File file) throws JAXBException, IOException {
+        Command command = new Command();
+        command.setCommand("logout");
+        xmlParser.parseToXML(command, file);
+        fileExchanger.sendFile(out, file);
+        System.exit(0);
+    }
+
+    private void list(File file) throws JAXBException, IOException {
+        Command command = new Command();
+        command.setCommand("list");
         xmlParser.parseToXML(command, file);
         fileExchanger.sendFile(out, file);
     }

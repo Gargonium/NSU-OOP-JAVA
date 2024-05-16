@@ -1,16 +1,18 @@
 package ru.nsu.votintsev.server;
 
 import jakarta.xml.bind.JAXBException;
-import ru.nsu.votintsev.*;
+import ru.nsu.votintsev.FileExchanger;
+import ru.nsu.votintsev.XMLParser;
 import ru.nsu.votintsev.xmlclasses.Error;
-import ru.nsu.votintsev.xmlclasses.Event;
-import ru.nsu.votintsev.xmlclasses.Command;
-import ru.nsu.votintsev.xmlclasses.Success;
+import ru.nsu.votintsev.xmlclasses.*;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.net.Socket;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 class ServerThread extends Thread {
     private final Socket clientSocket;
@@ -50,7 +52,7 @@ class ServerThread extends Thread {
                     Command command = (Command) xmlParser.parseFromXML(Command.class, file);
                     switch (command.getCommand()) {
                         case "login" -> loginCommand(command, file);
-                        case "list" -> listCommand();
+                        case "list" -> listCommand(file);
                         case "message" -> messageCommand(command, file);
                         case "logout" -> logoutCommand(file);
                     }
@@ -71,16 +73,17 @@ class ServerThread extends Thread {
 
         if (usersDataBase.containsKey(userName)) {
             if (passwordHash == usersDataBase.get(userName))
-                successSend(file);
-            else
+                successSendEmpty(file);
+            else {
                 errorSend("Wrong password", file);
+            }
         }
         else {
-            if ((Objects.equals(userName, "Server")) || (userName.isEmpty()) || (userName.equals("null")))
+            if ((userName.equals("Server")) || (userName.isEmpty()) || (userName.equals("null")))
                 errorSend("Invalid name", file);
             else {
                 usersDataBase.put(userName, passwordHash);
-                successSend(file);
+                successSendEmpty(file);
             }
         }
 
@@ -91,21 +94,43 @@ class ServerThread extends Thread {
         serverSender.sendToAll(file);
     }
 
-    private void listCommand() {
-        /// Тут как-то совсем сложно
+    private void listCommand(File file) throws JAXBException, IOException {
+        try {
+            List<User> userList = usersDataBase.keySet().stream().map(name -> {
+                User user = new User();
+                user.setName(name);
+                return user;
+            }).toList();
+
+            Success success = new Success();
+            Users users = new Users();
+            users.setUsers(userList);
+            success.setUsers(users);
+
+            xmlParser.parseToXML(success, file);
+            fileExchanger.sendFile(out, file);
+        }
+        catch (Exception e) {
+            errorSend(e.getMessage(), file);
+        }
     }
 
     private void messageCommand(Command command, File file) throws JAXBException, IOException {
         String message = command.getMessage();
-        Event event = new Event();
-        event.setEvent("message");
-        event.setMessage(message);
-        event.setFrom(userName);
-        xmlParser.parseToXML(event, file);
-        serverSender.sendToAll(file);
+        try {
+            Event event = new Event();
+            event.setEvent("message");
+            event.setMessage(message);
+            event.setFrom(userName);
+            xmlParser.parseToXML(event, file);
+            serverSender.sendToAll(file);
+        } catch (IOException | JAXBException e) {
+            errorSend(e.getMessage(), file);
+        }
+        successSendEmpty(file);
     }
 
-    private void successSend(File file) throws JAXBException, IOException {
+    private void successSendEmpty(File file) throws JAXBException, IOException {
         Success success = new Success();
         xmlParser.parseToXML(success, file);
         fileExchanger.sendFile(out, file);
@@ -124,6 +149,6 @@ class ServerThread extends Thread {
         event.setName(userName);
         xmlParser.parseToXML(event, file);
         serverSender.sendToAll(file);
-        successSend(file);
+        successSendEmpty(file);
     }
 }
