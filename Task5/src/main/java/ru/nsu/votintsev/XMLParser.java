@@ -12,12 +12,16 @@ public class XMLParser {
         JAXBContext context = JAXBContext.newInstance(objectToWrite.getClass());
         Marshaller marshaller = context.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.marshal(objectToWrite, file);
+        synchronized (marshaller) {
+            marshaller.marshal(objectToWrite, file);
+        }
     }
 
     public Object parseFromXML(Class<?> objectToRead, File file) throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(objectToRead);
         Unmarshaller unmarshaller = context.createUnmarshaller();
-        return unmarshaller.unmarshal(file);
+        synchronized (unmarshaller) {
+            return unmarshaller.unmarshal(file);
+        }
     }
 }
