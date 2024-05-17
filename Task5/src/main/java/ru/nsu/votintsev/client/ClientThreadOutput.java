@@ -41,7 +41,7 @@ public class ClientThreadOutput implements Runnable {
                     if (success.getUsers() != null)
                         listSuccess(success);
                 }
-                default -> throw new IllegalStateException("Unexpected value" );
+                default -> throw new IllegalStateException("Unexpected value");
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());

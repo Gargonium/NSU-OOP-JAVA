@@ -4,10 +4,11 @@ import org.pushingpixels.substance.api.skin.SubstanceGraphiteAquaLookAndFeel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 public class ClientView extends JFrame {
     private static final String LOGIN_PAGE = "login";
@@ -16,6 +17,7 @@ public class ClientView extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton loginButton;
+    private JLabel errorLoginLabel;
 
     private JButton sendFileButton;
     private JButton sendButton;
@@ -23,7 +25,6 @@ public class ClientView extends JFrame {
     private JTextField messageField;
 
     private JPanel messagePanel;
-
     private JScrollPane scrollPane;
 
     enum MessageType {
@@ -35,6 +36,7 @@ public class ClientView extends JFrame {
         setSize(600,400);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
 
         try {
             UIManager.setLookAndFeel(new SubstanceGraphiteAquaLookAndFeel());
@@ -52,6 +54,8 @@ public class ClientView extends JFrame {
         usernameField = new JTextField(20);
         passwordField = new JPasswordField(20);
         loginButton = new JButton("Login");
+        errorLoginLabel = new JLabel();
+        errorLoginLabel.setForeground(Color.RED);
 
         messageField = new JTextField(30);
         sendFileButton = new JButton("Send File");
@@ -103,6 +107,9 @@ public class ClientView extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.fill = GridBagConstraints.NONE;
+        loginPanel.add(errorLoginLabel, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 5;
         loginPanel.add(loginButton, gbc);
 
         getContentPane().setLayout(new CardLayout());
@@ -141,6 +148,9 @@ public class ClientView extends JFrame {
             showChatPanel();
             // TODO: Отправить join команду
         }
+        else {
+            errorLoginLabel.setText("Invalid username or password");
+        }
     }
 
     private void showLoginPanel() {
@@ -162,6 +172,7 @@ public class ClientView extends JFrame {
             if (result == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
                 // TODO: Отправить файл серверу
+                displayFile(selectedFile);
             }
         });
 
@@ -195,8 +206,72 @@ public class ClientView extends JFrame {
         });
     }
 
+    private void displayFile(File file) {
+        JPanel filePanel = new JPanel();
+        filePanel.setLayout(new BorderLayout());
+
+        // Загрузка иконки файла
+        ImageIcon blackDownloadArrowIconLabel = new ImageIcon("src\\main\\resources\\blackDownloadArrow.png");
+        ImageIcon greenDownloadArrowIconLabel = new ImageIcon("src\\main\\resources\\greenDownloadArrow.png");
+
+        JLabel iconLabel = new JLabel(blackDownloadArrowIconLabel);
+        iconLabel.setPreferredSize(new Dimension(50, 50));
+        filePanel.add(iconLabel, BorderLayout.WEST);
+
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+
+        JLabel nameLabel = new JLabel("File: " + file.getName());
+        JLabel sizeLabel = new JLabel("Size: " + file.length() / 1024 + " KB");
+        JLabel senderLabel = new JLabel("Sent by: ");
+
+        textPanel.add(nameLabel);
+        textPanel.add(sizeLabel);
+        textPanel.add(senderLabel);
+
+        filePanel.add(textPanel, BorderLayout.CENTER);
+
+        // Добавляем слушатель событий для наведения мыши
+        filePanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                iconLabel.setIcon(greenDownloadArrowIconLabel);
+                filePanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                iconLabel.setIcon(blackDownloadArrowIconLabel);
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Открытие диалога сохранения файла при клике
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setSelectedFile(new File(file.getName()));
+                int returnValue = fileChooser.showSaveDialog(ClientView.this);
+                if (returnValue == JFileChooser.APPROVE_OPTION) {
+                    File destinationFile = fileChooser.getSelectedFile();
+                    try {
+                        Files.copy(file.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        JOptionPane.showMessageDialog(ClientView.this, "File saved successfully.");
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(ClientView.this, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+
+        messagePanel.add(filePanel);
+        messagePanel.add(Box.createVerticalStrut(5)); // добавляем небольшой промежуток между сообщениями
+        messagePanel.revalidate();
+
+        // Прокрутка вниз
+        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum()));
+    }
+
     public static void main() {
         SwingUtilities.invokeLater(ClientView::new);
     }
 }
-//никита лох
+
