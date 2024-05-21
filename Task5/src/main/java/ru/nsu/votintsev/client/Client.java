@@ -9,15 +9,15 @@ import java.net.Socket;
 public class Client {
     private final ClientSender clientSender;
     private final ClientReceiver clientReceiver;
-    private ClientController clientController = new ClientController();
 
-    public Client(Socket socket) throws IOException {
+    public Client(Socket socket, ClientController clientController) throws IOException {
         XMLParser xmlParser = new XMLParser();
         FileExchanger fileExchanger = new FileExchanger();
         clientSender = new ClientSender(socket, xmlParser, fileExchanger);
         clientReceiver = new ClientReceiver(socket, xmlParser, fileExchanger);
 
         clientReceiver.addObserver(clientController);
+        clientController.setClientReceiver(clientReceiver);
     }
 
     public void run() {

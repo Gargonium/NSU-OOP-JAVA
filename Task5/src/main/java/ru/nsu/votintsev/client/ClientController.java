@@ -1,13 +1,40 @@
 package ru.nsu.votintsev.client;
 
+import ru.nsu.votintsev.client.view.MessageType;
 import ru.nsu.votintsev.client.view.ViewEvents;
+import ru.nsu.votintsev.xmlclasses.Users;
 
-public class ClientController implements Observer {
+import java.util.Map;
+
+public class ClientController implements Observer, Observable {
+
+    private ClientReceiver clientReceiver;
+    private Observer observer;
+
     @Override
     public void update(ViewEvents change) {
-        switch (change) {
-            case MESSAGE_RECEIVED -> {}
-            case USER_LIST_RECEIVED -> {}
-        }
+        notifyObservers(change);
+    }
+
+    public void setClientReceiver(ClientReceiver clientReceiver) {
+        this.clientReceiver = clientReceiver;
+    }
+
+    public Map<String, MessageType> getMessages() {
+        return clientReceiver.getMessageBuffer();
+    }
+
+    public Users getUserList() {
+        return clientReceiver.getUsers();
+    }
+
+    @Override
+    public void addObserver(Observer observer) {
+        this.observer = observer;
+    }
+
+    @Override
+    public void notifyObservers(ViewEvents change) {
+        observer.update(change);
     }
 }

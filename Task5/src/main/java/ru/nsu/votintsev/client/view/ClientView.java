@@ -1,7 +1,10 @@
 package ru.nsu.votintsev.client.view;
 
 import org.pushingpixels.substance.api.skin.SubstanceGraphiteAquaLookAndFeel;
+import ru.nsu.votintsev.client.ClientController;
 import ru.nsu.votintsev.client.Observer;
+import ru.nsu.votintsev.xmlclasses.User;
+import ru.nsu.votintsev.xmlclasses.Users;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,6 +13,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 public class ClientView extends JFrame implements Observer {
     private static final String LOGIN_PAGE = "login";
@@ -28,8 +34,13 @@ public class ClientView extends JFrame implements Observer {
     private JPanel messagePanel;
     private JScrollPane scrollPane;
 
-    public ClientView( ) {
+    private final ClientController clientController;
 
+    private Users userList;
+
+    public ClientView(ClientController clientController) {
+        this.clientController = clientController;
+        clientController.addObserver(this);
         setSize(600,400);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -115,27 +126,29 @@ public class ClientView extends JFrame implements Observer {
     }
 
     // TODO: Вызывать, когда пришло новое сообщение
-    public void displayMessage(String message, MessageType messageType) {
-        JTextArea messageArea = new JTextArea(message);
-        messageArea.setLineWrap(true);
-        messageArea.setWrapStyleWord(true);
-        messageArea.setEditable(false);
-        messageArea.setBackground(messagePanel.getBackground());
-        messageArea.setForeground(messageType.equals(MessageType.USER_MESSAGE) ? Color.BLACK : Color.RED);
-        messageArea.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    public void displayMessages(Map<String, MessageType> messages) {
+        Set<String> keys = messages.keySet();
+        for (String message : keys) {
+            JTextArea messageArea = new JTextArea(message);
+            messageArea.setLineWrap(true);
+            messageArea.setWrapStyleWord(true);
+            messageArea.setEditable(false);
+            messageArea.setBackground(messagePanel.getBackground());
+            messageArea.setForeground(messages.get(message).equals(MessageType.USER_MESSAGE) ? Color.BLACK : Color.RED);
+            messageArea.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        messagePanel.add(messageArea, 0);
-        messagePanel.add(Box.createVerticalStrut(5));
-        messagePanel.revalidate();
-        messagePanel.repaint();
+            messagePanel.add(messageArea, 0);
+            messagePanel.add(Box.createVerticalStrut(5));
+            messagePanel.revalidate();
+            messagePanel.repaint();
 
-        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum() + messageArea.getBounds().height));
+            SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum() + messageArea.getBounds().height));
+        }
     }
 
     private void sendMessage() {
         String message = messageField.getText();
-        // TODO: Отправить сообщение на сервер
-        displayMessage(message, MessageType.USER_MESSAGE);
+        // TODO: Переделать нафиг
         messageField.setText("");
     }
 
@@ -184,8 +197,6 @@ public class ClientView extends JFrame implements Observer {
 
         userListButton.addActionListener(_ -> {
             // TODO: Вызвать список пользователей
-            JOptionPane.showMessageDialog(ClientView.this,
-                    "User List:\nUser 1\nUser 2\nUser 3", "User List", JOptionPane.INFORMATION_MESSAGE);
         });
 
         KeyListener loginKeyAdapter = new KeyAdapter() {
@@ -210,15 +221,23 @@ public class ClientView extends JFrame implements Observer {
         });
     }
 
+    private void displayUserList() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (User user : userList.getUsers()) {
+            stringBuilder.append(user.getName()).append("\n");
+        }
+        JOptionPane.showMessageDialog(ClientView.this,
+                stringBuilder.toString(), "Users", JOptionPane.INFORMATION_MESSAGE);
+    }
+
     private void displayFile(File file, String sender) {
         JPanel filePanel = new JPanel();
         filePanel.setLayout(new BorderLayout());
 
-        // Загрузка иконки файла
-        ImageIcon blackDownloadArrowIconLabel = new ImageIcon("src\\main\\resources\\blackDownloadArrow.png");
-        ImageIcon greenDownloadArrowIconLabel = new ImageIcon("src\\main\\resources\\greenDownloadArrow.png");
+        Icon blackDownloadArrowIcon = new ImageIcon(Objects.requireNonNull(Object.class.getResource("blackDownloadArrow.png")));
+        Icon greenDownloadArrowIcon = new ImageIcon(Objects.requireNonNull(Object.class.getResource("greenDownloadArrow.png")));
 
-        JLabel iconLabel = new JLabel(blackDownloadArrowIconLabel);
+        JLabel iconLabel = new JLabel(blackDownloadArrowIcon);
         iconLabel.setPreferredSize(new Dimension(50, 50));
         filePanel.add(iconLabel, BorderLayout.WEST);
 
@@ -239,13 +258,13 @@ public class ClientView extends JFrame implements Observer {
         filePanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                iconLabel.setIcon(greenDownloadArrowIconLabel);
+                iconLabel.setIcon(greenDownloadArrowIcon);
                 filePanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                iconLabel.setIcon(blackDownloadArrowIconLabel);
+                iconLabel.setIcon(blackDownloadArrowIcon);
             }
 
             @Override
@@ -267,18 +286,20 @@ public class ClientView extends JFrame implements Observer {
         });
 
         messagePanel.add(filePanel, 0);
-        messagePanel.add(Box.createVerticalStrut(5)); // добавляем небольшой промежуток между сообщениями
+        messagePanel.add(Box.createVerticalStrut(5));
         messagePanel.revalidate();
 
-        // Прокрутка вниз
         SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum()));
     }
 
     @Override
     public void update(ViewEvents change) {
         switch (change) {
-
+            case MESSAGE_RECEIVED -> displayMessages(clientController.getMessages());
+            case USER_LIST_RECEIVED -> {
+                userList = clientController.getUserList();
+                displayUserList();
+            }
         }
     }
 }
-
