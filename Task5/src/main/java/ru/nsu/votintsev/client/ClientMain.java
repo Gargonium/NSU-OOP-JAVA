@@ -1,6 +1,5 @@
 package ru.nsu.votintsev.client;
 
-import jakarta.xml.bind.JAXBException;
 import ru.nsu.votintsev.client.view.ClientView;
 
 import javax.swing.*;
@@ -12,7 +11,7 @@ public class ClientMain {
         try (Socket socket = new Socket("localhost", 8886)) {
             new Client(socket).run();
             SwingUtilities.invokeLater(ClientView::new);
-        } catch (IOException | JAXBException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

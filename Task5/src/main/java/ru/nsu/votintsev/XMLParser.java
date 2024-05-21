@@ -6,22 +6,26 @@ import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 
 import java.io.File;
+import java.io.StringReader;
+import java.io.StringWriter;
 
 public class XMLParser {
-    public void parseToXML(Object objectToWrite, File file) throws JAXBException {
+    public String parseToXML(Object objectToWrite) throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(objectToWrite.getClass());
         Marshaller marshaller = context.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         synchronized (marshaller) {
-            marshaller.marshal(objectToWrite, file);
+            StringWriter stringWriter = new StringWriter();
+            marshaller.marshal(objectToWrite, stringWriter);
+            return stringWriter.toString();
         }
     }
 
-    public Object parseFromXML(Class<?> objectToRead, File file) throws JAXBException {
+    public Object parseFromXML(Class<?> objectToRead, String xmlString) throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(objectToRead);
         Unmarshaller unmarshaller = context.createUnmarshaller();
         synchronized (unmarshaller) {
-            return unmarshaller.unmarshal(file);
+            StringReader stringReader = new StringReader(xmlString);
+            return unmarshaller.unmarshal(stringReader);
         }
     }
 }

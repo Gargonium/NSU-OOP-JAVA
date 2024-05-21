@@ -1,6 +1,7 @@
 package ru.nsu.votintsev.client.view;
 
 import org.pushingpixels.substance.api.skin.SubstanceGraphiteAquaLookAndFeel;
+import ru.nsu.votintsev.client.Observer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,7 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
-public class ClientView extends JFrame {
+public class ClientView extends JFrame implements Observer {
     private static final String LOGIN_PAGE = "login";
     private static final String CHAT_PAGE = "chat";
 
@@ -27,12 +28,8 @@ public class ClientView extends JFrame {
     private JPanel messagePanel;
     private JScrollPane scrollPane;
 
-    enum MessageType {
-        SERVER_MESSAGE,
-        USER_MESSAGE
-    }
+    public ClientView( ) {
 
-    public ClientView() {
         setSize(600,400);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -118,14 +115,21 @@ public class ClientView extends JFrame {
     }
 
     // TODO: Вызывать, когда пришло новое сообщение
-    private void displayMessage(String message, MessageType messageType) {
-        JLabel messageLabel = new JLabel(message);
-        messageLabel.setForeground(messageType.equals(MessageType.USER_MESSAGE) ? Color.BLACK : Color.RED);
-        messagePanel.add(messageLabel, 0);
+    public void displayMessage(String message, MessageType messageType) {
+        JTextArea messageArea = new JTextArea(message);
+        messageArea.setLineWrap(true);
+        messageArea.setWrapStyleWord(true);
+        messageArea.setEditable(false);
+        messageArea.setBackground(messagePanel.getBackground());
+        messageArea.setForeground(messageType.equals(MessageType.USER_MESSAGE) ? Color.BLACK : Color.RED);
+        messageArea.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+        messagePanel.add(messageArea, 0);
+        messagePanel.add(Box.createVerticalStrut(5));
         messagePanel.revalidate();
         messagePanel.repaint();
 
-        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum()));
+        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum() + messageArea.getBounds().height));
     }
 
     private void sendMessage() {
@@ -172,7 +176,7 @@ public class ClientView extends JFrame {
             if (result == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
                 // TODO: Отправить файл серверу
-                displayFile(selectedFile);
+                displayFile(selectedFile, "User");
             }
         });
 
@@ -206,7 +210,7 @@ public class ClientView extends JFrame {
         });
     }
 
-    private void displayFile(File file) {
+    private void displayFile(File file, String sender) {
         JPanel filePanel = new JPanel();
         filePanel.setLayout(new BorderLayout());
 
@@ -223,7 +227,7 @@ public class ClientView extends JFrame {
 
         JLabel nameLabel = new JLabel("File: " + file.getName());
         JLabel sizeLabel = new JLabel("Size: " + file.length() / 1024 + " KB");
-        JLabel senderLabel = new JLabel("Sent by: ");
+        JLabel senderLabel = new JLabel("Sent by: " + sender);
 
         textPanel.add(nameLabel);
         textPanel.add(sizeLabel);
@@ -262,7 +266,7 @@ public class ClientView extends JFrame {
             }
         });
 
-        messagePanel.add(filePanel);
+        messagePanel.add(filePanel, 0);
         messagePanel.add(Box.createVerticalStrut(5)); // добавляем небольшой промежуток между сообщениями
         messagePanel.revalidate();
 
@@ -270,8 +274,11 @@ public class ClientView extends JFrame {
         SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum()));
     }
 
-    public static void main() {
-        SwingUtilities.invokeLater(ClientView::new);
+    @Override
+    public void update(ViewEvents change) {
+        switch (change) {
+
+        }
     }
 }
 

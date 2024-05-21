@@ -1,8 +1,11 @@
-package ru.nsu.votintsev.client;
+package ru.nsu.votintsev.client.oldrealize;
 
 import jakarta.xml.bind.JAXBException;
 import ru.nsu.votintsev.FileExchanger;
 import ru.nsu.votintsev.XMLParser;
+import ru.nsu.votintsev.client.Observable;
+import ru.nsu.votintsev.client.Observer;
+import ru.nsu.votintsev.client.view.ViewEvents;
 import ru.nsu.votintsev.xmlclasses.Command;
 
 import java.io.DataOutputStream;
@@ -12,7 +15,7 @@ import java.util.Objects;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ClientThreadInput implements Runnable {
+public class ClientThreadInput1 implements Runnable, Observable {
     private final XMLParser xmlParser;
     private final FileExchanger fileExchanger;
     private final Scanner scanner = new Scanner(System.in);
@@ -22,9 +25,11 @@ public class ClientThreadInput implements Runnable {
     private String clientName;
     private String password;
 
+    private Observer observer;
+
     private final AtomicBoolean isRegistred = new AtomicBoolean(false);
 
-    public ClientThreadInput(XMLParser xmlParser, FileExchanger fileExchanger, DataOutputStream out, File file) {
+    public ClientThreadInput1(XMLParser xmlParser, FileExchanger fileExchanger, DataOutputStream out, File file) {
         this.xmlParser = xmlParser;
         this.fileExchanger = fileExchanger;
         this.out = out;
@@ -89,5 +94,15 @@ public class ClientThreadInput implements Runnable {
         command.setCommand("list");
         xmlParser.parseToXML(command, file);
         fileExchanger.sendFile(out, file);
+    }
+
+    @Override
+    public void addObserver(Observer observer) {
+        this.observer = observer;
+    }
+
+    @Override
+    public void notifyObservers(ViewEvents change) {
+        observer.update(change);
     }
 }

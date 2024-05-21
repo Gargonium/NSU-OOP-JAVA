@@ -3,11 +3,9 @@ package ru.nsu.votintsev.xmlclasses;
 import jakarta.xml.bind.JAXBException;
 import ru.nsu.votintsev.XMLParser;
 
-import java.io.File;
-
 public sealed class ClientClasses permits Event, Error, Success, InvalidClass {
 
-    public ClientClasses parseFromXML(XMLParser xmlParser, File file) {
+    public ClientClasses parseFromXML(XMLParser xmlParser, String file) {
         try {
             return (Event) xmlParser.parseFromXML(Event.class, file);
         } catch (JAXBException e) {

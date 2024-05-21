@@ -5,48 +5,29 @@ import ru.nsu.votintsev.server.WrongLengthMessageException;
 import java.io.*;
 
 public class FileExchanger {
-    public void sendFile(DataOutputStream out, File file) throws IOException {
-        DataInputStream fileIn = new DataInputStream(new FileInputStream(file));
-
-            out.writeInt((int) file.length());
-
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = fileIn.read(buffer)) != -1) {
-                out.write(buffer, 0, bytesRead);
-            }
-
-            out.flush();
-            fileIn.close();
+    public void sendFile(DataOutputStream out, String xmlString) throws IOException {
+        out.writeInt(xmlString.length());
+        out.writeBytes(xmlString);
+        out.flush();
     }
 
-    public void receiveFile(DataInputStream in, File file) throws IOException, WrongLengthMessageException {
-        byte[] buffer = new byte[1024];
+    public String receiveFile(DataInputStream in) throws IOException, WrongLengthMessageException {
         long messageLength = in.readInt();
+        byte[] buffer = new byte[1024];
         long messageReadedLength = 0;
         int bytesRead;
 
-        FileWriter fileWriter = new FileWriter(file);
-        fileWriter.write("");
-        fileWriter.close();
-        DataOutputStream fileOut = new DataOutputStream(new FileOutputStream(file));
+        StringBuilder stringBuilder = new StringBuilder();
 
         while ((bytesRead = in.read(buffer)) != -1) {
-
-            if (messageReadedLength > messageLength) {
-                fileOut.flush();
-                fileOut.close();
+            if (messageReadedLength > messageLength)
                 throw new WrongLengthMessageException();
-            }
-
-            fileOut.write(buffer, 0, bytesRead);
+            stringBuilder.append(new String(buffer, 0, bytesRead));
             messageReadedLength += bytesRead;
-            if (bytesRead == messageLength) {
+            if (bytesRead == messageLength)
                 break;
-            }
         }
 
-        fileOut.flush();
-        fileOut.close();
+        return stringBuilder.toString();
     }
 }
