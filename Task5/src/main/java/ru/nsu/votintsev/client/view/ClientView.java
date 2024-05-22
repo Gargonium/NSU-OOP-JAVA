@@ -52,8 +52,11 @@ public class ClientView extends JFrame implements Observer {
             throw new RuntimeException(e);
         }
 
+        ViewController controller = new ViewController(usernameField, passwordField, loginButton, sendFileButton, sendButton, userListButton, messageField);
+        controller.setView(this);
+        controller.setClientController(clientController);
+
         initComponents();
-        addActionListeners();
         showLoginPanel();
         setVisible(true);
     }
@@ -126,7 +129,7 @@ public class ClientView extends JFrame implements Observer {
     }
 
     // TODO: Вызывать, когда пришло новое сообщение
-    public void displayMessages(Map<String, MessageType> messages) {
+    private void displayMessages(Map<String, MessageType> messages) {
         Set<String> keys = messages.keySet();
         for (String message : keys) {
             JTextArea messageArea = new JTextArea(message);
@@ -146,79 +149,18 @@ public class ClientView extends JFrame implements Observer {
         }
     }
 
-    private void sendMessage() {
-        String message = messageField.getText();
-        // TODO: Переделать нафиг
-        messageField.setText("");
-    }
-
-    private boolean authenticate(String userName, String password) {
-        // TODO: Реализовать это
-        return userName.equals("admin") && password.equals("admin");
-    }
-
-    private void login() {
-        String userName = usernameField.getText();
-        String password = new String(passwordField.getPassword());
-        boolean isAuthenticated = authenticate(userName, password);
-        if (isAuthenticated) {
-            showChatPanel();
-            // TODO: Отправить join команду
-        }
-        else {
-            errorLoginLabel.setText("Invalid username or password");
-        }
-    }
-
     private void showLoginPanel() {
         setTitle("Login");
         ((CardLayout) getContentPane().getLayout()).show(getContentPane(), LOGIN_PAGE);
     }
 
-    private void showChatPanel() {
+    public void showChatPanel() {
         setTitle("Chat");
         ((CardLayout) getContentPane().getLayout()).show(getContentPane(), CHAT_PAGE);
     }
 
-    private void addActionListeners() {
-        loginButton.addActionListener(_ -> login());
-
-        sendFileButton.addActionListener(_ -> {
-            JFileChooser fileChooser = new JFileChooser();
-            int result = fileChooser.showOpenDialog(ClientView.this);
-            if (result == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = fileChooser.getSelectedFile();
-                // TODO: Отправить файл серверу
-                displayFile(selectedFile, "User");
-            }
-        });
-
-        sendButton.addActionListener(_ -> sendMessage());
-
-        userListButton.addActionListener(_ -> {
-            // TODO: Вызвать список пользователей
-        });
-
-        KeyListener loginKeyAdapter = new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    login();
-                }
-            }
-        };
-
-        usernameField.addKeyListener(loginKeyAdapter);
-        passwordField.addKeyListener(loginKeyAdapter);
-
-        messageField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    sendMessage();
-                }
-            }
-        });
+    public void setErrorLoginLabel(String errorMessage) {
+        errorLoginLabel.setText(errorMessage);
     }
 
     private void displayUserList() {
@@ -269,7 +211,7 @@ public class ClientView extends JFrame implements Observer {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                // Открытие диалога сохранения файла при клике
+                // TODO: Переделать. Нужно запрашивать файлы у сервера
                 JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setSelectedFile(new File(file.getName()));
                 int returnValue = fileChooser.showSaveDialog(ClientView.this);
