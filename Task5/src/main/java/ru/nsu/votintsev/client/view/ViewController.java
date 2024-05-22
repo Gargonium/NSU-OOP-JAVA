@@ -1,23 +1,30 @@
 package ru.nsu.votintsev.client.view;
 
-import ru.nsu.votintsev.client.ClientController;
+import jakarta.xml.bind.JAXBException;
+import ru.nsu.votintsev.client.ClientSender;
 
 import javax.swing.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
+import java.net.Socket;
 
 public class ViewController implements ActionListener {
-    private JTextField usernameField;
-    private JPasswordField passwordField;
-    private JButton loginButton;
+    private final JTextField usernameField;
+    private final JPasswordField passwordField;
+    private final JButton loginButton;
 
-    private JButton sendFileButton;
-    private JButton sendButton;
-    private JButton userListButton;
-    private JTextField messageField;
+    private final JButton sendFileButton;
+    private final JButton sendButton;
+    private final JButton userListButton;
+    private final JTextField messageField;
 
     private ClientView clientView;
-    private ClientController clientController;
+    private ClientSender clientSender;
+
+    private Socket socket;
+
+    private boolean isAuthenticated = false;
 
     public ViewController(JTextField usernameField, JPasswordField passwordField, JButton loginButton, JButton sendFileButton, JButton sendButton, JButton userListButton, JTextField messageField) {
         this.usernameField = usernameField;
@@ -32,7 +39,11 @@ public class ViewController implements ActionListener {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    login();
+                    try {
+                        login();
+                    } catch (JAXBException | IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             }
         };
@@ -41,7 +52,11 @@ public class ViewController implements ActionListener {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    sendMessage();
+                    try {
+                        sendMessage();
+                    } catch (JAXBException | IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             }
         };
@@ -59,50 +74,70 @@ public class ViewController implements ActionListener {
 
     public void setView(ClientView clientView) {
         this.clientView = clientView;
+        clientView.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                try {
+                    clientSender.sendLogoutCommand();
+                    clientView.dispose();
+                    socket.close();
+                } catch (JAXBException | IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
     }
 
-    public void setClientController(ClientController clientController) {
-        this.clientController = clientController;
+    public void setClientSender (ClientSender clientSender) {
+        this.clientSender = clientSender;
+    }
+
+    public void setSocket(Socket socket) {
+        this.socket = socket;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == loginButton)
-            login();
-        else if (e.getSource() == sendFileButton)
-            sendFile();
-        else if (e.getSource() == sendButton)
-            sendMessage();
-        else if (e.getSource() == userListButton)
-            requestUserList();
+        try {
+            if (e.getSource() == loginButton)
+                login();
+            else if (e.getSource() == sendFileButton)
+                sendFile();
+            else if (e.getSource() == sendButton)
+                sendMessage();
+            else if (e.getSource() == userListButton)
+                requestUserList();
+        }
+        catch (JAXBException | IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
-    private void login() {
+    public void successReceived() {
+        if (!isAuthenticated) {
+            clientView.showChatPanel();
+            isAuthenticated = true;
+        }
+    }
+
+    public void loginErrorReceived() {
+        clientView.setErrorLoginLabel("Invalid username or password");
+    }
+
+    private void login() throws JAXBException, IOException {
         String userName = usernameField.getText();
         String password = new String(passwordField.getPassword());
-        boolean isAuthenticated = authenticate(userName, password);
-        if (isAuthenticated) {
-            clientView.showChatPanel();
-            // TODO: Отправить join команду
-        }
-        else {
-            clientView.setErrorLoginLabel("Invalid username or password");
-        }
+        clientSender.sendLoginCommand(userName, password);
     }
 
-    private void sendMessage() {
+    private void sendMessage() throws JAXBException, IOException {
         String message = messageField.getText();
-        // TODO: Отправить сообщение серверу
         messageField.setText("");
+        clientSender.sendMessageCommand(message);
     }
 
-    private boolean authenticate(String userName, String password) {
-        // TODO: Понять как понимать саксесс или ерор?
-        return userName.equals("admin") && password.equals("admin");
-    }
-
-    private void requestUserList() {
-        // TODO: Отправить запрос на юзер лист
+    private void requestUserList() throws JAXBException, IOException {
+        clientSender.sendListCommand();
     }
 
     private void sendFile() {

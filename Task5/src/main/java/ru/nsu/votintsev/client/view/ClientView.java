@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
@@ -35,15 +36,16 @@ public class ClientView extends JFrame implements Observer {
     private JScrollPane scrollPane;
 
     private final ClientController clientController;
+    private final ViewController viewController;
 
     private Users userList;
 
-    public ClientView(ClientController clientController) {
+    public ClientView(ClientController clientController, Socket socket) {
         this.clientController = clientController;
         clientController.addObserver(this);
         setSize(600,400);
         setResizable(false);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
 
         try {
@@ -52,13 +54,133 @@ public class ClientView extends JFrame implements Observer {
             throw new RuntimeException(e);
         }
 
-        ViewController controller = new ViewController(usernameField, passwordField, loginButton, sendFileButton, sendButton, userListButton, messageField);
-        controller.setView(this);
-        controller.setClientController(clientController);
-
         initComponents();
+
+        viewController = new ViewController(usernameField, passwordField, loginButton, sendFileButton, sendButton, userListButton, messageField);
+        viewController.setView(this);
+        viewController.setClientSender(clientController.getCLientSender());
+        viewController.setSocket(socket);
+
         showLoginPanel();
         setVisible(true);
+    }
+
+    public void setErrorLoginLabel(String errorMessage) {
+        errorLoginLabel.setText(errorMessage);
+    }
+
+    @Override
+    public void update(ViewEvents change) {
+        switch (change) {
+            case MESSAGE_RECEIVED -> SwingUtilities.invokeLater(() -> displayMessages(clientController.getMessages()));
+            case USER_LIST_RECEIVED -> {
+                userList = clientController.getUserList();
+                SwingUtilities.invokeLater(this::displayUserList);
+            }
+            case SUCCESS -> viewController.successReceived();
+            case LOGIN_ERROR -> viewController.loginErrorReceived();
+        }
+    }
+
+    public void showChatPanel() {
+        setTitle("Chat");
+        ((CardLayout) getContentPane().getLayout()).show(getContentPane(), CHAT_PAGE);
+    }
+
+    private void showLoginPanel() {
+        setTitle("Login");
+        ((CardLayout) getContentPane().getLayout()).show(getContentPane(), LOGIN_PAGE);
+    }
+
+    private void displayUserList() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (User user : userList.getUsers()) {
+            stringBuilder.append(user.getName()).append("\n");
+        }
+        JOptionPane.showMessageDialog(ClientView.this,
+                stringBuilder.toString(), "Users", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void displayMessages(Map<String, MessageType> messages) {
+        Set<String> keys = messages.keySet();
+        for (String message : keys) {
+            JTextArea messageArea = new JTextArea(message);
+            messageArea.setLineWrap(true);
+            messageArea.setWrapStyleWord(true);
+            messageArea.setEditable(false);
+            messageArea.setBackground(messagePanel.getBackground());
+            messageArea.setForeground(messages.get(message).equals(MessageType.USER_MESSAGE) ? Color.BLACK : Color.RED);
+            messageArea.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+            messagePanel.add(messageArea, 0);
+            messagePanel.add(Box.createVerticalStrut(5));
+            messagePanel.revalidate();
+            messagePanel.repaint();
+
+            SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum() + messageArea.getBounds().height));
+        }
+    }
+
+    private void displayFile(File file, String sender) {
+        JPanel filePanel = new JPanel();
+        filePanel.setLayout(new BorderLayout());
+
+        Icon blackDownloadArrowIcon = new ImageIcon(Objects.requireNonNull(Object.class.getResource("blackDownloadArrow.png")));
+        Icon greenDownloadArrowIcon = new ImageIcon(Objects.requireNonNull(Object.class.getResource("greenDownloadArrow.png")));
+
+        JLabel iconLabel = new JLabel(blackDownloadArrowIcon);
+        iconLabel.setPreferredSize(new Dimension(50, 50));
+        filePanel.add(iconLabel, BorderLayout.WEST);
+
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+
+        JLabel nameLabel = new JLabel("File: " + file.getName());
+        JLabel sizeLabel = new JLabel("Size: " + file.length() / 1024 + " KB");
+        JLabel senderLabel = new JLabel("Sent by: " + sender);
+
+        textPanel.add(nameLabel);
+        textPanel.add(sizeLabel);
+        textPanel.add(senderLabel);
+
+        filePanel.add(textPanel, BorderLayout.CENTER);
+
+        // Добавляем слушатель событий для наведения мыши
+        filePanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                iconLabel.setIcon(greenDownloadArrowIcon);
+                filePanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                iconLabel.setIcon(blackDownloadArrowIcon);
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // TODO: Переделать. Нужно запрашивать файлы у сервера
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setSelectedFile(new File(file.getName()));
+                int returnValue = fileChooser.showSaveDialog(ClientView.this);
+                if (returnValue == JFileChooser.APPROVE_OPTION) {
+                    File destinationFile = fileChooser.getSelectedFile();
+                    try {
+                        Files.copy(file.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        JOptionPane.showMessageDialog(ClientView.this, "File saved successfully.");
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(ClientView.this, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+
+        messagePanel.add(filePanel, 0);
+        messagePanel.add(Box.createVerticalStrut(5));
+        messagePanel.revalidate();
+
+        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum()));
     }
 
     private void initComponents() {
@@ -126,122 +248,5 @@ public class ClientView extends JFrame implements Observer {
         getContentPane().setLayout(new CardLayout());
         getContentPane().add(loginPanel, LOGIN_PAGE);
         getContentPane().add(chatPanel, CHAT_PAGE);
-    }
-
-    // TODO: Вызывать, когда пришло новое сообщение
-    private void displayMessages(Map<String, MessageType> messages) {
-        Set<String> keys = messages.keySet();
-        for (String message : keys) {
-            JTextArea messageArea = new JTextArea(message);
-            messageArea.setLineWrap(true);
-            messageArea.setWrapStyleWord(true);
-            messageArea.setEditable(false);
-            messageArea.setBackground(messagePanel.getBackground());
-            messageArea.setForeground(messages.get(message).equals(MessageType.USER_MESSAGE) ? Color.BLACK : Color.RED);
-            messageArea.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-            messagePanel.add(messageArea, 0);
-            messagePanel.add(Box.createVerticalStrut(5));
-            messagePanel.revalidate();
-            messagePanel.repaint();
-
-            SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum() + messageArea.getBounds().height));
-        }
-    }
-
-    private void showLoginPanel() {
-        setTitle("Login");
-        ((CardLayout) getContentPane().getLayout()).show(getContentPane(), LOGIN_PAGE);
-    }
-
-    public void showChatPanel() {
-        setTitle("Chat");
-        ((CardLayout) getContentPane().getLayout()).show(getContentPane(), CHAT_PAGE);
-    }
-
-    public void setErrorLoginLabel(String errorMessage) {
-        errorLoginLabel.setText(errorMessage);
-    }
-
-    private void displayUserList() {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (User user : userList.getUsers()) {
-            stringBuilder.append(user.getName()).append("\n");
-        }
-        JOptionPane.showMessageDialog(ClientView.this,
-                stringBuilder.toString(), "Users", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    private void displayFile(File file, String sender) {
-        JPanel filePanel = new JPanel();
-        filePanel.setLayout(new BorderLayout());
-
-        Icon blackDownloadArrowIcon = new ImageIcon(Objects.requireNonNull(Object.class.getResource("blackDownloadArrow.png")));
-        Icon greenDownloadArrowIcon = new ImageIcon(Objects.requireNonNull(Object.class.getResource("greenDownloadArrow.png")));
-
-        JLabel iconLabel = new JLabel(blackDownloadArrowIcon);
-        iconLabel.setPreferredSize(new Dimension(50, 50));
-        filePanel.add(iconLabel, BorderLayout.WEST);
-
-        JPanel textPanel = new JPanel();
-        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
-
-        JLabel nameLabel = new JLabel("File: " + file.getName());
-        JLabel sizeLabel = new JLabel("Size: " + file.length() / 1024 + " KB");
-        JLabel senderLabel = new JLabel("Sent by: " + sender);
-
-        textPanel.add(nameLabel);
-        textPanel.add(sizeLabel);
-        textPanel.add(senderLabel);
-
-        filePanel.add(textPanel, BorderLayout.CENTER);
-
-        // Добавляем слушатель событий для наведения мыши
-        filePanel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                iconLabel.setIcon(greenDownloadArrowIcon);
-                filePanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                iconLabel.setIcon(blackDownloadArrowIcon);
-            }
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                // TODO: Переделать. Нужно запрашивать файлы у сервера
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setSelectedFile(new File(file.getName()));
-                int returnValue = fileChooser.showSaveDialog(ClientView.this);
-                if (returnValue == JFileChooser.APPROVE_OPTION) {
-                    File destinationFile = fileChooser.getSelectedFile();
-                    try {
-                        Files.copy(file.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        JOptionPane.showMessageDialog(ClientView.this, "File saved successfully.");
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(ClientView.this, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            }
-        });
-
-        messagePanel.add(filePanel, 0);
-        messagePanel.add(Box.createVerticalStrut(5));
-        messagePanel.revalidate();
-
-        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum()));
-    }
-
-    @Override
-    public void update(ViewEvents change) {
-        switch (change) {
-            case MESSAGE_RECEIVED -> displayMessages(clientController.getMessages());
-            case USER_LIST_RECEIVED -> {
-                userList = clientController.getUserList();
-                displayUserList();
-            }
-        }
     }
 }

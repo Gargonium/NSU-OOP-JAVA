@@ -18,10 +18,10 @@ public class Client {
 
         clientReceiver.addObserver(clientController);
         clientController.setClientReceiver(clientReceiver);
+        clientController.setClientSender(clientSender);
     }
 
     public void run() {
-        new Thread(clientSender).start();
         new Thread(clientReceiver).start();
     }
 }

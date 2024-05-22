@@ -8,7 +8,6 @@ import ru.nsu.votintsev.xmlclasses.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.List;
@@ -24,17 +23,19 @@ class ServerThread extends Thread {
     private final DataOutputStream out;
     private final DataInputStream in;
 
-    private String userName;
+    private String username;
     private int passwordHash;
 
     private final Map<String, Integer> usersDataBase;
+    private final List<String> connectedUsers;
 
-    public ServerThread(Socket clientSocket, FileExchanger fileExchanger, XMLParser xmlParser, ServerSender serverSender, Map<String, Integer> usersDataBase) {
+    public ServerThread(Socket clientSocket, FileExchanger fileExchanger, XMLParser xmlParser, ServerSender serverSender, Map<String, Integer> usersDataBase, List<String> connectedUsers) {
         this.clientSocket = clientSocket;
         this.fileExchanger = fileExchanger;
         this.xmlParser = xmlParser;
         this.serverSender = serverSender;
         this.usersDataBase = usersDataBase;
+        this.connectedUsers = connectedUsers;
         try {
             out = new DataOutputStream(clientSocket.getOutputStream());
             in = new DataInputStream(clientSocket.getInputStream());
@@ -44,59 +45,61 @@ class ServerThread extends Thread {
     }
 
     public void run() {
-        File file = new File("src\\main\\resources\\ServerProtocol" + Thread.currentThread().threadId() + ".xml");
         try {
             while (clientSocket.isConnected()) {
                 try {
-                    fileExchanger.receiveFile(in, file);
-                    Command command = (Command) xmlParser.parseFromXML(Command.class, file);
+                    String xmlString = fileExchanger.receiveFile(in);
+                    Command command = (Command) xmlParser.parseFromXML(Command.class, xmlString);
                     switch (command.getCommand()) {
-                        case "login" -> loginCommand(command, file);
-                        case "list" -> listCommand(file);
-                        case "message" -> messageCommand(command, file);
-                        case "logout" -> logoutCommand(file);
+                        case "login" -> loginCommand(command);
+                        case "list" -> listCommand();
+                        case "message" -> messageCommand(command);
+                        case "logout" -> logoutCommand();
                     }
                 } catch (JAXBException e) {
                     System.out.println(e.getMessage());
                 }
             }
-            System.out.println("Client Disconnect");
+            System.out.println(username + " dissconnect");
         } catch (IOException e) {
+            connectedUsers.remove(username);
             System.out.println(e.getMessage());
         }
-        file.delete();
     }
 
-    private void loginCommand(Command command, File file) throws IOException, JAXBException {
-        userName = command.getUserName();
+    private void loginCommand(Command command) throws IOException, JAXBException {
+        username = command.getUserName();
         passwordHash = command.getUserPassword().hashCode();
 
-        if (usersDataBase.containsKey(userName)) {
-            if (passwordHash == usersDataBase.get(userName))
-                successSendEmpty(file);
+        if (usersDataBase.containsKey(username)) {
+            if (passwordHash == usersDataBase.get(username))
+                successSendEmpty();
             else {
-                errorSend("Wrong password", file);
+                errorSend("Wrong password");
+                return;
             }
         }
         else {
-            if ((userName.equals("Server")) || (userName.isEmpty()) || (userName.equals("null")))
-                errorSend("Invalid name", file);
+            if ((username.equals("Server")) || (username.isEmpty()) || (username.equals("null"))) {
+                errorSend("Invalid name");
+                return;
+            }
             else {
-                usersDataBase.put(userName, passwordHash);
-                successSendEmpty(file);
+                usersDataBase.put(username, passwordHash);
+                connectedUsers.add(username);
+                successSendEmpty();
             }
         }
 
         Event event = new Event();
         event.setEvent("userlogin");
-        event.setName(userName);
-        xmlParser.parseToXML(event, file);
-        serverSender.sendToAll(file);
+        event.setName(username);
+        serverSender.sendToAll(xmlParser.parseToXML(event));
     }
 
-    private void listCommand(File file) throws JAXBException, IOException {
+    private void listCommand() throws JAXBException, IOException {
         try {
-            List<User> userList = usersDataBase.keySet().stream().map(name -> {
+            List<User> userList = connectedUsers.stream().map(name -> {
                 User user = new User();
                 user.setName(name);
                 return user;
@@ -107,48 +110,43 @@ class ServerThread extends Thread {
             users.setUsers(userList);
             success.setUsers(users);
 
-            xmlParser.parseToXML(success, file);
-            fileExchanger.sendFile(out, file);
+            fileExchanger.sendFile(out, xmlParser.parseToXML(success));
         }
         catch (Exception e) {
-            errorSend(e.getMessage(), file);
+            errorSend(e.getMessage());
         }
     }
 
-    private void messageCommand(Command command, File file) throws JAXBException, IOException {
+    private void messageCommand(Command command) throws JAXBException, IOException {
         String message = command.getMessage();
         try {
             Event event = new Event();
             event.setEvent("message");
             event.setMessage(message);
-            event.setFrom(userName);
-            xmlParser.parseToXML(event, file);
-            serverSender.sendToAll(file);
+            event.setFrom(username);
+            serverSender.sendToAll(xmlParser.parseToXML(event));
         } catch (IOException | JAXBException e) {
-            errorSend(e.getMessage(), file);
+            errorSend(e.getMessage());
         }
-        successSendEmpty(file);
+        successSendEmpty();
     }
 
-    private void successSendEmpty(File file) throws JAXBException, IOException {
+    private void successSendEmpty() throws JAXBException, IOException {
         Success success = new Success();
-        xmlParser.parseToXML(success, file);
-        fileExchanger.sendFile(out, file);
+        fileExchanger.sendFile(out, xmlParser.parseToXML(success));
     }
 
-    private void errorSend(String reason, File file) throws JAXBException, IOException {
+    private void errorSend(String reason) throws JAXBException, IOException {
         Error error = new Error();
         error.setMessage(reason);
-        xmlParser.parseToXML(error, file);
-        fileExchanger.sendFile(out, file);
+        fileExchanger.sendFile(out, xmlParser.parseToXML(error));
     }
 
-    private void logoutCommand(File file) throws JAXBException, IOException {
+    private void logoutCommand() throws JAXBException, IOException {
         Event event = new Event();
         event.setEvent("userlogout");
-        event.setName(userName);
-        xmlParser.parseToXML(event, file);
-        serverSender.sendToAll(file);
-        successSendEmpty(file);
+        event.setName(username);
+        serverSender.sendToAll(xmlParser.parseToXML(event));
+        successSendEmpty();
     }
 }

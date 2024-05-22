@@ -15,7 +15,7 @@ public class ServerMain {
 
     private final static int port = 8886;
 
-    public static void main(String[] args) {
+    public static void main() {
 
         List<Socket> clientSockets = new ArrayList<>();
 
@@ -25,12 +25,14 @@ public class ServerMain {
 
         Map<String, Integer> usersDataBase = new HashMap<>();
 
+        List<String> connectedUsers = new ArrayList<>();
+
         System.out.println("Port to connect: " + port);
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 clientSockets.add(clientSocket);
-                new ServerThread(clientSocket, fileExchanger, xmlParser, serverSender, usersDataBase).start();
+                new ServerThread(clientSocket, fileExchanger, xmlParser, serverSender, usersDataBase, connectedUsers).start();
             }
 
         } catch (IOException e) {

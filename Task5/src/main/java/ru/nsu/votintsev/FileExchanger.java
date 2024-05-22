@@ -20,11 +20,16 @@ public class FileExchanger {
         StringBuilder stringBuilder = new StringBuilder();
 
         while ((bytesRead = in.read(buffer)) != -1) {
-            if (messageReadedLength > messageLength)
-                throw new WrongLengthMessageException();
-            stringBuilder.append(new String(buffer, 0, bytesRead));
+
             messageReadedLength += bytesRead;
-            if (bytesRead == messageLength)
+
+            if (messageReadedLength > messageLength) {
+                throw new WrongLengthMessageException();
+            }
+
+            stringBuilder.append(new String(buffer, 0, bytesRead));
+
+            if (messageReadedLength == messageLength)
                 break;
         }
 

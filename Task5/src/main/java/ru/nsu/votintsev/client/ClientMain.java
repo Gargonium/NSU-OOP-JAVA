@@ -8,10 +8,11 @@ import java.net.Socket;
 
 public class ClientMain {
     public static void main() {
-        try (Socket socket = new Socket("localhost", 8886)) {
+        try {
+            Socket socket = new Socket("localhost", 8886);
             ClientController clientController = new ClientController();
             new Client(socket, clientController).run();
-            SwingUtilities.invokeLater(() -> new ClientView(clientController));
+            SwingUtilities.invokeLater(() -> new ClientView(clientController, socket));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

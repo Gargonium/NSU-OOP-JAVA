@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class ClientReceiver implements Runnable, Observable {
     private final Socket socket;
@@ -47,14 +48,23 @@ public class ClientReceiver implements Runnable, Observable {
                         }
                     }
                     case Success success -> {
+                        notifyObservers(ViewEvents.SUCCESS);
                         if (success.getUsers() != null)
                             userListReceived(success);
                     }
-                    case Error error -> System.out.printf(error.getMessage());
+                    case Error error -> {
+                        if (Objects.equals(error.getMessage(), "Wrong password") || Objects.equals(error.getMessage(), "Invalid name"))
+                            notifyObservers(ViewEvents.LOGIN_ERROR);
+                        System.out.printf(error.getMessage());
+                    }
                     default -> System.out.println("Unknown xmlBlock");
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                if (Objects.equals(e.getMessage(), "Connection reset") || Objects.equals(e.getMessage(), "Socket closed")) {
+                    System.exit(1);
+                }
+                else
+                    throw new RuntimeException(e);
             }
         }
     }
