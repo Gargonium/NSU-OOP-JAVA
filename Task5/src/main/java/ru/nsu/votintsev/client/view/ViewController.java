@@ -1,13 +1,19 @@
 package ru.nsu.votintsev.client.view;
 
+import com.ibm.icu.text.CharsetDetector;
+import com.ibm.icu.text.CharsetMatch;
 import jakarta.xml.bind.JAXBException;
 import ru.nsu.votintsev.client.ClientSender;
 
 import javax.swing.*;
 import java.awt.event.*;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class ViewController implements ActionListener {
     private final JTextField usernameField;
@@ -144,12 +150,23 @@ public class ViewController implements ActionListener {
         clientSender.sendListCommand();
     }
 
-    private void sendFile() {
+    private void sendFile() throws JAXBException, IOException {
         JFileChooser fileChooser = new JFileChooser();
         int result = fileChooser.showOpenDialog(clientView);
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
-            // TODO: Отправить файл серверу
+
+            byte[] fileData = new byte[(int) selectedFile.length()];
+            DataInputStream dis = new DataInputStream(new FileInputStream(selectedFile));
+            dis.readFully(fileData);
+            dis.close();
+
+            CharsetMatch match = new CharsetDetector().setText(fileData).detect();
+            clientSender.sendUploadCommand(selectedFile.getName(), Files.probeContentType(Path.of(selectedFile.getPath())), match.getName() ,selectedFile);
         }
+    }
+
+    public void requestFile(Integer id) throws JAXBException, IOException {
+        clientSender.sendDownloadCommand(id);
     }
 }

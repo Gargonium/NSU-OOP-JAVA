@@ -1,5 +1,6 @@
 package ru.nsu.votintsev.client.view;
 
+import jakarta.xml.bind.JAXBException;
 import org.pushingpixels.substance.api.skin.SubstanceGraphiteAquaLookAndFeel;
 import ru.nsu.votintsev.client.ClientController;
 import ru.nsu.votintsev.client.Observer;
@@ -86,6 +87,8 @@ public class ClientView extends JFrame implements Observer {
                 }
             }
             case LOGIN_ERROR -> viewController.loginErrorReceived();
+            case FILE_RECEIVED -> SwingUtilities.invokeLater(() -> saveFile(clientController.getFile()));
+            case SOMEONE_SEND_FILE -> SwingUtilities.invokeLater(() -> displayFile(clientController.getFileName(), clientController.getFileSize(), clientController.getFrom(), clientController.getId()));
         }
     }
 
@@ -128,12 +131,27 @@ public class ClientView extends JFrame implements Observer {
         }
     }
 
-    private void displayFile(File file, String sender) {
+    private void saveFile(File file) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setSelectedFile(new File(file.getName()));
+        int returnValue = fileChooser.showSaveDialog(ClientView.this);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File destinationFile = fileChooser.getSelectedFile();
+            try {
+                Files.copy(file.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                JOptionPane.showMessageDialog(ClientView.this, "File saved successfully.");
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(ClientView.this, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void displayFile(String fileName, long fileSize, String sender, Integer id) {
         JPanel filePanel = new JPanel();
         filePanel.setLayout(new BorderLayout());
 
-        Icon blackDownloadArrowIcon = new ImageIcon(Objects.requireNonNull(Object.class.getResource("blackDownloadArrow.png")));
-        Icon greenDownloadArrowIcon = new ImageIcon(Objects.requireNonNull(Object.class.getResource("greenDownloadArrow.png")));
+        Icon blackDownloadArrowIcon = new ImageIcon(Objects.requireNonNull(this.getClass().getClassLoader().getResource("blackDownloadArrow.png")));
+        Icon greenDownloadArrowIcon = new ImageIcon((Objects.requireNonNull(this.getClass().getClassLoader().getResource("greenDownloadArrow.png"))));
 
         JLabel iconLabel = new JLabel(blackDownloadArrowIcon);
         iconLabel.setPreferredSize(new Dimension(50, 50));
@@ -142,8 +160,8 @@ public class ClientView extends JFrame implements Observer {
         JPanel textPanel = new JPanel();
         textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
 
-        JLabel nameLabel = new JLabel("File: " + file.getName());
-        JLabel sizeLabel = new JLabel("Size: " + file.length() / 1024 + " KB");
+        JLabel nameLabel = new JLabel("File: " + fileName);
+        JLabel sizeLabel = new JLabel("Size: " + fileSize / 1024 + " Kb");
         JLabel senderLabel = new JLabel("Sent by: " + sender);
 
         textPanel.add(nameLabel);
@@ -166,18 +184,10 @@ public class ClientView extends JFrame implements Observer {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                // TODO: Переделать. Нужно запрашивать файлы у сервера
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setSelectedFile(new File(file.getName()));
-                int returnValue = fileChooser.showSaveDialog(ClientView.this);
-                if (returnValue == JFileChooser.APPROVE_OPTION) {
-                    File destinationFile = fileChooser.getSelectedFile();
-                    try {
-                        Files.copy(file.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        JOptionPane.showMessageDialog(ClientView.this, "File saved successfully.");
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(ClientView.this, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                    }
+                try {
+                    viewController.requestFile(id);
+                } catch (JAXBException | IOException ex) {
+                    throw new RuntimeException(ex);
                 }
             }
         });

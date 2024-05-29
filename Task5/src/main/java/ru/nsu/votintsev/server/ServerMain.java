@@ -3,11 +3,13 @@ package ru.nsu.votintsev.server;
 import ru.nsu.votintsev.FileExchanger;
 import ru.nsu.votintsev.XMLParser;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ServerMain {
 
@@ -27,6 +29,13 @@ public class ServerMain {
 
         FileWriter logFileWriter = null;
 
+        AtomicInteger fileId = new AtomicInteger(0);
+
+        List<String> fileNames = new ArrayList<>();
+        List<String> mimeTypes = new ArrayList<>();
+        List<String> encodings = new ArrayList<>();
+        List<File> files = new ArrayList<>();
+
         System.out.println("Port to connect: " + port);
         try (ServerSocket serverSocket = new ServerSocket(port)) {
 
@@ -39,7 +48,8 @@ public class ServerMain {
                 try {
                     Socket clientSocket = serverSocket.accept();
                     clientSockets.add(clientSocket);
-                    serverThread = new ServerThread(clientSocket, fileExchanger, xmlParser, serverSender, usersDataBase, connectedUsers, lastMessages);
+                    serverThread = new ServerThread(clientSocket, fileExchanger, xmlParser, serverSender, usersDataBase, connectedUsers, lastMessages, logFileWriter, fileId);
+                    serverThread.setListsForFiles(fileNames, mimeTypes, encodings, files);
                     serverThread.start();
                 } catch (IOException e) {
                     serverThread.interrupt();
@@ -47,8 +57,10 @@ public class ServerMain {
             }
         } catch (IOException e) {
             try {
-                logFileWriter.append("Server crashed " + e.getMessage() + "\n");
+                assert logFileWriter != null;
+                logFileWriter.append("Server crashed ").append(e.getMessage()).append("\n");
                 logFileWriter.flush();
+                logFileWriter.close();
             } catch (IOException ex) {
                 throw new RuntimeException(e);
             }

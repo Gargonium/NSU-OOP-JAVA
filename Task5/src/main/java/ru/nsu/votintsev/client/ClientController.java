@@ -4,6 +4,7 @@ import ru.nsu.votintsev.client.view.MessageType;
 import ru.nsu.votintsev.client.view.ViewEvents;
 import ru.nsu.votintsev.xmlclasses.Users;
 
+import java.io.File;
 import java.util.Map;
 
 public class ClientController implements Observer, Observable {
@@ -45,5 +46,25 @@ public class ClientController implements Observer, Observable {
     @Override
     public void notifyObservers(ViewEvents change) {
         observer.update(change);
+    }
+
+    public File getFile() {
+        return clientReceiver.getReceivedFile();
+    }
+
+    public String getFrom() {
+        return clientReceiver.getFileSender();
+    }
+
+    public Integer getId() {
+        return clientReceiver.getFileId();
+    }
+
+    public String getFileName() {
+        return clientReceiver.getFileName();
+    }
+
+    public long getFileSize() {
+        return clientReceiver.getFileSize();
     }
 }

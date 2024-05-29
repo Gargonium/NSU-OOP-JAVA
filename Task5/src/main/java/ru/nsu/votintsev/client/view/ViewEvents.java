@@ -5,5 +5,7 @@ public enum ViewEvents {
     USER_LIST_RECEIVED,
     NEED_USER_LIST,
     SUCCESS,
-    LOGIN_ERROR
+    LOGIN_ERROR,
+    FILE_RECEIVED,
+    SOMEONE_SEND_FILE
 }

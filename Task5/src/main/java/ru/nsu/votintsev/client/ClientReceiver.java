@@ -8,6 +8,7 @@ import ru.nsu.votintsev.xmlclasses.*;
 import ru.nsu.votintsev.xmlclasses.Error;
 
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
@@ -28,6 +29,12 @@ public class ClientReceiver implements Runnable, Observable {
 
     private boolean isLogin = false;
 
+    private File receivedFile;
+    private String fileSender;
+    private Integer fileId;
+    private String fileName;
+    private long fileSize;
+
     public ClientReceiver(Socket socket, XMLParser xmlParser, FileExchanger fileExchanger) throws IOException {
         this.socket = socket;
         this.xmlParser = xmlParser;
@@ -47,6 +54,7 @@ public class ClientReceiver implements Runnable, Observable {
                                 case "message" -> messageEvent(event);
                                 case "userlogin" -> userLoginEvent(event);
                                 case "userlogout" -> userLogoutEvent(event);
+                                case "file" -> fileEvent(event);
                                 default -> System.out.println("Unknown event: " + event.getEvent());
                             }
                     }
@@ -56,6 +64,8 @@ public class ClientReceiver implements Runnable, Observable {
                             isLogin = true;
                         if (success.getUsers() != null)
                             userListReceived(success);
+                        else if (success.getContent() != null)
+                            fileReceived(success);
                     }
                     case Error error -> {
                         if (Objects.equals(error.getMessage(), "Wrong password") || Objects.equals(error.getMessage(), "Invalid name"))
@@ -74,6 +84,26 @@ public class ClientReceiver implements Runnable, Observable {
                 }
             }
         }
+    }
+
+    public Map<String, MessageType> getMessageBuffer() {
+        Map<String, MessageType> temp = new HashMap<>(messageBuffer);
+        messageBuffer.clear();
+        return temp;
+    }
+
+    public Users getUsers() {
+        return users;
+    }
+
+    @Override
+    public void addObserver(Observer observer) {
+        this.observer = observer;
+    }
+
+    @Override
+    public void notifyObservers(ViewEvents change) {
+        observer.update(change);
     }
 
     private void messageEvent(Event event) {
@@ -96,23 +126,38 @@ public class ClientReceiver implements Runnable, Observable {
         notifyObservers(ViewEvents.USER_LIST_RECEIVED);
     }
 
-    public Map<String, MessageType> getMessageBuffer() {
-        Map<String, MessageType> temp = new HashMap<>(messageBuffer);
-        messageBuffer.clear();
-        return temp;
+    private void fileEvent(Event event) {
+        fileId = event.getId();
+        fileSender = event.getFrom();
+        fileName = event.getName();
+        fileSize = event.getSize();
+        notifyObservers(ViewEvents.SOMEONE_SEND_FILE);
     }
 
-    public Users getUsers() {
-        return users;
+    private void fileReceived(Success success) {
+        fileId = success.getId();
+        fileName = success.getName();
+        receivedFile = success.getContent();
+        notifyObservers(ViewEvents.FILE_RECEIVED);
     }
 
-    @Override
-    public void addObserver(Observer observer) {
-        this.observer = observer;
+    public File getReceivedFile() {
+        return receivedFile;
     }
 
-    @Override
-    public void notifyObservers(ViewEvents change) {
-        observer.update(change);
+    public String getFileSender() {
+        return fileSender;
+    }
+
+    public Integer getFileId() {
+        return fileId;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public long getFileSize() {
+        return fileSize;
     }
 }
