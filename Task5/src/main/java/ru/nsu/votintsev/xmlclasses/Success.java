@@ -3,8 +3,6 @@ package ru.nsu.votintsev.xmlclasses;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
-import java.io.File;
-
 @XmlRootElement
 public non-sealed class Success extends ClientClasses {
     private Users users = null;
@@ -13,7 +11,7 @@ public non-sealed class Success extends ClientClasses {
     private String name;
     private String mimeType;
     private String encoding;
-    private File content;
+    private byte[] content;
 
     public Users getUsers() {
         return users;
@@ -60,12 +58,12 @@ public non-sealed class Success extends ClientClasses {
         this.encoding = encoding;
     }
 
-    public File getContent() {
+    public byte[] getContent() {
         return content;
     }
 
     @XmlElement(name="content")
-    public void setContent(File content) {
+    public void setContent(byte[] content) {
         this.content = content;
     }
 }

@@ -156,13 +156,17 @@ public class ViewController implements ActionListener {
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
 
+            FileInputStream fis = new FileInputStream(selectedFile);
+            byte[] bytes = new byte[(int) selectedFile.length()];
+            fis.read(bytes);
+
             byte[] fileData = new byte[(int) selectedFile.length()];
             DataInputStream dis = new DataInputStream(new FileInputStream(selectedFile));
             dis.readFully(fileData);
             dis.close();
 
             CharsetMatch match = new CharsetDetector().setText(fileData).detect();
-            clientSender.sendUploadCommand(selectedFile.getName(), Files.probeContentType(Path.of(selectedFile.getPath())), match.getName() ,selectedFile);
+            clientSender.sendUploadCommand(selectedFile.getName(), Files.probeContentType(Path.of(selectedFile.getPath())), match.getName(), bytes);
         }
     }
 

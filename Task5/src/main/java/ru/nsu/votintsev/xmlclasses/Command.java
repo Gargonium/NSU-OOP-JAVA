@@ -5,8 +5,6 @@ import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
-import java.io.File;
-
 @XmlRootElement
 public class Command {
     private String command;
@@ -17,7 +15,7 @@ public class Command {
 
     private String mimeType;
     private String encoding;
-    private File content;
+    private byte[] content;
     private Integer id;
 
     public String getCommand() {
@@ -74,12 +72,12 @@ public class Command {
         this.encoding = encoding;
     }
 
-    public File getContent() {
+    public byte[] getContent() {
         return content;
     }
 
     @XmlElement(name="content")
-    public void setContent(File content) {
+    public void setContent(byte[] content) {
         this.content = content;
     }
 

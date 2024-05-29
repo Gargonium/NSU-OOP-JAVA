@@ -6,7 +6,6 @@ import ru.nsu.votintsev.XMLParser;
 import ru.nsu.votintsev.xmlclasses.Command;
 
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -48,7 +47,7 @@ public class ClientSender {
         fileExchanger.sendFile(outputStream, xmlParser.parseToXML(command));
     }
 
-    public void sendUploadCommand(String fileName, String mimeType, String encoding, File content) throws JAXBException, IOException {
+    public void sendUploadCommand(String fileName, String mimeType, String encoding, byte[] content) throws JAXBException, IOException {
         Command command = new Command();
         command.setCommand("upload");
         command.setName(fileName);

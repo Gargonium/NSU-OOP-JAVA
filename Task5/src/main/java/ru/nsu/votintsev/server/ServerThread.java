@@ -36,7 +36,7 @@ class ServerThread extends Thread {
     private List<String> fileNames;
     private List<String> mimeTypes;
     private List<String> encodings;
-    private List<File> files;
+    private List<byte[]> files;
 
     public ServerThread(Socket clientSocket, FileExchanger fileExchanger, XMLParser xmlParser, ServerSender serverSender, Map<String, Integer> usersDataBase, List<String> connectedUsers, Queue<String> lastMessages, FileWriter logFileWriter, AtomicInteger fileId) throws IOException {
         this.clientSocket = clientSocket;
@@ -56,7 +56,7 @@ class ServerThread extends Thread {
         }
     }
 
-    public void setListsForFiles(List<String> fileNames, List<String> mimeTypes, List<String> encodings, List<File> files) {
+    public void setListsForFiles(List<String> fileNames, List<String> mimeTypes, List<String> encodings, List<byte[]> files) {
         this.fileNames = fileNames;
         this.mimeTypes = mimeTypes;
         this.encodings = encodings;
@@ -214,7 +214,7 @@ class ServerThread extends Thread {
     private void uploadCommand(Command command) throws JAXBException, IOException {
         try {
 
-            long size = command.getContent().length();
+            long size = command.getContent().length;
 
             if (size == 0) {
                 errorSend("File is empty");
@@ -241,7 +241,7 @@ class ServerThread extends Thread {
             event.setId(currentFileId);
             event.setFrom(username);
             event.setName(fileNames.get(currentFileId));
-            event.setSize(files.get(currentFileId).length());
+            event.setSize(files.get(currentFileId).length);
             event.setMimeType(mimeTypes.get(currentFileId));
             serverSender.sendToAll(xmlParser.parseToXML(event));
 

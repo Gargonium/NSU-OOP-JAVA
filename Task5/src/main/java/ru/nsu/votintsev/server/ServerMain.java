@@ -3,7 +3,6 @@ package ru.nsu.votintsev.server;
 import ru.nsu.votintsev.FileExchanger;
 import ru.nsu.votintsev.XMLParser;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -34,7 +33,7 @@ public class ServerMain {
         List<String> fileNames = new ArrayList<>();
         List<String> mimeTypes = new ArrayList<>();
         List<String> encodings = new ArrayList<>();
-        List<File> files = new ArrayList<>();
+        List<byte[]> files = new ArrayList<>();
 
         System.out.println("Port to connect: " + port);
         try (ServerSocket serverSocket = new ServerSocket(port)) {

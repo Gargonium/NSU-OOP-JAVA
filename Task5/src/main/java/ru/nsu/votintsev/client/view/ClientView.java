@@ -9,8 +9,10 @@ import ru.nsu.votintsev.xmlclasses.Users;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.Files;
@@ -87,7 +89,7 @@ public class ClientView extends JFrame implements Observer {
                 }
             }
             case LOGIN_ERROR -> viewController.loginErrorReceived();
-            case FILE_RECEIVED -> SwingUtilities.invokeLater(() -> saveFile(clientController.getFile()));
+            case FILE_RECEIVED -> SwingUtilities.invokeLater(() -> saveFile(clientController.getFile(), clientController.getFileName()));
             case SOMEONE_SEND_FILE -> SwingUtilities.invokeLater(() -> displayFile(clientController.getFileName(), clientController.getFileSize(), clientController.getFrom(), clientController.getId()));
         }
     }
@@ -131,7 +133,15 @@ public class ClientView extends JFrame implements Observer {
         }
     }
 
-    private void saveFile(File file) {
+    private void saveFile(byte[] bytes, String fileName) {
+        File file = new File(fileName);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(bytes);
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setSelectedFile(new File(file.getName()));
         int returnValue = fileChooser.showSaveDialog(ClientView.this);
@@ -144,6 +154,7 @@ public class ClientView extends JFrame implements Observer {
                 JOptionPane.showMessageDialog(ClientView.this, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
+        file.delete();
     }
 
     private void displayFile(String fileName, long fileSize, String sender, Integer id) {

@@ -20,7 +20,7 @@ public class FileExchanger {
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        while ((bytesRead = in.read(buffer, 0, (int) messageLength)) != -1) {
+        while ((bytesRead = in.read(buffer)) != -1) {
 
             messageReadedLength += bytesRead;
 

@@ -4,11 +4,10 @@ import ru.nsu.votintsev.FileExchanger;
 import ru.nsu.votintsev.XMLParser;
 import ru.nsu.votintsev.client.view.MessageType;
 import ru.nsu.votintsev.client.view.ViewEvents;
-import ru.nsu.votintsev.xmlclasses.*;
 import ru.nsu.votintsev.xmlclasses.Error;
+import ru.nsu.votintsev.xmlclasses.*;
 
 import java.io.DataInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
@@ -29,7 +28,7 @@ public class ClientReceiver implements Runnable, Observable {
 
     private boolean isLogin = false;
 
-    private File receivedFile;
+    private byte[] receivedFile;
     private String fileSender;
     private Integer fileId;
     private String fileName;
@@ -141,7 +140,7 @@ public class ClientReceiver implements Runnable, Observable {
         notifyObservers(ViewEvents.FILE_RECEIVED);
     }
 
-    public File getReceivedFile() {
+    public byte[] getReceivedFile() {
         return receivedFile;
     }
 
