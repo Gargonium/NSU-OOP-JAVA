@@ -13,9 +13,8 @@ import java.util.Map;
 
 public class ServerMain {
 
-    private final static int port = 8886;
-
-    public static void main() {
+    public static void main(String[] args) {
+        int port = Integer.parseInt(args[0]);
 
         List<Socket> clientSockets = new ArrayList<>();
 
@@ -30,9 +29,15 @@ public class ServerMain {
         System.out.println("Port to connect: " + port);
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             while (true) {
-                Socket clientSocket = serverSocket.accept();
-                clientSockets.add(clientSocket);
-                new ServerThread(clientSocket, fileExchanger, xmlParser, serverSender, usersDataBase, connectedUsers).start();
+                ServerThread serverThread = null;
+                try {
+                    Socket clientSocket = serverSocket.accept();
+                    clientSockets.add(clientSocket);
+                    serverThread = new ServerThread(clientSocket, fileExchanger, xmlParser, serverSender, usersDataBase, connectedUsers);
+                    serverThread.start();
+                } catch (IOException e) {
+                    serverThread.interrupt();
+                }
             }
 
         } catch (IOException e) {

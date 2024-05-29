@@ -6,6 +6,7 @@ import java.io.*;
 
 public class FileExchanger {
     public void sendFile(DataOutputStream out, String xmlString) throws IOException {
+        System.out.println("Send: " + xmlString);
         out.writeInt(xmlString.length());
         out.writeBytes(xmlString);
         out.flush();
@@ -19,20 +20,21 @@ public class FileExchanger {
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        while ((bytesRead = in.read(buffer)) != -1) {
+        while ((bytesRead = in.read(buffer, 0, (int) messageLength)) != -1) {
 
             messageReadedLength += bytesRead;
 
-            if (messageReadedLength > messageLength) {
-                throw new WrongLengthMessageException();
-            }
-
             stringBuilder.append(new String(buffer, 0, bytesRead));
+
+            if (messageReadedLength > messageLength) {
+                System.out.println("Must: " + messageLength + "\nReaded: " + messageReadedLength + "\n" + stringBuilder);
+                //throw new WrongLengthMessageException();
+            }
 
             if (messageReadedLength == messageLength)
                 break;
         }
-
+        System.out.println("Received: " + stringBuilder);
         return stringBuilder.toString();
     }
 }

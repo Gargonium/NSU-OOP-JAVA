@@ -77,7 +77,14 @@ public class ClientView extends JFrame implements Observer {
                 userList = clientController.getUserList();
                 SwingUtilities.invokeLater(this::displayUserList);
             }
-            case SUCCESS -> viewController.successReceived();
+            case SUCCESS -> {
+                try {
+                    viewController.successReceived();
+                }
+                catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             case LOGIN_ERROR -> viewController.loginErrorReceived();
         }
     }
@@ -145,7 +152,6 @@ public class ClientView extends JFrame implements Observer {
 
         filePanel.add(textPanel, BorderLayout.CENTER);
 
-        // Добавляем слушатель событий для наведения мыши
         filePanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {

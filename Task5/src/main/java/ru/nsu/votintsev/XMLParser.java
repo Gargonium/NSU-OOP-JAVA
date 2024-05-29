@@ -5,7 +5,6 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 
-import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
 
@@ -13,6 +12,7 @@ public class XMLParser {
     public String parseToXML(Object objectToWrite) throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(objectToWrite.getClass());
         Marshaller marshaller = context.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_ENCODING, "windows-1252");
         synchronized (marshaller) {
             StringWriter stringWriter = new StringWriter();
             marshaller.marshal(objectToWrite, stringWriter);

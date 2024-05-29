@@ -7,21 +7,36 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class Client {
-    private final ClientSender clientSender;
-    private final ClientReceiver clientReceiver;
+    private ClientSender clientSender;
+    private ClientReceiver clientReceiver;
 
-    public Client(Socket socket, ClientController clientController) throws IOException {
-        XMLParser xmlParser = new XMLParser();
-        FileExchanger fileExchanger = new FileExchanger();
+    private final ClientController clientController;
+    private final XMLParser xmlParser;
+    private final FileExchanger fileExchanger;
+    private Socket socket;
+
+    public Client(ClientController clientController) throws IOException {
+        xmlParser = new XMLParser();
+        fileExchanger = new FileExchanger();
+        this.clientController = clientController;
+    }
+
+    public void run() throws IOException {
         clientSender = new ClientSender(socket, xmlParser, fileExchanger);
         clientReceiver = new ClientReceiver(socket, xmlParser, fileExchanger);
 
         clientReceiver.addObserver(clientController);
         clientController.setClientReceiver(clientReceiver);
         clientController.setClientSender(clientSender);
+
+        new Thread(clientReceiver).start();
     }
 
-    public void run() {
-        new Thread(clientReceiver).start();
+    public Socket getSocket() {
+        return socket;
+    }
+
+    public void connect(String host, int port) throws IOException {
+        socket = new Socket(host, port);
     }
 }

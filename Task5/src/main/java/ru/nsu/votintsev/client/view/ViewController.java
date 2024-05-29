@@ -25,6 +25,7 @@ public class ViewController implements ActionListener {
     private Socket socket;
 
     private boolean isAuthenticated = false;
+    private boolean needToDispose = false;
 
     public ViewController(JTextField usernameField, JPasswordField passwordField, JButton loginButton, JButton sendFileButton, JButton sendButton, JButton userListButton, JTextField messageField) {
         this.usernameField = usernameField;
@@ -79,8 +80,7 @@ public class ViewController implements ActionListener {
             public void windowClosing(WindowEvent e) {
                 try {
                     clientSender.sendLogoutCommand();
-                    clientView.dispose();
-                    socket.close();
+                    needToDispose = true;
                 } catch (JAXBException | IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -113,10 +113,14 @@ public class ViewController implements ActionListener {
         }
     }
 
-    public void successReceived() {
+    public void successReceived() throws IOException {
         if (!isAuthenticated) {
             clientView.showChatPanel();
             isAuthenticated = true;
+        }
+        if (needToDispose) {
+            clientView.dispose();
+            socket.close();
         }
     }
 

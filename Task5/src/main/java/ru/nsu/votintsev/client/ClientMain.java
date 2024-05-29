@@ -4,15 +4,19 @@ import ru.nsu.votintsev.client.view.ClientView;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.net.Socket;
 
 public class ClientMain {
+
+    private final static String host = "localhost";
+    private final static int port = 8886;
+
     public static void main() {
         try {
-            Socket socket = new Socket("localhost", 8886);
             ClientController clientController = new ClientController();
-            new Client(socket, clientController).run();
-            SwingUtilities.invokeLater(() -> new ClientView(clientController, socket));
+            Client client = new Client(clientController);
+            client.connect(host, port);
+            client.run();
+            SwingUtilities.invokeLater(() -> new ClientView(clientController, client.getSocket()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

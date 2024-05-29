@@ -26,6 +26,8 @@ public class ClientReceiver implements Runnable, Observable {
     private final Map<String, MessageType> messageBuffer = new HashMap<>();
     private Users users;
 
+    private boolean isLogin = false;
+
     public ClientReceiver(Socket socket, XMLParser xmlParser, FileExchanger fileExchanger) throws IOException {
         this.socket = socket;
         this.xmlParser = xmlParser;
@@ -41,7 +43,10 @@ public class ClientReceiver implements Runnable, Observable {
                 switch (clientClasses.parseFromXML(xmlParser, xmlString)) {
                     case Event event -> {
                         switch (event.getEvent()) {
-                            case "message" -> messageEvent(event);
+                            case "message" -> {
+                                if (isLogin)
+                                    messageEvent(event);
+                            }
                             case "userlogin" -> userLoginEvent(event);
                             case "userlogout" -> userLogoutEvent(event);
                             default -> System.out.println("Unknown event: " + event.getEvent());
@@ -49,6 +54,8 @@ public class ClientReceiver implements Runnable, Observable {
                     }
                     case Success success -> {
                         notifyObservers(ViewEvents.SUCCESS);
+                        if (!isLogin)
+                            isLogin = true;
                         if (success.getUsers() != null)
                             userListReceived(success);
                     }
@@ -60,11 +67,13 @@ public class ClientReceiver implements Runnable, Observable {
                     default -> System.out.println("Unknown xmlBlock");
                 }
             } catch (IOException e) {
-                if (Objects.equals(e.getMessage(), "Connection reset") || Objects.equals(e.getMessage(), "Socket closed")) {
+                if (Objects.equals(e.getMessage(), "Connection reset") || Objects.equals(e.getMessage(), "Socket is closed")) {
                     System.exit(1);
                 }
-                else
-                    throw new RuntimeException(e);
+                else {
+                    System.out.println(e.getMessage());
+                    System.exit(1);
+                }
             }
         }
     }

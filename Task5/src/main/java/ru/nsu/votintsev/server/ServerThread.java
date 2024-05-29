@@ -46,7 +46,7 @@ class ServerThread extends Thread {
 
     public void run() {
         try {
-            while (clientSocket.isConnected()) {
+            while (!clientSocket.isClosed()) {
                 try {
                     String xmlString = fileExchanger.receiveFile(in);
                     Command command = (Command) xmlParser.parseFromXML(Command.class, xmlString);
@@ -64,6 +64,13 @@ class ServerThread extends Thread {
         } catch (IOException e) {
             connectedUsers.remove(username);
             System.out.println(e.getMessage());
+            if (!clientSocket.isClosed()) {
+                try {
+                    clientSocket.close();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
         }
     }
 
@@ -148,5 +155,7 @@ class ServerThread extends Thread {
         event.setName(username);
         serverSender.sendToAll(xmlParser.parseToXML(event));
         successSendEmpty();
+        connectedUsers.remove(username);
+        Thread.currentThread().interrupt();
     }
 }
