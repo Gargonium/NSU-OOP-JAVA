@@ -42,15 +42,13 @@ public class ClientReceiver implements Runnable, Observable {
                 String xmlString = fileExchanger.receiveFile(inputStream);
                 switch (clientClasses.parseFromXML(xmlParser, xmlString)) {
                     case Event event -> {
-                        switch (event.getEvent()) {
-                            case "message" -> {
-                                if (isLogin)
-                                    messageEvent(event);
+                        if (isLogin)
+                            switch (event.getEvent()) {
+                                case "message" -> messageEvent(event);
+                                case "userlogin" -> userLoginEvent(event);
+                                case "userlogout" -> userLogoutEvent(event);
+                                default -> System.out.println("Unknown event: " + event.getEvent());
                             }
-                            case "userlogin" -> userLoginEvent(event);
-                            case "userlogout" -> userLogoutEvent(event);
-                            default -> System.out.println("Unknown event: " + event.getEvent());
-                        }
                     }
                     case Success success -> {
                         notifyObservers(ViewEvents.SUCCESS);

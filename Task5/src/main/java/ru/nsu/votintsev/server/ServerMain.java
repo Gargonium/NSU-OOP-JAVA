@@ -6,10 +6,7 @@ import ru.nsu.votintsev.XMLParser;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ServerMain {
 
@@ -17,10 +14,11 @@ public class ServerMain {
         int port = Integer.parseInt(args[0]);
 
         List<Socket> clientSockets = new ArrayList<>();
+        Queue<String> lastMessages = new LinkedList<>();
 
         FileExchanger fileExchanger = new FileExchanger();
         XMLParser xmlParser = new XMLParser();
-        ServerSender serverSender = new ServerSender(clientSockets, fileExchanger);
+        ServerSender serverSender = new ServerSender(clientSockets, fileExchanger, lastMessages);
 
         Map<String, Integer> usersDataBase = new HashMap<>();
 
@@ -33,7 +31,7 @@ public class ServerMain {
                 try {
                     Socket clientSocket = serverSocket.accept();
                     clientSockets.add(clientSocket);
-                    serverThread = new ServerThread(clientSocket, fileExchanger, xmlParser, serverSender, usersDataBase, connectedUsers);
+                    serverThread = new ServerThread(clientSocket, fileExchanger, xmlParser, serverSender, usersDataBase, connectedUsers, lastMessages);
                     serverThread.start();
                 } catch (IOException e) {
                     serverThread.interrupt();

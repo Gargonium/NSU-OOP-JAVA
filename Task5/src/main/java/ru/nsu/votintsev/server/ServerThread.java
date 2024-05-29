@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 class ServerThread extends Thread {
     private final Socket clientSocket;
@@ -28,14 +29,16 @@ class ServerThread extends Thread {
 
     private final Map<String, Integer> usersDataBase;
     private final List<String> connectedUsers;
+    private final Queue<String> lastMessages;
 
-    public ServerThread(Socket clientSocket, FileExchanger fileExchanger, XMLParser xmlParser, ServerSender serverSender, Map<String, Integer> usersDataBase, List<String> connectedUsers) {
+    public ServerThread(Socket clientSocket, FileExchanger fileExchanger, XMLParser xmlParser, ServerSender serverSender, Map<String, Integer> usersDataBase, List<String> connectedUsers, Queue<String> lastMessages) {
         this.clientSocket = clientSocket;
         this.fileExchanger = fileExchanger;
         this.xmlParser = xmlParser;
         this.serverSender = serverSender;
         this.usersDataBase = usersDataBase;
         this.connectedUsers = connectedUsers;
+        this.lastMessages = lastMessages;
         try {
             out = new DataOutputStream(clientSocket.getOutputStream());
             in = new DataInputStream(clientSocket.getInputStream());
@@ -79,8 +82,10 @@ class ServerThread extends Thread {
         passwordHash = command.getUserPassword().hashCode();
 
         if (usersDataBase.containsKey(username)) {
-            if (passwordHash == usersDataBase.get(username))
+            if (passwordHash == usersDataBase.get(username)) {
                 successSendEmpty();
+                sendLastMessages();
+            }
             else {
                 errorSend("Wrong password");
                 return;
@@ -95,6 +100,7 @@ class ServerThread extends Thread {
                 usersDataBase.put(username, passwordHash);
                 connectedUsers.add(username);
                 successSendEmpty();
+                sendLastMessages();
             }
         }
 
@@ -131,6 +137,7 @@ class ServerThread extends Thread {
             event.setEvent("message");
             event.setMessage(message);
             event.setFrom(username);
+
             serverSender.sendToAll(xmlParser.parseToXML(event));
         } catch (IOException | JAXBException e) {
             errorSend(e.getMessage());
@@ -157,5 +164,11 @@ class ServerThread extends Thread {
         successSendEmpty();
         connectedUsers.remove(username);
         Thread.currentThread().interrupt();
+    }
+
+    private void sendLastMessages() throws IOException {
+        for (String xmlString : lastMessages) {
+            fileExchanger.sendFile(out, xmlString);
+        }
     }
 }
