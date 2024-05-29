@@ -7,10 +7,10 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class Command {
-    private String command = "null";
-    private String userName = "null";
-    private String userPassword = "null";
-    private String message = "null";
+    private String command;
+    private String userName;
+    private String userPassword;
+    private String message;
 
     public String getCommand() {
         return command;

@@ -6,10 +6,10 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public non-sealed class Event extends ClientClasses {
-    private String event = "null";
-    private String message = "null";
-    private String from = "null";
-    private String name = "null";
+    private String event;
+    private String message;
+    private String from;
+    private String name;
 
     public String getEvent() {
         return event;

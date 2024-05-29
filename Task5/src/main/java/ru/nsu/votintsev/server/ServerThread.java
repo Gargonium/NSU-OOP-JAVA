@@ -8,6 +8,7 @@ import ru.nsu.votintsev.xmlclasses.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.List;
@@ -31,7 +32,9 @@ class ServerThread extends Thread {
     private final List<String> connectedUsers;
     private final Queue<String> lastMessages;
 
-    public ServerThread(Socket clientSocket, FileExchanger fileExchanger, XMLParser xmlParser, ServerSender serverSender, Map<String, Integer> usersDataBase, List<String> connectedUsers, Queue<String> lastMessages) {
+    private final FileWriter logFileWriter;
+
+    public ServerThread(Socket clientSocket, FileExchanger fileExchanger, XMLParser xmlParser, ServerSender serverSender, Map<String, Integer> usersDataBase, List<String> connectedUsers, Queue<String> lastMessages) throws IOException {
         this.clientSocket = clientSocket;
         this.fileExchanger = fileExchanger;
         this.xmlParser = xmlParser;
@@ -45,6 +48,7 @@ class ServerThread extends Thread {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        logFileWriter = new FileWriter("ServerLog.txt");
     }
 
     public void run() {
@@ -63,10 +67,10 @@ class ServerThread extends Thread {
                     System.out.println(e.getMessage());
                 }
             }
-            System.out.println(username + " dissconnect");
         } catch (IOException e) {
             connectedUsers.remove(username);
             System.out.println(e.getMessage());
+            try { logFileWriter.append("Server Thread got Error " + e.getMessage() + "\n"); logFileWriter.flush(); } catch (IOException ex) { throw new RuntimeException(ex); }
             if (!clientSocket.isClosed()) {
                 try {
                     clientSocket.close();
@@ -83,22 +87,30 @@ class ServerThread extends Thread {
 
         if (usersDataBase.containsKey(username)) {
             if (passwordHash == usersDataBase.get(username)) {
+                logFileWriter.append("Client login successful: " + username + "\n");
+                logFileWriter.flush();
                 successSendEmpty();
                 sendLastMessages();
             }
             else {
                 errorSend("Wrong password");
+                logFileWriter.append("Client login failed: " + username + " (Wrong Password)\n");
+                logFileWriter.flush();
                 return;
             }
         }
         else {
             if ((username.equals("Server")) || (username.isEmpty()) || (username.equals("null"))) {
                 errorSend("Invalid name");
+                logFileWriter.append("Client login failed: " + username + " (Invalid name)\n");
+                logFileWriter.flush();
                 return;
             }
             else {
                 usersDataBase.put(username, passwordHash);
                 connectedUsers.add(username);
+                logFileWriter.append("Client login successful: " + username + "\n");
+                logFileWriter.flush();
                 successSendEmpty();
                 sendLastMessages();
             }
@@ -118,6 +130,9 @@ class ServerThread extends Thread {
                 return user;
             }).toList();
 
+            logFileWriter.append("List of users for " + username + "\n");
+            logFileWriter.flush();
+
             Success success = new Success();
             Users users = new Users();
             users.setUsers(userList);
@@ -126,12 +141,16 @@ class ServerThread extends Thread {
             fileExchanger.sendFile(out, xmlParser.parseToXML(success));
         }
         catch (Exception e) {
+            logFileWriter.append("Error in giving list of users " + e.getMessage() + "\n");
+            logFileWriter.flush();
             errorSend(e.getMessage());
         }
     }
 
     private void messageCommand(Command command) throws JAXBException, IOException {
         String message = command.getMessage();
+        logFileWriter.append("Got message " + message + " From " + username + "\n");
+        logFileWriter.flush();
         try {
             Event event = new Event();
             event.setEvent("message");
@@ -140,6 +159,8 @@ class ServerThread extends Thread {
 
             serverSender.sendToAll(xmlParser.parseToXML(event));
         } catch (IOException | JAXBException e) {
+            logFileWriter.append("Error in giving message " + e.getMessage() + "\n");
+            logFileWriter.flush();
             errorSend(e.getMessage());
         }
         successSendEmpty();
@@ -160,6 +181,8 @@ class ServerThread extends Thread {
         Event event = new Event();
         event.setEvent("userlogout");
         event.setName(username);
+        logFileWriter.append("User logout: " + username + "\n");
+        logFileWriter.flush();
         serverSender.sendToAll(xmlParser.parseToXML(event));
         successSendEmpty();
         connectedUsers.remove(username);
@@ -170,5 +193,7 @@ class ServerThread extends Thread {
         for (String xmlString : lastMessages) {
             fileExchanger.sendFile(out, xmlString);
         }
+        logFileWriter.append("Send last messages\n");
+        logFileWriter.flush();
     }
 }

@@ -3,6 +3,7 @@ package ru.nsu.votintsev.server;
 import ru.nsu.votintsev.FileExchanger;
 import ru.nsu.votintsev.XMLParser;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -24,8 +25,15 @@ public class ServerMain {
 
         List<String> connectedUsers = new ArrayList<>();
 
+        FileWriter logFileWriter = null;
+
         System.out.println("Port to connect: " + port);
         try (ServerSocket serverSocket = new ServerSocket(port)) {
+
+            logFileWriter = new FileWriter("ServerLog.txt");
+            logFileWriter.append("Server online\n");
+            logFileWriter.flush();
+
             while (true) {
                 ServerThread serverThread = null;
                 try {
@@ -37,8 +45,13 @@ public class ServerMain {
                     serverThread.interrupt();
                 }
             }
-
         } catch (IOException e) {
+            try {
+                logFileWriter.append("Server crashed " + e.getMessage() + "\n");
+                logFileWriter.flush();
+            } catch (IOException ex) {
+                throw new RuntimeException(e);
+            }
             throw new RuntimeException(e);
         }
     }
