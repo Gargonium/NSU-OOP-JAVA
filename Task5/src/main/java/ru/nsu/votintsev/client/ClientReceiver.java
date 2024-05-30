@@ -15,10 +15,10 @@ import java.util.Map;
 import java.util.Objects;
 
 public class ClientReceiver implements Runnable, Observable {
-    private final Socket socket;
+    private Socket socket;
     private final XMLParser xmlParser;
     private final FileExchanger fileExchanger;
-    private final DataInputStream inputStream;
+    private DataInputStream inputStream;
 
     private final ClientClasses clientClasses = new ClientClasses();
     private Observer observer;
@@ -35,17 +35,14 @@ public class ClientReceiver implements Runnable, Observable {
     private String fileName;
     private long fileSize;
 
-    public ClientReceiver(Socket socket, XMLParser xmlParser, FileExchanger fileExchanger, DataInputStream inputStream) throws IOException {
-        this.socket = socket;
+    public ClientReceiver(XMLParser xmlParser, FileExchanger fileExchanger) throws IOException {
         this.xmlParser = xmlParser;
         this.fileExchanger = fileExchanger;
-        this.inputStream = inputStream;
     }
 
     @Override
     public void run() {
         while (!socket.isClosed()) {
-            System.out.println("CS " + socket.isClosed());
             try {
                 String xmlString = fileExchanger.receiveFile(inputStream);
                 switch (clientClasses.parseFromXML(xmlParser, xmlString)) {
@@ -76,7 +73,6 @@ public class ClientReceiver implements Runnable, Observable {
                     default -> System.out.println("Unknown xmlBlock");
                 }
             } catch (IOException e) {
-                System.out.println("CS " + socket.isClosed());
                 client.disconnect();
             }
         }
@@ -159,5 +155,13 @@ public class ClientReceiver implements Runnable, Observable {
 
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    public void setSocket(Socket socket) {
+        this.socket = socket;
+    }
+
+    public void setInputStream(DataInputStream in) {
+        this.inputStream = in;
     }
 }

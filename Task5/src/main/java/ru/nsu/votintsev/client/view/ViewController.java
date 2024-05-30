@@ -3,6 +3,8 @@ package ru.nsu.votintsev.client.view;
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
 import jakarta.xml.bind.JAXBException;
+import ru.nsu.votintsev.client.Client;
+import ru.nsu.votintsev.client.ClientController;
 import ru.nsu.votintsev.client.ClientSender;
 
 import javax.swing.*;
@@ -27,6 +29,12 @@ public class ViewController implements ActionListener {
     private final JButton userListButton;
     private final JTextField messageField;
 
+    private final JTextField ipField;
+    private final JTextField portField;
+    private final JButton connectButton;
+
+    private final Client client;
+
     private ClientView clientView;
     private ClientSender clientSender;
 
@@ -37,7 +45,7 @@ public class ViewController implements ActionListener {
 
     private List<JButton> muteButtons;
 
-    public ViewController(JTextField usernameField, JPasswordField passwordField, JButton loginButton, JButton sendFileButton, JButton sendButton, JButton userListButton, JTextField messageField) {
+    public ViewController(JTextField usernameField, JPasswordField passwordField, JButton loginButton, JButton sendFileButton, JButton sendButton, JButton userListButton, JTextField messageField, JTextField ipField, JTextField portField, JButton connectButton, Client client) {
         this.usernameField = usernameField;
         this.passwordField = passwordField;
         this.loginButton = loginButton;
@@ -45,6 +53,24 @@ public class ViewController implements ActionListener {
         this.sendButton = sendButton;
         this.userListButton = userListButton;
         this.messageField = messageField;
+        this.ipField = ipField;
+        this.portField = portField;
+        this.connectButton = connectButton;
+        this.client = client;
+
+        KeyListener connectKeyAdapter = new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    try {
+                        client.connect(ipField.getText(), Integer.parseInt(portField.getText()));
+                        clientView.showLoginPanel();
+                    } catch (IOException ex) {
+                        clientView.setErrorConnectLabel(ex.getMessage());
+                    }
+                }
+            }
+        };
 
         KeyListener loginKeyAdapter = new KeyAdapter() {
             @Override
@@ -72,11 +98,15 @@ public class ViewController implements ActionListener {
             }
         };
 
+        ipField.addKeyListener(connectKeyAdapter);
+        portField.addKeyListener(connectKeyAdapter);
+
         usernameField.addKeyListener(loginKeyAdapter);
         passwordField.addKeyListener(loginKeyAdapter);
 
         messageField.addKeyListener(messageKeyAdapter);
 
+        connectButton.addActionListener(this);
         sendFileButton.addActionListener(this);
         sendButton.addActionListener(this);
         userListButton.addActionListener(this);
@@ -92,12 +122,15 @@ public class ViewController implements ActionListener {
         clientView.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                try {
-                    clientSender.sendLogoutCommand();
-                    needToDispose = true;
-                } catch (JAXBException | IOException ex) {
-                    throw new RuntimeException(ex);
-                }
+                if (client.isConnected())
+                    try {
+                        clientSender.sendLogoutCommand();
+                        needToDispose = true;
+                    } catch (JAXBException | IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                else
+                    System.exit(0);
             }
         });
     }
@@ -113,7 +146,14 @@ public class ViewController implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            if (e.getSource() == loginButton)
+            if (e.getSource() == connectButton)
+                try {
+                    client.connect(ipField.getText(), Integer.parseInt(portField.getText()));
+                    clientView.showLoginPanel();
+                } catch (IOException ex) {
+                    clientView.setErrorConnectLabel(ex.getMessage());
+                }
+            else if (e.getSource() == loginButton)
                 login();
             else if (e.getSource() == sendFileButton)
                 sendFile();
@@ -137,7 +177,7 @@ public class ViewController implements ActionListener {
         }
         if (needToDispose) {
             clientView.dispose();
-            socket.close();
+            System.exit(1);
         }
     }
 

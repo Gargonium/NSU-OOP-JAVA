@@ -12,12 +12,11 @@ import java.net.Socket;
 public class ClientSender {
     private final XMLParser xmlParser;
     private final FileExchanger fileExchanger;
-    private final DataOutputStream outputStream;
+    private DataOutputStream outputStream;
 
-    public ClientSender(XMLParser xmlParser, FileExchanger fileExchanger, DataOutputStream outputStream) {
+    public ClientSender(XMLParser xmlParser, FileExchanger fileExchanger) {
         this.xmlParser = xmlParser;
         this.fileExchanger = fileExchanger;
-        this.outputStream = outputStream;
     }
 
     public void sendLoginCommand(String username, String password) throws JAXBException, IOException {
@@ -76,5 +75,9 @@ public class ClientSender {
         command.setCommand("mute");
         command.setName(target);
         fileExchanger.sendFile(outputStream, xmlParser.parseToXML(command));
+    }
+
+    public void setOutputStream(DataOutputStream out) {
+        this.outputStream = out;
     }
 }

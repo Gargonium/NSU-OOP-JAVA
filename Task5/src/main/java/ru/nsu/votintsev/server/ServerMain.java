@@ -67,7 +67,6 @@ public class ServerMain {
             } catch (IOException ex) {
                 throw new RuntimeException(e);
             }
-            throw new RuntimeException(e);
         }
     }
 

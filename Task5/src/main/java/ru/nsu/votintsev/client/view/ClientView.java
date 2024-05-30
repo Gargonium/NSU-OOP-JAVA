@@ -2,6 +2,7 @@ package ru.nsu.votintsev.client.view;
 
 import jakarta.xml.bind.JAXBException;
 import org.pushingpixels.substance.api.skin.SubstanceGraphiteAquaLookAndFeel;
+import ru.nsu.votintsev.client.Client;
 import ru.nsu.votintsev.client.ClientController;
 import ru.nsu.votintsev.client.Observer;
 import ru.nsu.votintsev.xmlclasses.Users;
@@ -24,6 +25,12 @@ import java.util.Set;
 public class ClientView extends JFrame implements Observer {
     private static final String LOGIN_PAGE = "login";
     private static final String CHAT_PAGE = "chat";
+    private static final String CONNECT_PAGE = "connect";
+
+    private JTextField ipField;
+    private JTextField portField;
+    private JButton connectButton;
+    private JLabel errorConnectLabel;
 
     private JTextField usernameField;
     private JPasswordField passwordField;
@@ -41,10 +48,13 @@ public class ClientView extends JFrame implements Observer {
     private final ClientController clientController;
     private final ViewController viewController;
 
+    private final Client client;
+
     private Users userList;
 
-    public ClientView(ClientController clientController, Socket socket) {
+    public ClientView(ClientController clientController, Socket socket, Client client) {
         this.clientController = clientController;
+        this.client = client;
         clientController.addObserver(this);
         setSize(600,400);
         setResizable(false);
@@ -59,17 +69,21 @@ public class ClientView extends JFrame implements Observer {
 
         initComponents();
 
-        viewController = new ViewController(usernameField, passwordField, loginButton, sendFileButton, sendButton, userListButton, messageField);
+        viewController = new ViewController(usernameField, passwordField, loginButton, sendFileButton, sendButton, userListButton, messageField, ipField, portField, connectButton, client);
         viewController.setView(this);
         viewController.setClientSender(clientController.getCLientSender());
         viewController.setSocket(socket);
 
-        showLoginPanel();
+        showConnectPanel();
         setVisible(true);
     }
 
     public void setErrorLoginLabel(String errorMessage) {
         errorLoginLabel.setText(errorMessage);
+    }
+
+    public void setErrorConnectLabel(String errorMessage) {
+        errorConnectLabel.setText(errorMessage);
     }
 
     @Override
@@ -99,9 +113,14 @@ public class ClientView extends JFrame implements Observer {
         ((CardLayout) getContentPane().getLayout()).show(getContentPane(), CHAT_PAGE);
     }
 
-    private void showLoginPanel() {
+    public void showLoginPanel() {
         setTitle("Login");
         ((CardLayout) getContentPane().getLayout()).show(getContentPane(), LOGIN_PAGE);
+    }
+
+    private void showConnectPanel() {
+        setTitle("Connect");
+        ((CardLayout) getContentPane().getLayout()).show(getContentPane(), CONNECT_PAGE);
     }
 
     private void displayUserList() {
@@ -206,6 +225,12 @@ public class ClientView extends JFrame implements Observer {
     }
 
     private void initComponents() {
+        ipField = new JTextField(20);
+        portField = new JTextField(20);
+        connectButton = new JButton("Connect");
+        errorConnectLabel = new JLabel();
+        errorConnectLabel.setForeground(Color.RED);
+
         usernameField = new JTextField(20);
         passwordField = new JPasswordField(20);
         loginButton = new JButton("Login");
@@ -267,7 +292,36 @@ public class ClientView extends JFrame implements Observer {
         gbc.gridy = 5;
         loginPanel.add(loginButton, gbc);
 
+        JPanel connectPanel = new JPanel();
+        connectPanel.setLayout(new GridBagLayout());
+
+        GridBagConstraints gbc1 = new GridBagConstraints();
+        gbc1.insets = new Insets(10, 10, 10, 10);
+        gbc1.gridx = 0;
+        gbc1.gridy = 0;
+        connectPanel.add(new JLabel("Ip:"), gbc1);
+        gbc1.gridx = 0;
+        gbc1.gridy = 1;
+        gbc1.fill = GridBagConstraints.HORIZONTAL;
+        connectPanel.add(ipField, gbc1);
+        gbc1.gridx = 0;
+        gbc1.gridy = 2;
+        gbc1.fill = GridBagConstraints.NONE;
+        connectPanel.add(new JLabel("Port:"), gbc1);
+        gbc1.gridx = 0;
+        gbc1.gridy = 3;
+        gbc1.fill = GridBagConstraints.HORIZONTAL;
+        connectPanel.add(portField, gbc1);
+        gbc1.gridx = 0;
+        gbc1.gridy = 4;
+        gbc1.fill = GridBagConstraints.NONE;
+        connectPanel.add(errorConnectLabel, gbc1);
+        gbc1.gridx = 0;
+        gbc1.gridy = 5;
+        connectPanel.add(connectButton, gbc1);
+
         getContentPane().setLayout(new CardLayout());
+        getContentPane().add(connectPanel, CONNECT_PAGE);
         getContentPane().add(loginPanel, LOGIN_PAGE);
         getContentPane().add(chatPanel, CHAT_PAGE);
     }

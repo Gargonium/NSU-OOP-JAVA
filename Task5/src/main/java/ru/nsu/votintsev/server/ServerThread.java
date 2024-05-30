@@ -64,9 +64,10 @@ class ServerThread extends Thread {
         this.encodings = encodings;
     }
 
+    @Override
     public void run() {
         try {
-            while (!clientSocket.isClosed()) {
+            while (true) {
                 String xmlString = fileExchanger.receiveFile(in);
                 Command command = (Command) xmlParser.parseFromXML(Command.class, xmlString);
                 switch (command.getCommand()) {
@@ -78,26 +79,36 @@ class ServerThread extends Thread {
                     case "upload" -> uploadCommand(command);
                     case "mute" -> muteUser(command);
                     case "unmute" -> unmuteUser(command);
+                    default -> errorSend("Unknown command");
                 }
             }
         }
         catch (EOFException e) {
             System.out.println("Client disconnect");
         }
-        catch (IOException | JAXBException e) {
-            System.out.println(e.getMessage());
+        catch (IOException e) {
+            System.out.println("Cant handle user connection " + e.getMessage());
+        }
+        catch (JAXBException e) {
+            try {
+                errorSend("Unknown xmlBlock");
+            } catch (JAXBException | IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
         finally {
-            if (username != null) {
-                connectedUsers.remove(username);
-                username = null;
-                try {
-                    clientSocket.close();
-                } catch (IOException e) {
-                    System.out.println("Error closing client connection");
-                    try { logFileWriter.append("Server Thread got Error ").append(e.getMessage()).append("\n"); logFileWriter.flush(); } catch (IOException ex) { throw new RuntimeException(ex); }
-                }
+            connectedUsers.remove(username);
+            username = null;
+
+            try {
+                in.close();
+                out.close();
+                clientSocket.close();
+            } catch (IOException e) {
+                System.out.println("Error closing client connection");
+                try { logFileWriter.append("Server Thread got Error ").append(e.getMessage()).append("\n"); logFileWriter.flush(); } catch (IOException ex) { throw new RuntimeException(ex); }
             }
+            Thread.currentThread().interrupt();
         }
     }
 

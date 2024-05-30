@@ -20,22 +20,26 @@ public class Client {
     private DataOutputStream out;
     private DataInputStream in;
 
+    private boolean isConnected = false;
+
     public Client(ClientController clientController) throws IOException {
         xmlParser = new XMLParser();
         fileExchanger = new FileExchanger();
         this.clientController = clientController;
-    }
-
-    public void run() throws IOException {
-        clientSender = new ClientSender(xmlParser, fileExchanger, out);
-        clientReceiver = new ClientReceiver(socket, xmlParser, fileExchanger, in);
-
+        clientSender = new ClientSender(xmlParser, fileExchanger);
+        clientReceiver = new ClientReceiver(xmlParser, fileExchanger);
         clientReceiver.addObserver(clientController);
         clientController.setClientReceiver(clientReceiver);
         clientController.setClientSender(clientSender);
 
         clientReceiver.setClient(this);
+    }
 
+    public void run() throws IOException {
+
+        clientSender.setOutputStream(out);
+        clientReceiver.setSocket(socket);
+        clientReceiver.setInputStream(in);
         new Thread(clientReceiver).start();
     }
 
@@ -47,6 +51,8 @@ public class Client {
         socket = new Socket(host, port);
         out = new DataOutputStream(socket.getOutputStream());
         in = new DataInputStream(socket.getInputStream());
+        isConnected = true;
+        run();
     }
 
     public void disconnect() {
@@ -58,5 +64,9 @@ public class Client {
         catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean isConnected() {
+        return isConnected;
     }
 }
