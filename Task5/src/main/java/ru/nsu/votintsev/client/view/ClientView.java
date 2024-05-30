@@ -8,7 +8,6 @@ import ru.nsu.votintsev.client.Observer;
 import ru.nsu.votintsev.xmlclasses.Users;
 
 import javax.swing.*;
-import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -16,7 +15,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.Objects;
@@ -175,8 +176,8 @@ public class ClientView extends JFrame implements Observer {
         JPanel filePanel = new JPanel();
         filePanel.setLayout(new BorderLayout());
 
-        Icon blackDownloadArrowIcon = new ImageIcon(Objects.requireNonNull(this.getClass().getClassLoader().getResource("blackDownloadArrow.png")));
-        Icon greenDownloadArrowIcon = new ImageIcon((Objects.requireNonNull(this.getClass().getClassLoader().getResource("greenDownloadArrow.png"))));
+        Icon blackDownloadArrowIcon = new ImageIcon("src/main/resources/blackDownloadArrow.png");
+        Icon greenDownloadArrowIcon = new ImageIcon("src/main/resources/greenDownloadArrow.png");
 
         JLabel iconLabel = new JLabel(blackDownloadArrowIcon);
         iconLabel.setPreferredSize(new Dimension(50, 50));

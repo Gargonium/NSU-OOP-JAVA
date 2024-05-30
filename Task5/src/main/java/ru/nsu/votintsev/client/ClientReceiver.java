@@ -10,6 +10,7 @@ import ru.nsu.votintsev.xmlclasses.*;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -129,7 +130,7 @@ public class ClientReceiver implements Runnable, Observable {
     private void fileReceived(Success success) {
         fileId = success.getId();
         fileName = success.getName();
-        receivedFile = success.getContent();
+        receivedFile = Base64.getDecoder().decode(success.getContent());
         notifyObservers(ViewEvents.FILE_RECEIVED);
     }
 

@@ -8,10 +8,7 @@ import ru.nsu.votintsev.xmlclasses.*;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 class ServerThread extends Thread {
@@ -283,6 +280,10 @@ class ServerThread extends Thread {
                 errorSend("File is too big");
                 return;
             }
+            if (!Objects.equals(command.getEncoding(), "base64")) {
+                errorSend("File must be base64 encode");
+                return;
+            }
 
             fileNames.add(command.getName());
             mimeTypes.add(command.getMimeType());
@@ -290,7 +291,8 @@ class ServerThread extends Thread {
 
             int currentFileId = fileId.getAndIncrement();
 
-            byte[] byteArray = command.getContent();
+            byte[] byteArray = Base64.getDecoder().decode(command.getContent());
+
             File file = new File(currentFileId + "");
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(byteArray);
@@ -334,7 +336,8 @@ class ServerThread extends Thread {
             FileInputStream fis = new FileInputStream(file);
             byte[] bytes = new byte[(int) file.length()];
             fis.read(bytes);
-            success.setContent(bytes);
+
+            success.setContent(Base64.getEncoder().encode(bytes));
             fis.close();
 
             fileExchanger.sendFile(out, xmlParser.parseToXML(success));

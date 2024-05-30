@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 
@@ -216,8 +217,7 @@ public class ViewController implements ActionListener {
             dis.readFully(fileData);
             dis.close();
 
-            CharsetMatch match = new CharsetDetector().setText(fileData).detect();
-            clientSender.sendUploadCommand(selectedFile.getName(), Files.probeContentType(Path.of(selectedFile.getPath())), match.getName(), bytes);
+            clientSender.sendUploadCommand(selectedFile.getName(), Files.probeContentType(Path.of(selectedFile.getPath())), "base64", Base64.getEncoder().encode(bytes));
         }
     }
 
