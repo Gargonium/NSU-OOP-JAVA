@@ -37,7 +37,6 @@ class ServerThread extends Thread {
     private List<String> fileNames;
     private List<String> mimeTypes;
     private List<String> encodings;
-    private List<byte[]> files;
 
     private final List<String> mutedUsers = new ArrayList<>();
 
@@ -59,11 +58,10 @@ class ServerThread extends Thread {
         }
     }
 
-    public void setListsForFiles(List<String> fileNames, List<String> mimeTypes, List<String> encodings, List<byte[]> files) {
+    public void setListsForFiles(List<String> fileNames, List<String> mimeTypes, List<String> encodings) {
         this.fileNames = fileNames;
         this.mimeTypes = mimeTypes;
         this.encodings = encodings;
-        this.files = files;
     }
 
     public void run() {
@@ -90,6 +88,7 @@ class ServerThread extends Thread {
             connectedUsers.remove(username);
             System.out.println(e.getMessage());
             try { logFileWriter.append("Server Thread got Error ").append(e.getMessage()).append("\n"); logFileWriter.flush(); } catch (IOException ex) { throw new RuntimeException(ex); }
+
             if (!clientSocket.isClosed()) {
                 try {
                     clientSocket.close();
@@ -279,9 +278,15 @@ class ServerThread extends Thread {
             fileNames.add(command.getName());
             mimeTypes.add(command.getMimeType());
             encodings.add(command.getEncoding());
-            files.add(command.getContent());
 
             int currentFileId = fileId.getAndIncrement();
+
+            byte[] byteArray = command.getContent();
+            File file = new File(currentFileId + "");
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(byteArray);
+            fos.flush();
+            fos.close();
 
             Success success = new Success();
             success.setId(currentFileId);
@@ -292,7 +297,7 @@ class ServerThread extends Thread {
             event.setId(currentFileId);
             event.setFrom(username);
             event.setName(fileNames.get(currentFileId));
-            event.setSize((long) files.get(currentFileId).length);
+            event.setSize(file.length());
             event.setMimeType(mimeTypes.get(currentFileId));
             serverSender.sendToAll(xmlParser.parseToXML(event), username);
 
@@ -315,7 +320,13 @@ class ServerThread extends Thread {
             success.setName(fileNames.get(requiredFileId));
             success.setMimeType(mimeTypes.get(requiredFileId));
             success.setEncoding(encodings.get(requiredFileId));
-            success.setContent(files.get(requiredFileId));
+
+            File file = new File(requiredFileId + "");
+            FileInputStream fis = new FileInputStream(file);
+            byte[] bytes = new byte[(int) file.length()];
+            fis.read(bytes);
+            success.setContent(bytes);
+            fis.close();
 
             fileExchanger.sendFile(out, xmlParser.parseToXML(success));
 

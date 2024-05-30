@@ -3,6 +3,7 @@ package ru.nsu.votintsev.server;
 import ru.nsu.votintsev.FileExchanger;
 import ru.nsu.votintsev.XMLParser;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -11,6 +12,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ServerMain {
+
+    private static final List<String> fileNames = new ArrayList<>();
 
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
@@ -30,10 +33,8 @@ public class ServerMain {
 
         AtomicInteger fileId = new AtomicInteger(0);
 
-        List<String> fileNames = new ArrayList<>();
         List<String> mimeTypes = new ArrayList<>();
         List<String> encodings = new ArrayList<>();
-        List<byte[]> files = new ArrayList<>();
 
         System.out.println("Port to connect: " + port);
         try (ServerSocket serverSocket = new ServerSocket(port)) {
@@ -48,13 +49,16 @@ public class ServerMain {
                     Socket clientSocket = serverSocket.accept();
                     serverThread = new ServerThread(clientSocket, fileExchanger, xmlParser, serverSender, usersDataBase, connectedUsers, lastMessages, logFileWriter, fileId);
                     serverThreads.add(serverThread);
-                    serverThread.setListsForFiles(fileNames, mimeTypes, encodings, files);
+                    serverThread.setListsForFiles(fileNames, mimeTypes, encodings);
                     serverThread.start();
                 } catch (IOException e) {
                     serverThread.interrupt();
                 }
             }
         } catch (IOException e) {
+
+            deleteFiles();
+
             try {
                 assert logFileWriter != null;
                 logFileWriter.append("Server crashed ").append(e.getMessage()).append("\n");
@@ -64,6 +68,13 @@ public class ServerMain {
                 throw new RuntimeException(e);
             }
             throw new RuntimeException(e);
+        }
+    }
+
+    private static void deleteFiles() {
+        for (int i = 0; i < fileNames.size(); i++) {
+            File file = new File(i + "");
+            file.delete();
         }
     }
 }
