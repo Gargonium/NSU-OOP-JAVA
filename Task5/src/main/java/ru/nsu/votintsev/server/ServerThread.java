@@ -8,6 +8,7 @@ import ru.nsu.votintsev.xmlclasses.*;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -37,6 +38,8 @@ class ServerThread extends Thread {
     private List<String> mimeTypes;
     private List<String> encodings;
     private List<byte[]> files;
+
+    private final List<String> mutedUsers = new ArrayList<>();
 
     public ServerThread(Socket clientSocket, FileExchanger fileExchanger, XMLParser xmlParser, ServerSender serverSender, Map<String, Integer> usersDataBase, List<String> connectedUsers, Queue<String> lastMessages, FileWriter logFileWriter, AtomicInteger fileId) throws IOException {
         this.clientSocket = clientSocket;
@@ -76,6 +79,8 @@ class ServerThread extends Thread {
                         case "logout" -> logoutCommand();
                         case "download" -> downloadCommand(command);
                         case "upload" -> uploadCommand(command);
+                        case "mute" -> muteUser(command);
+                        case "unmute" -> unmuteUser(command);
                     }
                 } catch (JAXBException e) {
                     System.out.println(e.getMessage());
@@ -92,6 +97,49 @@ class ServerThread extends Thread {
                     throw new RuntimeException(ex);
                 }
             }
+        }
+    }
+
+    public DataOutputStream getClientOutputStream() {
+        return out;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public List<String> getMutedUsers() {
+        return mutedUsers;
+    }
+
+    private void unmuteUser(Command command) throws JAXBException, IOException {
+        try {
+            String target = command.getName();
+
+
+            if (!mutedUsers.remove(target)) {
+                errorSend("User already unmute");
+                return;
+            }
+            successSendEmpty();
+        }
+        catch (Exception e) {
+            errorSend(e.getMessage());
+        }
+    }
+
+    private void muteUser(Command command) throws JAXBException, IOException {
+        try {
+            String target = command.getName();
+            if (mutedUsers.contains(target)) {
+                errorSend("User already mute");
+                return;
+            }
+            mutedUsers.add(target);
+            successSendEmpty();
+        }
+        catch (Exception e) {
+            errorSend(e.getMessage());
         }
     }
 
@@ -133,7 +181,7 @@ class ServerThread extends Thread {
         Event event = new Event();
         event.setEvent("userlogin");
         event.setName(username);
-        serverSender.sendToAll(xmlParser.parseToXML(event));
+        serverSender.sendToAll(xmlParser.parseToXML(event), username);
     }
 
     private void listCommand() throws JAXBException, IOException {
@@ -141,8 +189,11 @@ class ServerThread extends Thread {
             List<User> userList = connectedUsers.stream().map(name -> {
                 User user = new User();
                 user.setName(name);
+                user.setMute(mutedUsers.contains(name));
                 return user;
             }).toList();
+
+
 
             logFileWriter.append("List of users for ").append(username).append("\n");
             logFileWriter.flush();
@@ -171,7 +222,7 @@ class ServerThread extends Thread {
             event.setMessage(message);
             event.setFrom(username);
 
-            serverSender.sendToAll(xmlParser.parseToXML(event));
+            serverSender.sendToAll(xmlParser.parseToXML(event), username);
         } catch (IOException | JAXBException e) {
             logFileWriter.append("Error in giving message ").append(e.getMessage()).append("\n");
             logFileWriter.flush();
@@ -197,7 +248,7 @@ class ServerThread extends Thread {
         event.setName(username);
         logFileWriter.append("User logout: ").append(username).append("\n");
         logFileWriter.flush();
-        serverSender.sendToAll(xmlParser.parseToXML(event));
+        serverSender.sendToAll(xmlParser.parseToXML(event), username);
         successSendEmpty();
         connectedUsers.remove(username);
         Thread.currentThread().interrupt();
@@ -241,9 +292,9 @@ class ServerThread extends Thread {
             event.setId(currentFileId);
             event.setFrom(username);
             event.setName(fileNames.get(currentFileId));
-            event.setSize(files.get(currentFileId).length);
+            event.setSize((long) files.get(currentFileId).length);
             event.setMimeType(mimeTypes.get(currentFileId));
-            serverSender.sendToAll(xmlParser.parseToXML(event));
+            serverSender.sendToAll(xmlParser.parseToXML(event), username);
 
             logFileWriter.append("Received file: ").append(fileNames.get(currentFileId)).append("\n");
             logFileWriter.flush();

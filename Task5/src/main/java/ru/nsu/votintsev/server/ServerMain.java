@@ -15,12 +15,12 @@ public class ServerMain {
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
 
-        List<Socket> clientSockets = new ArrayList<>();
+        List<ServerThread> serverThreads = new ArrayList<>();
         Queue<String> lastMessages = new LinkedList<>();
 
         FileExchanger fileExchanger = new FileExchanger();
         XMLParser xmlParser = new XMLParser();
-        ServerSender serverSender = new ServerSender(clientSockets, fileExchanger, lastMessages);
+        ServerSender serverSender = new ServerSender(serverThreads, fileExchanger, lastMessages);
 
         Map<String, Integer> usersDataBase = new HashMap<>();
 
@@ -46,8 +46,8 @@ public class ServerMain {
                 ServerThread serverThread = null;
                 try {
                     Socket clientSocket = serverSocket.accept();
-                    clientSockets.add(clientSocket);
                     serverThread = new ServerThread(clientSocket, fileExchanger, xmlParser, serverSender, usersDataBase, connectedUsers, lastMessages, logFileWriter, fileId);
+                    serverThreads.add(serverThread);
                     serverThread.setListsForFiles(fileNames, mimeTypes, encodings, files);
                     serverThread.start();
                 } catch (IOException e) {

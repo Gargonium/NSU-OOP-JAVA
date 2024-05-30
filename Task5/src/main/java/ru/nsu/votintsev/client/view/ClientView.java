@@ -4,7 +4,6 @@ import jakarta.xml.bind.JAXBException;
 import org.pushingpixels.substance.api.skin.SubstanceGraphiteAquaLookAndFeel;
 import ru.nsu.votintsev.client.ClientController;
 import ru.nsu.votintsev.client.Observer;
-import ru.nsu.votintsev.xmlclasses.User;
 import ru.nsu.votintsev.xmlclasses.Users;
 
 import javax.swing.*;
@@ -105,12 +104,7 @@ public class ClientView extends JFrame implements Observer {
     }
 
     private void displayUserList() {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (User user : userList.getUsers()) {
-            stringBuilder.append(user.getName()).append("\n");
-        }
-        JOptionPane.showMessageDialog(ClientView.this,
-                stringBuilder.toString(), "Users", JOptionPane.INFORMATION_MESSAGE);
+        SwingUtilities.invokeLater(() -> new UserListFrame(userList, viewController));
     }
 
     private void displayMessages(Map<String, MessageType> messages) {

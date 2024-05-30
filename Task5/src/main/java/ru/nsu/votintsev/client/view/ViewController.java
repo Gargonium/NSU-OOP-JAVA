@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
 
 public class ViewController implements ActionListener {
     private final JTextField usernameField;
@@ -32,6 +34,8 @@ public class ViewController implements ActionListener {
 
     private boolean isAuthenticated = false;
     private boolean needToDispose = false;
+
+    private List<JButton> muteButtons;
 
     public ViewController(JTextField usernameField, JPasswordField passwordField, JButton loginButton, JButton sendFileButton, JButton sendButton, JButton userListButton, JTextField messageField) {
         this.usernameField = usernameField;
@@ -79,6 +83,10 @@ public class ViewController implements ActionListener {
         loginButton.addActionListener(this);
     }
 
+    public void setMuteButtons(List<JButton> muteButtons) {
+        this.muteButtons = muteButtons;
+    }
+
     public void setView(ClientView clientView) {
         this.clientView = clientView;
         clientView.addWindowListener(new WindowAdapter() {
@@ -113,6 +121,9 @@ public class ViewController implements ActionListener {
                 sendMessage();
             else if (e.getSource() == userListButton)
                 requestUserList();
+            else if (muteButtons.contains(e.getSource())) {
+                muteButtonPushed(muteButtons.indexOf(e.getSource()));
+            }
         }
         catch (JAXBException | IOException ex) {
             throw new RuntimeException(ex);
@@ -172,5 +183,17 @@ public class ViewController implements ActionListener {
 
     public void requestFile(Integer id) throws JAXBException, IOException {
         clientSender.sendDownloadCommand(id);
+    }
+
+    private void muteButtonPushed(int index) throws JAXBException, IOException {
+        JButton button = muteButtons.get(index);
+        if (Objects.equals(button.getText(), "Unmute")) {
+            clientSender.sendUnmuteCommand(button.getName());
+            button.setText("Mute");
+        }
+        else {
+            clientSender.sendMuteCommand(button.getName());
+            button.setText("Unmute");
+        }
     }
 }

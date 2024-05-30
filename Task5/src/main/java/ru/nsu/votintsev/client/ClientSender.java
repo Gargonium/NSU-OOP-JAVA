@@ -63,4 +63,18 @@ public class ClientSender {
         command.setId(id);
         fileExchanger.sendFile(outputStream, xmlParser.parseToXML(command));
     }
+
+    public void sendUnmuteCommand(String target) throws JAXBException, IOException {
+        Command command = new Command();
+        command.setCommand("unmute");
+        command.setName(target);
+        fileExchanger.sendFile(outputStream, xmlParser.parseToXML(command));
+    }
+
+    public void sendMuteCommand(String target) throws JAXBException, IOException {
+        Command command = new Command();
+        command.setCommand("mute");
+        command.setName(target);
+        fileExchanger.sendFile(outputStream, xmlParser.parseToXML(command));
+    }
 }

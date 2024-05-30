@@ -13,7 +13,7 @@ public non-sealed class Event extends ClientClasses {
     private String name;
 
     private Integer id;
-    private long size;
+    private Long size;
     private String mimeType;
 
     public String getEvent() {
@@ -61,12 +61,12 @@ public non-sealed class Event extends ClientClasses {
         this.id = id;
     }
 
-    public long getSize() {
+    public Long getSize() {
         return size;
     }
 
     @XmlElement(name="size")
-    public void setSize(long size) {
+    public void setSize(Long size) {
         this.size = size;
     }
 
