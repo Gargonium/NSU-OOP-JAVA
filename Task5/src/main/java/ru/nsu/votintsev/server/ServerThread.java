@@ -67,33 +67,35 @@ class ServerThread extends Thread {
     public void run() {
         try {
             while (!clientSocket.isClosed()) {
-                try {
-                    String xmlString = fileExchanger.receiveFile(in);
-                    Command command = (Command) xmlParser.parseFromXML(Command.class, xmlString);
-                    switch (command.getCommand()) {
-                        case "login" -> loginCommand(command);
-                        case "list" -> listCommand();
-                        case "message" -> messageCommand(command);
-                        case "logout" -> logoutCommand();
-                        case "download" -> downloadCommand(command);
-                        case "upload" -> uploadCommand(command);
-                        case "mute" -> muteUser(command);
-                        case "unmute" -> unmuteUser(command);
-                    }
-                } catch (JAXBException e) {
-                    System.out.println(e.getMessage());
+                String xmlString = fileExchanger.receiveFile(in);
+                Command command = (Command) xmlParser.parseFromXML(Command.class, xmlString);
+                switch (command.getCommand()) {
+                    case "login" -> loginCommand(command);
+                    case "list" -> listCommand();
+                    case "message" -> messageCommand(command);
+                    case "logout" -> logoutCommand();
+                    case "download" -> downloadCommand(command);
+                    case "upload" -> uploadCommand(command);
+                    case "mute" -> muteUser(command);
+                    case "unmute" -> unmuteUser(command);
                 }
             }
-        } catch (IOException e) {
-            connectedUsers.remove(username);
+        }
+        catch (EOFException e) {
+            System.out.println("Client disconnect");
+        }
+        catch (IOException | JAXBException e) {
             System.out.println(e.getMessage());
-            try { logFileWriter.append("Server Thread got Error ").append(e.getMessage()).append("\n"); logFileWriter.flush(); } catch (IOException ex) { throw new RuntimeException(ex); }
-
-            if (!clientSocket.isClosed()) {
+        }
+        finally {
+            if (username != null) {
+                connectedUsers.remove(username);
+                username = null;
                 try {
                     clientSocket.close();
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                } catch (IOException e) {
+                    System.out.println("Error closing client connection");
+                    try { logFileWriter.append("Server Thread got Error ").append(e.getMessage()).append("\n"); logFileWriter.flush(); } catch (IOException ex) { throw new RuntimeException(ex); }
                 }
             }
         }
@@ -101,10 +103,6 @@ class ServerThread extends Thread {
 
     public DataOutputStream getClientOutputStream() {
         return out;
-    }
-
-    public String getUsername() {
-        return username;
     }
 
     public List<String> getMutedUsers() {

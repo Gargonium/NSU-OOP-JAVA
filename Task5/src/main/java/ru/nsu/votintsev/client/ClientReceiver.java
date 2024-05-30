@@ -22,6 +22,7 @@ public class ClientReceiver implements Runnable, Observable {
 
     private final ClientClasses clientClasses = new ClientClasses();
     private Observer observer;
+    private Client client;
 
     private final Map<String, MessageType> messageBuffer = new HashMap<>();
     private Users users;
@@ -34,16 +35,17 @@ public class ClientReceiver implements Runnable, Observable {
     private String fileName;
     private long fileSize;
 
-    public ClientReceiver(Socket socket, XMLParser xmlParser, FileExchanger fileExchanger) throws IOException {
+    public ClientReceiver(Socket socket, XMLParser xmlParser, FileExchanger fileExchanger, DataInputStream inputStream) throws IOException {
         this.socket = socket;
         this.xmlParser = xmlParser;
         this.fileExchanger = fileExchanger;
-        inputStream = new DataInputStream(socket.getInputStream());
+        this.inputStream = inputStream;
     }
 
     @Override
     public void run() {
         while (!socket.isClosed()) {
+            System.out.println("CS " + socket.isClosed());
             try {
                 String xmlString = fileExchanger.receiveFile(inputStream);
                 switch (clientClasses.parseFromXML(xmlParser, xmlString)) {
@@ -74,13 +76,8 @@ public class ClientReceiver implements Runnable, Observable {
                     default -> System.out.println("Unknown xmlBlock");
                 }
             } catch (IOException e) {
-                if (Objects.equals(e.getMessage(), "Connection reset") || Objects.equals(e.getMessage(), "Socket is closed")) {
-                    System.exit(1);
-                }
-                else {
-                    System.out.println(e.getMessage());
-                    System.exit(1);
-                }
+                System.out.println("CS " + socket.isClosed());
+                client.disconnect();
             }
         }
     }
@@ -158,5 +155,9 @@ public class ClientReceiver implements Runnable, Observable {
 
     public long getFileSize() {
         return fileSize;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
     }
 }

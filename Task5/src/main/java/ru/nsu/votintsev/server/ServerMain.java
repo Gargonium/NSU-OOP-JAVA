@@ -44,15 +44,15 @@ public class ServerMain {
             logFileWriter.flush();
 
             while (true) {
-                ServerThread serverThread = null;
                 try {
                     Socket clientSocket = serverSocket.accept();
-                    serverThread = new ServerThread(clientSocket, fileExchanger, xmlParser, serverSender, usersDataBase, connectedUsers, lastMessages, logFileWriter, fileId);
+                    ServerThread serverThread = new ServerThread(clientSocket, fileExchanger, xmlParser, serverSender, usersDataBase, connectedUsers, lastMessages, logFileWriter, fileId);
                     serverThreads.add(serverThread);
                     serverThread.setListsForFiles(fileNames, mimeTypes, encodings);
                     serverThread.start();
-                } catch (IOException e) {
-                    serverThread.interrupt();
+                }
+                catch (IOException e) {
+                    System.out.println("Error accepting client connection");
                 }
             }
         } catch (IOException e) {

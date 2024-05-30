@@ -12,7 +12,7 @@ public class User {
         return name;
     }
 
-    @XmlElement(name = "name")
+    @XmlElement(name="name")
     public void setName(String name) {
         this.name = name;
     }

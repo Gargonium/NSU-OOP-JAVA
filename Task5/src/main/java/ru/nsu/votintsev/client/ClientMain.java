@@ -7,8 +7,11 @@ import java.io.IOException;
 
 public class ClientMain {
 
-    private final static String host = "localhost";
-    private final static int port = 8886;
+//    private final static String host = "localhost";
+//    private final static int port = 8886;
+
+    private final static String host = "192.168.31.192";
+    private final static int port = 8080;
 
     public static void main() {
         try {

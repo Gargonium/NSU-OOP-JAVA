@@ -14,10 +14,10 @@ public class ClientSender {
     private final FileExchanger fileExchanger;
     private final DataOutputStream outputStream;
 
-    public ClientSender(Socket socket, XMLParser xmlParser, FileExchanger fileExchanger) throws IOException {
+    public ClientSender(XMLParser xmlParser, FileExchanger fileExchanger, DataOutputStream outputStream) {
         this.xmlParser = xmlParser;
         this.fileExchanger = fileExchanger;
-        outputStream = new DataOutputStream(socket.getOutputStream());
+        this.outputStream = outputStream;
     }
 
     public void sendLoginCommand(String username, String password) throws JAXBException, IOException {
