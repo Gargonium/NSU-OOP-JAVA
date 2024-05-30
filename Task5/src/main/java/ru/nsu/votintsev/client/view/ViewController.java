@@ -46,6 +46,8 @@ public class ViewController implements ActionListener {
 
     private List<JButton> muteButtons;
 
+    private UserListFrame userListFrame;
+
     public ViewController(JTextField usernameField, JPasswordField passwordField, JButton loginButton, JButton sendFileButton, JButton sendButton, JButton userListButton, JTextField messageField, JTextField ipField, JTextField portField, JButton connectButton, Client client) {
         this.usernameField = usernameField;
         this.passwordField = passwordField;
@@ -229,11 +231,15 @@ public class ViewController implements ActionListener {
         JButton button = muteButtons.get(index);
         if (Objects.equals(button.getText(), "Unmute")) {
             clientSender.sendUnmuteCommand(button.getName());
-            button.setText("Mute");
         }
         else {
             clientSender.sendMuteCommand(button.getName());
-            button.setText("Unmute");
         }
+        userListFrame.dispose();
+        requestUserList();
+    }
+
+    public void setUserListFrame(UserListFrame userListFrame) {
+        this.userListFrame = userListFrame;
     }
 }

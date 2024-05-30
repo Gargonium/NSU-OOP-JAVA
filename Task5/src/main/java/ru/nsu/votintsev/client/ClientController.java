@@ -4,13 +4,15 @@ import ru.nsu.votintsev.client.view.MessageType;
 import ru.nsu.votintsev.client.view.ViewEvents;
 import ru.nsu.votintsev.xmlclasses.Users;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class ClientController implements Observer, Observable {
 
     private ClientReceiver clientReceiver;
     private ClientSender clientSender;
-    private Observer observer;
+    private final List<Observer> observerList = new ArrayList<>();
 
     @Override
     public void update(ViewEvents change) {
@@ -39,12 +41,14 @@ public class ClientController implements Observer, Observable {
 
     @Override
     public void addObserver(Observer observer) {
-        this.observer = observer;
+        observerList.add(observer);
     }
 
     @Override
     public void notifyObservers(ViewEvents change) {
-        observer.update(change);
+        for (Observer observer : observerList) {
+            observer.update(change);
+        }
     }
 
     public byte[] getFile() {
