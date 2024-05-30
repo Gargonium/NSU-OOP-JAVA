@@ -6,8 +6,7 @@ import javax.swing.*;
 import java.io.IOException;
 
 public class ClientMain {
-
-    public static void main() {
+    public static void main(String[] args) {
         try {
             ClientController clientController = new ClientController();
             Client client = new Client(clientController);

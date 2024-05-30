@@ -67,7 +67,7 @@ class ServerThread extends Thread {
     @Override
     public void run() {
         try {
-            while (true) {
+            while (!clientSocket.isClosed()) {
                 String xmlString = fileExchanger.receiveFile(in);
                 Command command = (Command) xmlParser.parseFromXML(Command.class, xmlString);
                 switch (command.getCommand()) {

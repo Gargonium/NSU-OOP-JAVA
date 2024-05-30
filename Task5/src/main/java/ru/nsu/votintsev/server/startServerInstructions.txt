@@ -1,0 +1,2 @@
+mvn clean package
+java -cp .\target\Task5-1.0-SNAPSHOT.jar ru.nsu.votintsev.server.ServerMain 8000
